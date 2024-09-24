@@ -1,11 +1,22 @@
+"""
+================================================================    
+Title: Book Worm Den
+Author: Fabricio Ribeiro
+Date: September 17, 2024
+
+================================================================
+"""
+
 import os
 from flask import Flask, request, render_template, redirect, flash
 from flask_debugtoolbar import DebugToolbarExtension
 from dotenv import load_dotenv
 from models import connect_db
 
+# Load environmental variables file
 load_dotenv()
 
+# Import Environmental Variables
 db_user = os.environ.get("DB_USER")
 db_pass = os.environ.get("DB_PASSWORD")
 db_host = os.environ.get("DB_HOST")
@@ -14,6 +25,7 @@ production_db = os.environ.get("DB_URI") # If local database should have the for
 testrun = os.environ.get("TESTRUN") # True or False
 secret_code = os.environ.get("SECRETE_KEY")
 
+# Setup Flask app
 app = Flask(__name__)
 app.config["SECRET_KEY"] = secret_code
 app.config["DEBUG_TB_INTERCEPT_REDIRECTS"] = True
@@ -31,7 +43,18 @@ if __name__ == "__main__":
     app.app_context().push()
 
 
+"""
+View functions
+"""
+
+
 @app.route("/")
 def homepage():
+    """View Function for the portal homepage.
 
+    Actions:
+    
+    Returns:
+        Render Homepage template file
+    """
     return render_template("homepage.html")
