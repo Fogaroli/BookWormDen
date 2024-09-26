@@ -8,7 +8,7 @@ Date: September 17, 2024
 """
 
 import os
-from flask import Flask, request, render_template, redirect, flash
+from flask import Flask, render_template
 from flask_debugtoolbar import DebugToolbarExtension
 from dotenv import load_dotenv
 from models import connect_db
@@ -17,10 +17,6 @@ from models import connect_db
 load_dotenv()
 
 # Import Environmental Variables
-db_user = os.environ.get("DB_USER")
-db_pass = os.environ.get("DB_PASSWORD")
-db_host = os.environ.get("DB_HOST")
-db_port = os.environ.get("DB_PORT")
 production_db = os.environ.get("DB_URI") # If local database should have the format: "postgresql:///<dbname>"
 testrun = os.environ.get("TESTRUN") # True or False
 secret_code = os.environ.get("SECRETE_KEY")

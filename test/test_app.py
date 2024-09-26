@@ -1,14 +1,11 @@
-# run these tests like:
-#
-#    python -m unittest test_app.py
-
 import os
+import sys
 from unittest import TestCase
-from datetime import datetime, timezone, timedelta
-from dotenv import load_dotenv
-from models import connect_db
 
-load_dotenv()
+# Setup relative path in order to import the flask application modules:
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
+
+from models import connect_db
 
 # BEFORE we import our app, let's set an environmental variable
 # to identify it is a test run. It will prevent connecting to 
@@ -20,7 +17,10 @@ os.environ["TESTRUN"] = True
 # Now we can import app
 from app import app
 
+
+
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("TEST_DB_URI")
+app.config["SQLALCHEMY_ECHO"] = False
 connect_db(app)
 
 
