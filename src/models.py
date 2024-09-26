@@ -28,6 +28,9 @@ class User(db.Model):
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(100), nullable=False, unique=True)
+    image_url = db.Column(db.Text)
+    bio = db.Column(db.Text)
+    location = db.Column(db.String(30))
 
     @classmethod
     def signup(cls, username, password, first_name, last_name, email):
