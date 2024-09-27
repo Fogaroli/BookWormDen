@@ -3,7 +3,7 @@ import sys
 from unittest import TestCase
 
 # Setup relative path in order to import the flask application modules:
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
 
 from models import db, connect_db, User
 
@@ -40,10 +40,34 @@ class UserModelTestCase(TestCase):
         db.drop_all()
         db.create_all()
 
-        self.u1 = User(email="test1@test.com", username="testuser1", password="HASHED_PASSWORD", first_name="Test User", last_name="Number 1")
-        self.u2 = User(email="test2@test.com", username="testuser2", password="HASHED_PASSWORD", first_name="Tester", last_name="Number 2")
-        self.u3 = User(email="test3@test.com", username="testuser3", password="HASHED_PASSWORD", first_name="Testing", last_name="User 3")
-        self.u4 = User(email="test4@test.com", username="testuser4", password="HASHED_PASSWORD", first_name="Test User", last_name="Number 4")
+        self.u1 = User(
+            email="test1@test.com",
+            username="testuser1",
+            password="HASHED_PASSWORD",
+            first_name="Test User",
+            last_name="Number 1",
+        )
+        self.u2 = User(
+            email="test2@test.com",
+            username="testuser2",
+            password="HASHED_PASSWORD",
+            first_name="Tester",
+            last_name="Number 2",
+        )
+        self.u3 = User(
+            email="test3@test.com",
+            username="testuser3",
+            password="HASHED_PASSWORD",
+            first_name="Testing",
+            last_name="User 3",
+        )
+        self.u4 = User(
+            email="test4@test.com",
+            username="testuser4",
+            password="HASHED_PASSWORD",
+            first_name="Test User",
+            last_name="Number 4",
+        )
 
     def tearDown(self):
         """

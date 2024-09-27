@@ -1,7 +1,8 @@
 """
-File used to enter basic data into the database    
+File used to enter basic data into the database
 
 """
+
 from app import app
 from models import db, User
 
@@ -28,6 +29,5 @@ user2 = User(
 
 
 with app.app_context():
-
     db.session.add_all([user1, user2])
     db.session.commit()

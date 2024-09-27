@@ -1,4 +1,3 @@
-
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
 
@@ -7,12 +6,13 @@ db = SQLAlchemy()
 
 
 def connect_db(app):
-    """Function to connect flask app to the database.
-    """
+    """Function to connect flask app to the database."""
     db.app = app
     db.init_app(app)
 
+
 # Database model will go here.
+
 
 class User(db.Model):
     """User account database model
@@ -20,6 +20,7 @@ class User(db.Model):
     actions:
         Create database structure to store User Accounts.
     """
+
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -34,9 +35,14 @@ class User(db.Model):
 
     @classmethod
     def signup(cls, username, password, first_name, last_name, email):
-        """Class method to create new users in the database
-        """
-        new_user = User(username=username, password=password, first_name=first_name, last_name=last_name, email=email)
+        """Class method to create new users in the database"""
+        new_user = User(
+            username=username,
+            password=password,
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+        )
         db.session.add(new_user)
         db.session.commit
         return new_user

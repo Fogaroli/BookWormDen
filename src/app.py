@@ -1,5 +1,5 @@
 """
-================================================================    
+================================================================
 Title: Book Worm Den
 Author: Fabricio Ribeiro
 Date: September 17, 2024
@@ -17,8 +17,10 @@ from models import connect_db
 load_dotenv()
 
 # Import Environmental Variables
-production_db = os.environ.get("DB_URI") # If local database should have the format: "postgresql:///<dbname>"
-testrun = os.environ.get("TESTRUN") # True or False
+production_db = os.environ.get(
+    "DB_URI"
+)  # If local database should have the format: "postgresql:///<dbname>"
+testrun = os.environ.get("TESTRUN")  # True or False
 secret_code = os.environ.get("SECRETE_KEY")
 
 # Setup Flask app
@@ -49,7 +51,7 @@ def homepage():
     """View Function for the portal homepage.
 
     Actions:
-    
+
     Returns:
         Render Homepage template file
     """
