@@ -62,6 +62,10 @@ def login(user):
     session["CURRENT_USER"] = user.id
 
 
+def logout():
+    session.pop("CURRENT_USER")
+
+
 @app.route("/")
 def homepage():
     """View Function for the portal homepage.
@@ -108,3 +112,11 @@ def login_view():
         else:
             flash("User and/or password invalid, please try again", "danger")
     return render_template("user_login.html", form=login_form)
+
+
+@app.route("/logout", methods=["POST"])
+def logout_view():
+    """View function for user login"""
+    if g.user:
+        logout()
+    return redirect("/")
