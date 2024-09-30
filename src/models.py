@@ -34,15 +34,19 @@ class User(db.Model):
     location = db.Column(db.String(30))
 
     @classmethod
-    def signup(cls, username, password, first_name, last_name, email):
+    def signup(cls, data):
         """Class method to create new users in the database"""
-        new_user = User(
-            username=username,
-            password=password,
-            first_name=first_name,
-            last_name=last_name,
-            email=email,
-        )
-        db.session.add(new_user)
-        db.session.commit
-        return new_user
+        try:
+            new_user = User(
+                username=data["username"],
+                password=["password"],
+                email=data["email"],
+                first_name=data["first_name"],
+                last_name=data["last_name"],
+            )
+            db.session.add(new_user)
+            db.session.commit()
+            return new_user
+        except:
+            db.session.rollback()
+            return False
