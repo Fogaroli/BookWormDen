@@ -37,9 +37,12 @@ class User(db.Model):
     def signup(cls, data):
         """Class method to create new users in the database"""
         try:
+            hashed_password = bcrypt.generate_password_hash(data["password"]).decode(
+                "utf8"
+            )
             new_user = User(
                 username=data["username"],
-                password=["password"],
+                password=hashed_password,
                 email=data["email"],
                 first_name=data["first_name"],
                 last_name=data["last_name"],
