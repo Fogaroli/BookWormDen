@@ -32,6 +32,23 @@
                     class="collapse navbar-collapse justify-content-end"
                     id="myLinks">
                     <ul class="navbar-nav">
+                        {%if g.user%}
+
+                        <li class="nav-link">{{g.user.username}}</li>
+
+                        <li class="nav-item">
+                        <form action="/logout" method="POST">
+                            <button
+                                type="submit"
+                                class="nav-link"
+                                title="Log-out">
+                                <i
+                                    class="fa-solid fa-right-from-bracket"></i>
+                            </button>
+                        </form>
+                        </li>
+
+                        {%else%}
                         <li class="nav-item">
                             <a href="/register" class="nav-link">Sign-Up</a>
                         </li>
@@ -40,6 +57,9 @@
                                 ><i class="fa-solid fa-right-to-bracket"></i
                             ></a>
                         </li>
+
+
+                        {%endif%}
                     </ul>
                 </div>
             </div>

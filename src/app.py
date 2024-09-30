@@ -8,10 +8,10 @@ Date: September 17, 2024
 """
 
 import os
-from flask import Flask, flash, render_template, redirect, session
+from flask import Flask, flash, render_template, redirect, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from dotenv import load_dotenv
-from models import connect_db, User
+from models import db, connect_db, User
 from forms import UserAddForm, LoginForm
 
 # Load environmental variables file
@@ -47,6 +47,17 @@ View functions
 """
 
 
+@app.before_request
+def load_user():
+    """If user login id found in session, load current user to Flask global."""
+
+    if "CURRENT_USER" in session:
+        g.user = db.session.get(User, session["CURRENT_USER"])
+
+    else:
+        g.user = None
+
+
 def login(user):
     session["CURRENT_USER"] = user.id
 
@@ -64,17 +75,36 @@ def homepage():
 
 
 @app.route("/register", methods=["GET", "POST"])
-def register():
+def registration_view():
     """View function for new user registration"""
 
     registration_form = UserAddForm()
     if registration_form.validate_on_submit():
         new_user = User.signup(registration_form.data)
         if new_user:
-            flash(f"Welcome {new_user.username} to the BookWormDen", "success")
+            flash(f"Welcome {new_user.first_name} to the BookWormDen", "success")
             login(new_user)
             return redirect("/")
         else:
             flash(f"Error creating new user, please try again", "danger")
-    else:
-        return render_template("user_signup.html", form=registration_form)
+
+    return render_template("user_signup.html", form=registration_form)
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login_view():
+    """View function for user login"""
+    login_form = LoginForm()
+    if login_form.validate_on_submit():
+        user_attempt = (
+            db.session.query(User)
+            .filter(User.username == login_form.data["username"])
+            .first()
+        )
+        if user_attempt and user_attempt.validate_user(login_form.data["password"]):
+            login(user_attempt)
+            flash(f"Welcome back {user_attempt.first_name}", "success")
+            return redirect("/")
+        else:
+            flash("User and/or password invalid, please try again", "danger")
+    return render_template("user_login.html", form=login_form)

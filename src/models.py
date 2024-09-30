@@ -33,6 +33,9 @@ class User(db.Model):
     bio = db.Column(db.Text)
     location = db.Column(db.String(30))
 
+    def validate_user(self, password):
+        return self if bcrypt.check_password_hash(self.password, password) else False
+
     @classmethod
     def signup(cls, data):
         """Class method to create new users in the database"""
