@@ -117,3 +117,14 @@ class UserViewTestCase(TestCase):
 
             with c.session_transaction() as sess:
                 self.assertIsNone(sess.get("CURRENT_USER"))
+
+    def test_user_page(self):
+        """Test user home route."""
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess["CURRENT_USER"] = self.u1.id
+
+            resp = c.get("/user")
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn(self.u1.first_name, str(resp.data))
+            self.assertIn("This page is not visible by any other user", str(resp.data))
