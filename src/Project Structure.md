@@ -18,7 +18,7 @@ This document describes the project structure and steps to be followed in order 
 1. ~~Create base Flask structure and HTML templates using local database.~~
 1. ~~Created database models for user accounts.~~
 1. ~~Create registration/login functionality, with active sessions saved on Flask Sessions.~~
-1. Integrate supabase database and deploy dev branch to render
+1. ~~Integrate supabase database and deploy dev branch to render~~
 1. Create Book search API engine (Implemented on the frontend?)
 1. Create Book Search interface and result management. Should differentiate between signed-in users and anonymous.
 1. Create database model for books information.
