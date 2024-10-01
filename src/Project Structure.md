@@ -13,18 +13,26 @@ This document describes the project structure and steps to be followed in order 
 
 - 
 
-## Project developemnt steps:
+## Project development steps:
 
-1. Create base Flask structure and HTML templates using local database.
-2. Created database models for user accounts.
-3. Create registration/login functionality, with active sessions saved on Flask Sessions.
-4. Create Book search API engine.
-5. Create Book Search interface and result management. Should differentiate between unsigned and signed users.
-6. Create database model for books information.
-7. Create interface to store books in the database.
-8. Create functionality for users to log reading status and statistics (associated database model update/creation).
-9. Create model for book clubs.
-10. Create functionality to create book clubs (Create clubs, add users, add book reading list)
-11. Create book feedback/comments functionality (differentiate private and public comments, update search engine logic to include locally stored feedback).
-12. Create message board within the club.
+1. ~~Create base Flask structure and HTML templates using local database.~~
+1. ~~Created database models for user accounts.~~
+1. ~~Create registration/login functionality, with active sessions saved on Flask Sessions.~~
+1. Integrate supabase database and deploy dev branch to render
+1. Create Book search API engine (Implemented on the frontend?)
+1. Create Book Search interface and result management. Should differentiate between signed-in users and anonymous.
+1. Create database model for books information.
+1. Create interface to store books in the database.
+1. Create functionality for users to log reading status and statistics (associated database model update/creation).
+1. Create model for book clubs.
+1. Create functionality to create book clubs (Create clubs, add users, add book reading list)
+1. Create book feedback/comments functionality (differentiate private and public comments, update search engine logic to include locally stored feedback).
+1. Create RESTful api to handle a message board within the club.
+1. Create message board frontend.
+
+Features to be added.
+- Add passsword reset.
+- Migrate Unittest to use Pytest
+- Add Google user Signin option
+
 <To be Expanded>

@@ -18,16 +18,16 @@ bcrypt = Bcrypt()
 user1 = User(
     username="fabricio",
     password=bcrypt.generate_password_hash("fabricio").decode("utf8"),
-    email="fabricio@me.com",
+    email="fogaroli@gmail.com",
     first_name="Fabricio",
     last_name="Ribeiro",
 )
 
 user2 = User(
-    username="BigWorm",
+    username="mainworm",
     password=bcrypt.generate_password_hash("bigworm").decode("utf8"),
-    email="bfwamr@test.com",
-    first_name="Very Big",
+    email="bfworm@test.com",
+    first_name="Main",
     last_name="Worm",
 )
 
