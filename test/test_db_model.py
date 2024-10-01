@@ -43,30 +43,9 @@ class UserModelTestCase(TestCase):
         self.u1 = User(
             email="test1@test.com",
             username="testuser1",
-            password="HASHED_PASSWORD",
+            password="PassWord1",
             first_name="Test User",
             last_name="Number 1",
-        )
-        self.u2 = User(
-            email="test2@test.com",
-            username="testuser2",
-            password="HASHED_PASSWORD",
-            first_name="Tester",
-            last_name="Number 2",
-        )
-        self.u3 = User(
-            email="test3@test.com",
-            username="testuser3",
-            password="HASHED_PASSWORD",
-            first_name="Testing",
-            last_name="User 3",
-        )
-        self.u4 = User(
-            email="test4@test.com",
-            username="testuser4",
-            password="HASHED_PASSWORD",
-            first_name="Test User",
-            last_name="Number 4",
         )
 
     def tearDown(self):
@@ -91,3 +70,63 @@ class UserModelTestCase(TestCase):
         self.assertEqual(self.u1.image_url, "image_test")
         self.assertEqual(self.u1.bio, "this is a bio")
         self.assertEqual(self.u1.location, "location test")
+
+    def test_user_sign_up(self):
+        """Check if the class method to register a new user is working"""
+
+        new_user = User.signup(
+            {
+                "username": "testuser5",
+                "password": "PassWord5",
+                "email": "test5@test.com",
+                "first_name": "My Name",
+                "last_name": "surname",
+            }
+        )
+
+        self.assertIsNotNone(new_user.id)
+
+        self.assertTrue(new_user)
+        db.session.add(self.u1)
+        db.session.commit()
+
+        new_user2 = User.signup(
+            {
+                "username": "testuser1",
+                "password": "PassWord6",
+                "email": "test6@test.com",
+                "first_name": "My Name 6",
+                "last_name": "surname",
+            }
+        )
+        self.assertFalse(new_user2)
+
+        new_user3 = User.signup(
+            {
+                "username": "testuser7",
+                "password": "PassWord7",
+                "email": "test1@test.com",
+                "first_name": "My Name 7",
+                "last_name": "surname",
+            }
+        )
+        self.assertFalse(new_user3)
+
+    def test_user_authentication(self):
+        """Check if the class method to authentication the user is working as expected"""
+
+        new_user = User.signup(
+            {
+                "username": "testuser5",
+                "password": "PassWord5",
+                "email": "test5@test.com",
+                "first_name": "My Name",
+                "last_name": "surname",
+            }
+        )
+
+        self.assertNotEqual(new_user.password, "PassWord5")
+
+        self.assertTrue(new_user.validate_user("PassWord5"))
+
+        self.assertFalse(new_user.validate_user("PassWord"))
