@@ -34,7 +34,9 @@
                     <ul class="navbar-nav">
                         {%if g.user%}
 
-                        <li class="nav-link">{{g.user.username}}</li>
+                        <li class="nav-item">
+                            <a href="/user" class="nav-link">{{g.user.username}}</a>
+                        </li>
 
                         <li class="nav-item">
                         <form action="/logout" method="POST">

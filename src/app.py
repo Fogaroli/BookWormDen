@@ -8,7 +8,8 @@ Date: September 17, 2024
 """
 
 import os
-from flask import Flask, flash, render_template, redirect, session, g
+from flask import Flask, flash, render_template, redirect, session, g, url_for, request
+from functools import wraps
 from flask_debugtoolbar import DebugToolbarExtension
 from dotenv import load_dotenv
 from models import db, connect_db, User
@@ -47,15 +48,17 @@ View functions
 """
 
 
-@app.before_request
-def load_user():
-    """If user login id found in session, load current user to Flask global."""
+def login_required(f):
+    """Decorator function to control protected views"""
 
-    if "CURRENT_USER" in session:
-        g.user = db.session.get(User, session["CURRENT_USER"])
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if "CURRENT_USER" not in session:
+            flash("Please login first", "danger")
+            return redirect(url_for("login_view", next=request.url))
+        return f(*args, **kwargs)
 
-    else:
-        g.user = None
+    return decorated_function
 
 
 def login(user):
@@ -64,6 +67,17 @@ def login(user):
 
 def logout():
     session.pop("CURRENT_USER")
+
+
+@app.before_request
+def load_user():
+    """If user login id found in session, load current user to Flask global."""
+
+    if "CURRENT_USER" in session:
+        g.user = db.get_or_404(User, session["CURRENT_USER"])
+
+    else:
+        g.user = None
 
 
 @app.route("/")
@@ -108,7 +122,7 @@ def login_view():
         if user_attempt and user_attempt.validate_user(login_form.data["password"]):
             login(user_attempt)
             flash(f"Welcome back {user_attempt.first_name}", "success")
-            return redirect("/")
+            return redirect(url_for("user_page"))
         else:
             flash("User and/or password invalid, please try again", "danger")
     return render_template("user_login.html", form=login_form)
@@ -116,7 +130,14 @@ def login_view():
 
 @app.route("/logout", methods=["POST"])
 def logout_view():
-    """View function for user login"""
+    """View function for user logout"""
     if g.user:
         logout()
     return redirect("/")
+
+
+@app.route("/user")
+@login_required
+def user_page():
+    """View function to open user profile"""
+    return render_template("user_page.html")
