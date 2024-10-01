@@ -4,7 +4,7 @@ from wtforms.validators import DataRequired, Length, Email
 
 
 class UserAddForm(FlaskForm):
-    """Form for adding users."""
+    """Form for user registration."""
 
     first_name = StringField("First name", validators=[DataRequired(), Length(max=50)])
     last_name = StringField("Last name", validators=[DataRequired(), Length(max=50)])

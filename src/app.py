@@ -44,7 +44,7 @@ if __name__ == "__main__":
 
 
 """
-View functions
+Supporting functions
 """
 
 
@@ -62,10 +62,12 @@ def login_required(f):
 
 
 def login(user):
+    """Function to process login, store user information on flask session"""
     session["CURRENT_USER"] = user.id
 
 
 def logout():
+    """Function to process logout, remove user information from flask session"""
     session.pop("CURRENT_USER")
 
 
@@ -78,6 +80,11 @@ def load_user():
 
     else:
         g.user = None
+
+
+"""
+View functions
+"""
 
 
 @app.route("/")
@@ -102,7 +109,7 @@ def registration_view():
         if new_user:
             flash(f"Welcome {new_user.first_name} to the BookWormDen", "success")
             login(new_user)
-            return redirect("/")
+            return redirect(url_for("homepage"))
         else:
             flash(f"Error creating new user, please try again", "danger")
 
@@ -133,11 +140,11 @@ def logout_view():
     """View function for user logout"""
     if g.user:
         logout()
-    return redirect("/")
+    return redirect(url_for("homepage"))
 
 
 @app.route("/user")
 @login_required
 def user_page():
-    """View function to open user profile"""
+    """View function to open user homepage"""
     return render_template("user_page.html")

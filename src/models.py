@@ -34,6 +34,7 @@ class User(db.Model):
     location = db.Column(db.String(30))
 
     def validate_user(self, password):
+        """Function to validate entered password, comparing to stored hashed password"""
         return self if bcrypt.check_password_hash(self.password, password) else False
 
     @classmethod
