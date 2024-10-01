@@ -1,0 +1,36 @@
+{% extends 'base.html' %} {% block title %} The Book Worm Den {% endblock %} {%
+    block body %}
+    
+<div class="container text-center">
+
+    <h1>Log in back to the Den </h1>
+    <p>Enter account username and password.</p>
+    
+    <form method="post" id="login_form">
+        {{form.hidden_tag()}}
+        
+        {% for field in form if field.widget.input_type != 'hidden'%}
+        <div class="mb-3 row text-end">
+            {{field.label(class_="col-sm-4 col-form-label")}}
+            <div class="col-sm-6">
+                {{field(class_="form-control")}} {%for err in field.errors%}
+                <small class="text-danger"> {{err}} </small>
+                {%endfor%}
+            </div>
+        </div>
+        {%endfor%}
+        <div class="float-center">
+            <button
+            id="submit_sigup_btn"
+            type="submit"
+            class="btn btn-secondary">
+            Enter
+        </button>
+    </div>
+</form>
+
+</div>
+
+    
+    {% endblock %}
+    
