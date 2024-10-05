@@ -34,5 +34,6 @@ Features to be added.
 - Add passsword reset.
 - Migrate Unittest to use Pytest
 - Add Google user Signin option
+- Add dropdown for books already in teh database during book search
 
 <To be Expanded>
