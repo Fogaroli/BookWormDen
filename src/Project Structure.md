@@ -11,9 +11,7 @@ This document describes the project structure and steps to be followed in order 
 
 ## Assumptions
 
-- 
-
-## Project development steps:
+## Project development steps
 
 1. ~~Create base Flask structure and HTML templates using local database.~~
 1. ~~Created database models for user accounts.~~
@@ -31,9 +29,10 @@ This document describes the project structure and steps to be followed in order 
 1. Create message board frontend.
 
 Features to be added.
+
 - Add passsword reset.
 - Migrate Unittest to use Pytest
 - Add Google user Signin option
 - Add dropdown for books already in teh database during book search
 
-<To be Expanded>
+TODO > To be Expanded

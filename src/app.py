@@ -131,7 +131,7 @@ def registration_view():
             login(new_user)
             return redirect(url_for("homepage"))
         else:
-            flash(f"Error creating new user, please try again", "danger")
+            flash("Error creating new user, please try again", "danger")
 
     return render_template("user_signup.html", form=registration_form)
 

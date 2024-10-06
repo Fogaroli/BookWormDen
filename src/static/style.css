@@ -5,5 +5,20 @@ h1 {
 }
 
 body {
+    /* background-color: lightgray; */
+}
+
+#book-search-section {
+    position: fixed;
+    top:10%;
+    left: 10%;
+    right: 10%;
+    height:100%;
     background-color: lightgray;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    /* justify-content: center; */
+    align-items: center;
+    display: none;
 }
