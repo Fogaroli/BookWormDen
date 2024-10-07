@@ -193,24 +193,23 @@ def search_books():
     response = requests.get(url=GOOGLE_BOOKS_API_URL, params=params)
     if response.status_code == 200:
         data = response.json()
-        books = {}
+        books = []
         for item in data.get("items", []):
             if item["volumeInfo"]["language"] == "en":
                 id = item.get("id")
-                books[id] = []
                 volume_info = item.get(
                     "volumeInfo", {}
                 )  # volume is the google book term for an item (book, magazine or other content)
-                books[id].append(
-                    {
-                        "title": volume_info.get("title"),
-                        "authors": volume_info.get("authors", []),
-                        "publishedDate": volume_info.get("publishedDate"),
-                        "description": volume_info.get("description"),
-                        "thumbnail": volume_info.get("imageLinks", {}).get("thumbnail"),
-                        "id": volume_info.get("id"),
-                    }
-                )
+                data = {
+                    "title": volume_info.get("title"),
+                    "authors": volume_info.get("authors", []),
+                    "publishedDate": volume_info.get("publishedDate"),
+                    "description": volume_info.get("description"),
+                    "thumbnail": volume_info.get("imageLinks", {}).get("thumbnail"),
+                    "id": volume_info.get("id"),
+                }
+                books.append({"id": id, "data": data})
+
         return jsonify(books)
     else:
         return jsonify(

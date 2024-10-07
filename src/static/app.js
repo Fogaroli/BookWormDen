@@ -12,22 +12,46 @@ const $bookListLoading = $("#book-list-loading-msg")
 const $bookSearchResults = $("#book-search-results")
 const $bookSearchForm = $("#book-search-form")
 const $bookSearchInput = $('#book-search-input')
+const $userPageLink = $('#user-page-link')
 
 
 //================================================================
 //Feature Functions
 
 //function to create book markup
+function addMarkup(book){
+    /**Add html markup to the book entry before adding to the results page */
+    const bookEntry = `
+                <div class="row" id="${book.id}">
+                    <div class="col-2 img-fluid">
+                        <img
+                            src="${book.thumbnail}"
+                        />
+                    </div>
+                    <div class="col-10">
+                        <div class="row">
+                            <div class="col-12 h4">
+                                ${book.title}
+                            </div>
+                            <div class="col-4">${book.authors}</div>
+                            <div class="col-5"></div>
+                            <div class="col-3 text-align-right">${book.publishedDate}</div>
+                            <div class="col-12">
+                                <small>
+                                ${book.description}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-//async function to read data from the backend
-async function getBookList(seachString){
+    `
+    return $("<li>", {class:"list-group-item"}).html(bookEntry)
+}
+    
 
-};
-
-
-
-//function to fill book results
-async function performBookSearch(inputString){
+//function to convert search string to searcheable format.
+function convertSearchString(inputString){
     let searchString = '';
     let inQuotes = false;
     
@@ -41,12 +65,7 @@ async function performBookSearch(inputString){
             searchString += inputString[i];
         }
     }
-    console.log(searchString)
-    try {
-        response = await getBookList(searchString)
-    } catch{
-        
-    }
+    return searchString
 }
 
 //================================================================
@@ -73,9 +92,20 @@ $bookSearchForm.on("submit", (event) =>{
 })
 
 
-//function to update the overlay with book results
+//procedure to update the overlay with book results
 async function updateBookSearch(searchInput){
-    bookList = await performBookSearch(searchInput)
+    const searchString = convertSearchString(searchInput)
+    const bookList = await Book.getBookByTitle(searchString)
+    if (!bookList){
+        $bookSearchResults.append($("<p>", {text:"Error to connect to the search server, please try again."}))
+    }else{
+
+        bookList.forEach((bookVolume)=> {
+            const bookEntry = addMarkup(bookVolume);
+            $bookSearchResults.append(bookEntry)
+        });
+    }
+    $bookListLoading.hide();
 }
 
 

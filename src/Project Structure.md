@@ -34,5 +34,6 @@ Features to be added.
 - Migrate Unittest to use Pytest
 - Add Google user Signin option
 - Add dropdown for books already in teh database during book search
+- Add option for advanced search, MVP only book title search.
 
 TODO > To be Expanded

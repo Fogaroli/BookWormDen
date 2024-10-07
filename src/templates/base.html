@@ -47,7 +47,7 @@
                         {%if g.user%}
 
                         <li class="nav-item">
-                            <a href="/user" class="nav-link"
+                            <a href="/user" class="nav-link" id="user-page-link"
                                 >{{g.user.username}}</a
                             >
                         </li>
@@ -89,9 +89,9 @@
                         <div class="input-group m-3">
                             <input
                                 type="text"
-                                name="q"
+                                name="title-search"
                                 class="form-control"
-                                placeholder="Search Books"
+                                placeholder="Enter Book Title"
                                 id="book-search-input"
                             />
                             <button type="submit" class="btn btn-default">
@@ -104,35 +104,7 @@
             <div id="book-list-loading-msg" class="text-center">
                 <div><i class="fa-solid fa-sync fa-spin"></i></div>
             </div>
-            <div id="book-search-results">
-                <div class="m-3">
-                    <p>
-                        ipsum Lorem ipsum, dolor sit amet consectetur
-                        adipisicing elit. Explicabo quisquam laboriosam nobis
-                        repellendus debitis aut deserunt voluptates porro
-                        aperiam natus eum esse aliquid, neque quos soluta
-                        excepturi sapiente, asperiores autem?
-                    </p>
-                </div>
-                <div class="m-3">
-                    <p>
-                        ipsum Lorem ipsum, dolor sit amet consectetur
-                        adipisicing elit. Explicabo quisquam laboriosam nobis
-                        repellendus debitis aut deserunt voluptates porro
-                        aperiam natus eum esse aliquid, neque quos soluta
-                        excepturi sapiente, asperiores autem?
-                    </p>
-                </div>
-                <div class="m-3">
-                    <p>
-                        ipsum Lorem ipsum, dolor sit amet consectetur
-                        adipisicing elit. Explicabo quisquam laboriosam nobis
-                        repellendus debitis aut deserunt voluptates porro
-                        aperiam natus eum esse aliquid, neque quos soluta
-                        excepturi sapiente, asperiores autem?
-                    </p>
-                </div>
-            </div>
+            <ul id="book-search-results" class="list-group"></ul>
         </section>
 
         <div class="container">
@@ -172,6 +144,7 @@
             src="https://kit.fontawesome.com/35b9fbe0d0.js"
             crossorigin="anonymous"
         ></script>
+        <script src="/static/book.js"></script>
         <script src="/static/app.js"></script>
     </body>
 </html>
