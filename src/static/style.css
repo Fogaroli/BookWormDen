@@ -22,3 +22,7 @@ body {
     align-items: center;
     display: none;
 }
+
+#book-list-loading-msg {
+    display: none;
+}
