@@ -1,0 +1,1 @@
+// How to generate fake responses to test the function with controlled data?

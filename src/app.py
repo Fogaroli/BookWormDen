@@ -8,12 +8,23 @@ Date: September 17, 2024
 """
 
 import os
-from flask import Flask, flash, render_template, redirect, session, g, url_for, request
+from flask import (
+    Flask,
+    flash,
+    render_template,
+    redirect,
+    session,
+    g,
+    url_for,
+    request,
+    jsonify,
+)
 from functools import wraps
 from flask_debugtoolbar import DebugToolbarExtension
 from dotenv import load_dotenv
 from models import db, connect_db, User
 from forms import UserAddForm, LoginForm
+import requests
 
 # Load environmental variables file
 load_dotenv()
@@ -24,6 +35,7 @@ production_db = os.environ.get(
 )  # If local database should have the format: "postgresql:///<dbname>"
 testrun = os.environ.get("TESTRUN")  # True or False
 secret_code = os.environ.get("SECRETE_KEY")
+api_key = os.environ.get("GOOGLE_API_KEY")
 
 # Setup Flask app
 app = Flask(__name__)
@@ -43,8 +55,12 @@ if __name__ == "__main__":
     app.app_context().push()
 
 
+# Setup Google API
+GOOGLE_BOOKS_API_URL = "https://www.googleapis.com/books/v1/volumes"
+
+
 """
-Supporting functions
+# Supporting functions
 """
 
 
@@ -83,11 +99,15 @@ def load_user():
 
 
 """
-View functions
+# View functions
+"""
+
+"""
+User registration and login
 """
 
 
-@app.route("/")
+@app.route("/", methods=["GET"])
 def homepage():
     """View Function for the portal homepage.
 
@@ -111,7 +131,7 @@ def registration_view():
             login(new_user)
             return redirect(url_for("homepage"))
         else:
-            flash(f"Error creating new user, please try again", "danger")
+            flash("Error creating new user, please try again", "danger")
 
     return render_template("user_signup.html", form=registration_form)
 
@@ -143,8 +163,87 @@ def logout_view():
     return redirect(url_for("homepage"))
 
 
-@app.route("/user")
+@app.route("/user", methods=["GET"])
 @login_required
 def user_page():
     """View function to open user homepage"""
     return render_template("user_page.html")
+
+
+"""
+Book search engine
+"""
+
+
+@app.route("/search", methods=["GET"])
+def search_books():
+    title_search = request.args.get("q")
+    if not title_search:
+        return jsonify({"error": "Please enter a book title to search"}), 400
+
+    params = {
+        "q": f"intitle:{title_search}",
+        "key": api_key,
+        "maxResults": 40,
+        "printType": "books",
+        # "projection": "lite",
+        "langRestrict": "en",
+    }
+
+    response = requests.get(url=GOOGLE_BOOKS_API_URL, params=params)
+    if response.status_code == 200:
+        data = response.json()
+        books = []
+        for item in data.get("items", []):
+            if item["volumeInfo"]["language"] == "en":
+                id = item.get("id")
+                volume_info = item.get(
+                    "volumeInfo", {}
+                )  # volume is the google book term for an item (book, magazine or other content)
+                data = {
+                    "title": volume_info.get("title"),
+                    "authors": volume_info.get("authors", []),
+                    "publishedDate": volume_info.get("publishedDate"),
+                    "description": volume_info.get("description"),
+                    "thumbnail": volume_info.get("imageLinks", {}).get("thumbnail"),
+                }
+                books.append({"id": id, "data": data})
+
+        return jsonify(books)
+    else:
+        return jsonify(
+            {"error": "Failed to fetch data please try again"}
+        ), response.status_code
+
+
+@app.route("/book/<id>", methods=["GET"])
+def get_book_details(id):
+    params = {
+        "key": api_key,
+    }
+
+    response = requests.get(url=f"{GOOGLE_BOOKS_API_URL}/{id}", params=params)
+    if response.status_code == 200:
+        data = response.json()
+        book_data = []
+        volume_info = data.get(
+            "volumeInfo", {}
+        )  # volume is the google book term for an item (book, magazine or other content)
+        book_data.append(
+            {
+                "title": volume_info.get("title"),
+                "authors": volume_info.get("authors", []),
+                "categories": volume_info.get("categories", []),
+                "publisher": volume_info.get("publisher"),
+                "publishedDate": volume_info.get("publishedDate"),
+                "description": volume_info.get("description"),
+                "thumbnail": volume_info.get("imageLinks", {}).get("thumbnail"),
+                "page_count": volume_info.get("PageCount"),
+                "average_rating": volume_info.get("averageRating"),
+            }
+        )
+        return jsonify(book_data)
+    else:
+        return jsonify(
+            {"error": "Failed to fetch data please try again"}
+        ), response.status_code
