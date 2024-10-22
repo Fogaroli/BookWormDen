@@ -206,7 +206,6 @@ def search_books():
                     "publishedDate": volume_info.get("publishedDate"),
                     "description": volume_info.get("description"),
                     "thumbnail": volume_info.get("imageLinks", {}).get("thumbnail"),
-                    "id": volume_info.get("id"),
                 }
                 books.append({"id": id, "data": data})
 
