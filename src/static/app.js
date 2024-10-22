@@ -48,7 +48,6 @@ function addMarkup(book){
     `
     return $("<li>", {class:"list-group-item"}).html(bookEntry)
 }
-    
 
 //function to convert search string to searcheable format.
 function convertSearchString(inputString){
@@ -108,5 +107,3 @@ async function updateBookSearch(searchInput){
     $bookListLoading.hide();
 }
 
-
-//================================================================
