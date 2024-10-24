@@ -1,5 +1,7 @@
+from turtle import title
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Nullable
 
 bcrypt = Bcrypt()
 db = SQLAlchemy()
@@ -54,6 +56,34 @@ class User(db.Model):
             db.session.add(new_user)
             db.session.commit()
             return new_user
+        except:
+            db.session.rollback()
+            return False
+
+
+class Book(db.Model):
+    """Book records database model
+    Should contain basic information about books that are indexed in the portal.
+
+    """
+
+    __tablename__ = "books"
+
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.Text, nullable=False)
+    api_id = db.Column(db.String(30), nullable=False, unique=True)
+
+    @classmethod
+    def saveBook(cls, data):
+        """Class method to save a new book to the database"""
+        try:
+            new_book = Book(
+                api_id=data["id"],
+                title=data["title"],
+            )
+            db.session.add(new_book)
+            db.session.commit()
+            return new_book
         except:
             db.session.rollback()
             return False

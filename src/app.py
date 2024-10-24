@@ -239,6 +239,7 @@ def get_book_details(id):
             "thumbnail": volume_info.get("imageLinks", {}).get("thumbnail"),
             "page_count": volume_info.get("pageCount"),
             "average_rating": volume_info.get("averageRating"),
+            "id": id,
         }
         return jsonify(book_data)
     else:
