@@ -206,8 +206,9 @@ def search_books():
                     "publishedDate": volume_info.get("publishedDate"),
                     "description": volume_info.get("description"),
                     "thumbnail": volume_info.get("imageLinks", {}).get("thumbnail"),
+                    "id": id,
                 }
-                books.append({"id": id, "data": data})
+                books.append({"data": data})
 
         return jsonify(books)
     else:
@@ -225,23 +226,20 @@ def get_book_details(id):
     response = requests.get(url=f"{GOOGLE_BOOKS_API_URL}/{id}", params=params)
     if response.status_code == 200:
         data = response.json()
-        book_data = []
         volume_info = data.get(
             "volumeInfo", {}
         )  # volume is the google book term for an item (book, magazine or other content)
-        book_data.append(
-            {
-                "title": volume_info.get("title"),
-                "authors": volume_info.get("authors", []),
-                "categories": volume_info.get("categories", []),
-                "publisher": volume_info.get("publisher"),
-                "publishedDate": volume_info.get("publishedDate"),
-                "description": volume_info.get("description"),
-                "thumbnail": volume_info.get("imageLinks", {}).get("thumbnail"),
-                "page_count": volume_info.get("PageCount"),
-                "average_rating": volume_info.get("averageRating"),
-            }
-        )
+        book_data = {
+            "title": volume_info.get("title"),
+            "authors": volume_info.get("authors", []),
+            "categories": volume_info.get("categories", []),
+            "publisher": volume_info.get("publisher"),
+            "publishedDate": volume_info.get("publishedDate"),
+            "description": volume_info.get("description"),
+            "thumbnail": volume_info.get("imageLinks", {}).get("thumbnail"),
+            "page_count": volume_info.get("pageCount"),
+            "average_rating": volume_info.get("averageRating"),
+        }
         return jsonify(book_data)
     else:
         return jsonify(

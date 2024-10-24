@@ -21,6 +21,19 @@ class Book {
         return response.data.map((bookVolume) => new Book(bookVolume["data"]))
     }
 
+    static async getBookDetailById(bookId){
+        /**Class method to get book details for a specific book ID, ID provided as parameter */
+        const response = await axios({
+            url:`/book/${bookId}`,
+            method: "GET",
+        }).catch((error) => {
+            return error;
+        });
+        if (response instanceof Error){
+            return;
+        }        
+        return new Book(response.data)
+    }
 
 
 }
