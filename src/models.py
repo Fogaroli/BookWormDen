@@ -35,6 +35,9 @@ class User(db.Model):
     bio = db.Column(db.Text)
     location = db.Column(db.String(30))
 
+    books = db.relationship("Book", secondary="users_books", backref="users")
+    readlog = db.relationship("UserBook")
+
     def validate_user(self, password):
         """Function to validate entered password, comparing to stored hashed password"""
         return self if bcrypt.check_password_hash(self.password, password) else False
@@ -87,3 +90,22 @@ class Book(db.Model):
         except:
             db.session.rollback()
             return False
+
+
+class UserBook(db.model):
+    """Model for many to many relationship between users and books"""
+
+    __tablename__ = "users_books"
+
+    user_id = db.Column(
+        db.Integer, db.ForeignKey("users.id"), primary_key=True, nullable=False
+    )
+    book_id = db.Column(
+        db.Integer, db.ForeignKey("books.id"), primary_key=True, nullable=False
+    )
+    start_date = db.Column(db.DateTime)
+    finish_date = db.Column(db.DateTime)
+    current_page = db.Column(db.Integer)
+    status = db.Column(
+        db.Integer
+    )  # Status should indicate 0-backlog, 1-reading, 2-completed
