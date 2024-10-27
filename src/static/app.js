@@ -13,6 +13,7 @@ const $bookSearchResults = $("#book-search-results")
 const $bookSearchForm = $("#book-search-form")
 const $bookSearchInput = $('#book-search-input')
 const $userPageLink = $('#user-page-link')
+const userIsLogged = $('#user-page-link').length ? true : false
 
 
 //================================================================
@@ -78,14 +79,22 @@ function addBookDetailsMarkup(book){
     const bookEntry = `
                 <div class="row">
                     <div class="col-2 img-fluid">
-                        <img
-                            src="${book.thumbnail}"
-                        />
+                        <div class="row">    
+                            <img src="${book.thumbnail}"/>
+                        </div>
+                        <div class="row">
+                            ${userIsLogged ? 
+                                `<form action="/book/${book.id}/add-to-user" method="POST">
+                                <input name="book_title" value="${book.title}" hidden />
+                                <button type="submit" class="btn btn-light m-2" >Add to my reading list</button>
+                                </form>`
+                                : "" }
+                        </div>
                     </div>
                     <div class="col-10">
                         <div class="row">
                             <div class="col-12 h4">
-                                <strong class="book-link" id="${book.id}">${book.title}</strong>
+                                <strong>${book.title}</strong>
                             </div>
                         </div>
                         <div class="row">

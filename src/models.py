@@ -1,7 +1,5 @@
-from turtle import title
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Nullable
 
 bcrypt = Bcrypt()
 db = SQLAlchemy()
@@ -36,7 +34,7 @@ class User(db.Model):
     location = db.Column(db.String(30))
 
     books = db.relationship("Book", secondary="users_books", backref="users")
-    readlog = db.relationship("UserBook")
+    readlog = db.relationship("UserBook", overlaps="books,users")
 
     def validate_user(self, password):
         """Function to validate entered password, comparing to stored hashed password"""
@@ -72,16 +70,15 @@ class Book(db.Model):
 
     __tablename__ = "books"
 
-    id = db.Column(db.Integer, primary_key=True)
+    api_id = db.Column(db.String(30), primary_key=True)
     title = db.Column(db.Text, nullable=False)
-    api_id = db.Column(db.String(30), nullable=False, unique=True)
 
     @classmethod
     def saveBook(cls, data):
         """Class method to save a new book to the database"""
         try:
             new_book = Book(
-                api_id=data["id"],
+                api_id=data["api_id"],
                 title=data["title"],
             )
             db.session.add(new_book)
@@ -92,7 +89,7 @@ class Book(db.Model):
             return False
 
 
-class UserBook(db.model):
+class UserBook(db.Model):
     """Model for many to many relationship between users and books"""
 
     __tablename__ = "users_books"
@@ -101,7 +98,7 @@ class UserBook(db.model):
         db.Integer, db.ForeignKey("users.id"), primary_key=True, nullable=False
     )
     book_id = db.Column(
-        db.Integer, db.ForeignKey("books.id"), primary_key=True, nullable=False
+        db.String, db.ForeignKey("books.api_id"), primary_key=True, nullable=False
     )
     start_date = db.Column(db.DateTime)
     finish_date = db.Column(db.DateTime)

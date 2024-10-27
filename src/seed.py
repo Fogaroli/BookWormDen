@@ -5,7 +5,7 @@ File used to enter basic data into the database
 
 import bcrypt
 from app import app
-from models import db, User, Book
+from models import db, User, Book, UserBook
 from flask_bcrypt import Bcrypt
 
 # Clear database
