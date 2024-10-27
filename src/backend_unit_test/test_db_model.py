@@ -38,6 +38,7 @@ def context():
 
 @pytest.fixture
 def test_user(context):
+    """Create a test user"""
     u1 = User(
         email="test1@test.com",
         username="testuser1",
@@ -48,6 +49,17 @@ def test_user(context):
     return u1
 
 
+@pytest.fixture
+def test_book(context):
+    """Create a test book"""
+    book = Book(api_id="test123", title="Test Book")
+    return book
+
+
+# Database model tests
+
+
+# User
 def test_user_model(context, test_user):
     """Does basic model work?"""
 
@@ -125,3 +137,29 @@ def test_user_authentication(context):
     assert new_user.password != "PassWord5"
     assert new_user.validate_user("PassWord5")
     assert not new_user.validate_user("PassWord")
+
+
+# Book
+def test_book_model(context, test_book):
+    """Test Book model."""
+
+    db.session.add(test_book)
+    db.session.commit()
+
+    assert test_book.api_id is not None
+
+    book = Book.saveBook({"api_id": "book123", "title": "Test Book Title"})
+
+    assert book.api_id == "book123"
+    assert book.title == "Test Book Title"
+
+
+def test_user_book_relationship(context, test_user, test_book):
+    """Test User-Book relationship."""
+    # Add book to user's reading list
+    test_user.books.append(test_book)
+    db.session.commit()
+
+    # Test relationship
+    assert test_book in test_user.books
+    assert test_user in test_book.users
