@@ -3,7 +3,7 @@ import sys
 from unittest import TestCase
 
 # Setup relative path in order to import the flask application modules:
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../")))
 
 from models import connect_db, db, User
 

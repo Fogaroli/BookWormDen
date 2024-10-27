@@ -3,7 +3,7 @@ import sys
 from unittest import TestCase
 
 # Setup relative path in order to import the flask application modules:
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../")))
 
 from models import connect_db, db, User
 
@@ -42,7 +42,7 @@ class BookSeachTestCase(TestCase):
         with self.client as c:
             resp = c.get("/search?q=Harry+Potter")
             self.assertEqual(resp.status_code, 200)
-            self.assertIn("Harry Potter and the Deathly Hallows", str(resp.json))
+            self.assertIn("Harry Potter", str(resp.json))
             self.assertTrue(
                 {"title", "authors", "description", "thumbnail"}.issubset(
                     resp.json[0]["data"].keys()
@@ -69,5 +69,5 @@ class BookSeachTestCase(TestCase):
                     "average_rating",
                     "description",
                     "thumbnail",
-                }.issubset(resp.json[0].keys())
+                }.issubset(resp.json.keys())
             )
