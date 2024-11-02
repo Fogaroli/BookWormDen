@@ -1,1 +1,12 @@
-// How to generate fake responses to test the function with controlled data?
+const fs = require("fs");
+const path = require("path");
+const $ = require('jquery');
+const Book = require("../static/book.js");
+
+// Mock the Book class methods
+jest.mock('../static/book.js', () => {
+  return {
+    getBookByTitle: jest.fn(),
+    getBookDetailById: jest.fn(),
+  };
+});
