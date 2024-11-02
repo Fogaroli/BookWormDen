@@ -28,3 +28,7 @@ body {
 #book-list-loading-msg {
     display: none;
 }
+
+.book-link {
+    cursor: pointer;
+}

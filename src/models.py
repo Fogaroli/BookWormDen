@@ -33,6 +33,9 @@ class User(db.Model):
     bio = db.Column(db.Text)
     location = db.Column(db.String(30))
 
+    books = db.relationship("Book", secondary="users_books", backref="users")
+    readlog = db.relationship("UserBook", overlaps="books,users")
+
     def validate_user(self, password):
         """Function to validate entered password, comparing to stored hashed password"""
         return self if bcrypt.check_password_hash(self.password, password) else False
@@ -57,3 +60,49 @@ class User(db.Model):
         except:
             db.session.rollback()
             return False
+
+
+class Book(db.Model):
+    """Book records database model
+    Should contain basic information about books that are indexed in the portal.
+
+    """
+
+    __tablename__ = "books"
+
+    api_id = db.Column(db.String(30), primary_key=True)
+    title = db.Column(db.Text, nullable=False)
+
+    @classmethod
+    def saveBook(cls, data):
+        """Class method to save a new book to the database"""
+        try:
+            new_book = Book(
+                api_id=data["api_id"],
+                title=data["title"],
+            )
+            db.session.add(new_book)
+            db.session.commit()
+            return new_book
+        except:
+            db.session.rollback()
+            return False
+
+
+class UserBook(db.Model):
+    """Model for many to many relationship between users and books"""
+
+    __tablename__ = "users_books"
+
+    user_id = db.Column(
+        db.Integer, db.ForeignKey("users.id"), primary_key=True, nullable=False
+    )
+    book_id = db.Column(
+        db.String, db.ForeignKey("books.api_id"), primary_key=True, nullable=False
+    )
+    start_date = db.Column(db.DateTime)
+    finish_date = db.Column(db.DateTime)
+    current_page = db.Column(db.Integer)
+    status = db.Column(
+        db.Integer
+    )  # Status should indicate 0-backlog, 1-reading, 2-completed

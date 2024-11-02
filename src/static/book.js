@@ -1,3 +1,5 @@
+// Supporting Classes and Functions
+
 class Book {
     /**
      * Class to store information about each book obtained from API.
@@ -7,20 +9,37 @@ class Book {
         Object.assign(this, { ...properties });
     }
 
-    static async getBookByTitle(titleString){
+    static async getBookByTitle(titleString) {
         /**Class method to get a book list based on the book title. Title sent as parameter */
         const response = await axios({
-            url:`/search?q=${titleString}`,
+            url: `/search?q=${titleString}`,
             method: "GET",
         }).catch((error) => {
             return error;
         });
-        if (response instanceof Error){
+        if (response instanceof Error) {
             return;
-        }        
-        return response.data.map((bookVolume) => new Book(bookVolume["data"]))
+        }
+        return response.data.map((bookVolume) => new Book(bookVolume["data"]));
     }
 
+    static async getBookDetailById(bookId) {
+        /**Class method to get book details for a specific book ID, ID provided as parameter */
+        const response = await axios({
+            url: `/book/${bookId}`,
+            method: "GET",
+        }).catch((error) => {
+            return error;
+        });
+        if (response instanceof Error) {
+            return;
+        }
+        return new Book(response.data);
+    }
+}
 
-
+//================================================================
+//Setup for unit testing
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = Book;
 }

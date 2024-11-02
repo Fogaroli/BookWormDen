@@ -1,9 +1,19 @@
 {% extends 'base.html' %} {% block title %} User Home Den {% endblock %} {%
-    block body %}
-    
-    <h1>Welcome to the your Den </h1>
-    <p>This page contains all the information about <strong> {{g.user.first_name}} {{g.user.last_name}}</strong></p>
-    <p>This page is not visible by any other user.</p>
-    
-    {% endblock %}
-    
+block body %}
+
+<h1>Welcome to the your Den</h1>
+<p>
+    This page contains all the information about
+    <strong> {{g.user.first_name}} {{g.user.last_name}}</strong>
+</p>
+<p>This page is not visible by any other user.</p>
+
+{% if list|length > 0%}
+<h2>Reading list</h2>
+<ol>
+    {%for book in list%}
+    <li>{{book.title}}</li>
+    {%endfor%}
+</ol>
+
+{%endif%} {% endblock %}

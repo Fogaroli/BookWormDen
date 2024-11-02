@@ -22,7 +22,7 @@ from flask import (
 from functools import wraps
 from flask_debugtoolbar import DebugToolbarExtension
 from dotenv import load_dotenv
-from models import db, connect_db, User
+from models import db, connect_db, User, Book
 from forms import UserAddForm, LoginForm
 import requests
 
@@ -167,7 +167,8 @@ def logout_view():
 @login_required
 def user_page():
     """View function to open user homepage"""
-    return render_template("user_page.html")
+    reading_list = g.user.books
+    return render_template("user_page.html", list=reading_list)
 
 
 """
@@ -177,6 +178,7 @@ Book search engine
 
 @app.route("/search", methods=["GET"])
 def search_books():
+    """Route to execute book search queries. Replies with json file with search content"""
     title_search = request.args.get("q")
     if not title_search:
         return jsonify({"error": "Please enter a book title to search"}), 400
@@ -206,8 +208,9 @@ def search_books():
                     "publishedDate": volume_info.get("publishedDate"),
                     "description": volume_info.get("description"),
                     "thumbnail": volume_info.get("imageLinks", {}).get("thumbnail"),
+                    "id": id,
                 }
-                books.append({"id": id, "data": data})
+                books.append({"data": data})
 
         return jsonify(books)
     else:
@@ -218,6 +221,7 @@ def search_books():
 
 @app.route("/book/<id>", methods=["GET"])
 def get_book_details(id):
+    """Route to collect detailed information for a particular book volume"""
     params = {
         "key": api_key,
     }
@@ -225,25 +229,47 @@ def get_book_details(id):
     response = requests.get(url=f"{GOOGLE_BOOKS_API_URL}/{id}", params=params)
     if response.status_code == 200:
         data = response.json()
-        book_data = []
         volume_info = data.get(
             "volumeInfo", {}
         )  # volume is the google book term for an item (book, magazine or other content)
-        book_data.append(
-            {
-                "title": volume_info.get("title"),
-                "authors": volume_info.get("authors", []),
-                "categories": volume_info.get("categories", []),
-                "publisher": volume_info.get("publisher"),
-                "publishedDate": volume_info.get("publishedDate"),
-                "description": volume_info.get("description"),
-                "thumbnail": volume_info.get("imageLinks", {}).get("thumbnail"),
-                "page_count": volume_info.get("PageCount"),
-                "average_rating": volume_info.get("averageRating"),
-            }
-        )
+        book_data = {
+            "title": volume_info.get("title"),
+            "authors": volume_info.get("authors", []),
+            "categories": volume_info.get("categories", []),
+            "publisher": volume_info.get("publisher"),
+            "publishedDate": volume_info.get("publishedDate"),
+            "description": volume_info.get("description"),
+            "thumbnail": volume_info.get("imageLinks", {}).get("thumbnail"),
+            "page_count": volume_info.get("pageCount"),
+            "average_rating": volume_info.get("averageRating"),
+            "id": id,
+        }
         return jsonify(book_data)
     else:
         return jsonify(
             {"error": "Failed to fetch data please try again"}
         ), response.status_code
+
+
+@app.route("/book/<volume_id>/add-to-user", methods=["POST"])
+@login_required
+def addBookToUserList(volume_id):
+    """Function to add a volume to the user reading list.
+    If the book does not exist in the local dictionary, this function will add it before adding to the user reading list.
+    """
+    book_entry = db.session.get(Book, volume_id)
+    if not book_entry:
+        title = request.form["book_title"]
+        book_entry = Book.saveBook({"api_id": volume_id, "title": title})
+    if book_entry in g.user.books:
+        flash("Book already in your reading list", "danger")
+    else:
+        try:
+            g.user.books.append(book_entry)
+            db.session.commit()
+            flash("Book added to you reading list", "success")
+        except:
+            db.session.rollback()
+            flash("Error adding book to your reading list", "danger")
+
+    return redirect(url_for("user_page"))

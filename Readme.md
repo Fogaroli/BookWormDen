@@ -55,8 +55,11 @@ Run in debug mode by using
 
 ## Unit Tests
 
-Unit tests are written and added to the repository. They can be executed entering the `test` folder and triggering each python test script individually, example below:
+Unit tests are written and added to the repository. 
+Backend tests can be executed entering the `test` folder and triggering each python test script individually, example below:
 
 `python -m unittest test_<file name>.py`
 
+Frontend tests can be executed by downloading Jasmine library from [This Address](https://github.com/jasmine/jasmine/releases) and then opening the file below on a live server:
 
+`frontend_test/FrontEdnTestRunner.html`
