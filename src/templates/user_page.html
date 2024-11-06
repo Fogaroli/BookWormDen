@@ -1,19 +1,30 @@
 {% extends 'base.html' %} {% block title %} User Home Den {% endblock %} {%
 block body %}
 
-<h1>Welcome to the your Den</h1>
-<p>
-    This page contains all the information about
-    <strong> {{g.user.first_name}} {{g.user.last_name}}</strong>
-</p>
-<p>This page is not visible by any other user.</p>
+<h1>Home Den</h1>
 
 {% if list|length > 0%}
-<h2>Reading list</h2>
-<ol>
-    {%for book in list%}
-    <li>{{book.title}}</li>
+<h4>Books in your list</h4>
+<div class="row">
+    {%for log in list%}
+    <div class="card col-4">
+        <a href="/user/{{log.book_id}}" class="mx-auto"
+            ><img
+                src="{{log.books.cover}}"
+                class="card-img-top book-cover img-thumbnail img-fluid mx-auto"
+                alt="{{log.books.title}} cover image"
+        /></a>
+        <div class="card-body">
+            <p class="card-text">
+                Started reading date: {{log.start_date}} <br />
+                Stopped reading date:{{log.finish_date}} <br />
+                Current page reading: {{log.current_page}}<br />
+                Status: {{log.status}}
+            </p>
+        </div>
+    </div>
+
     {%endfor%}
-</ol>
+</div>
 
 {%endif%} {% endblock %}

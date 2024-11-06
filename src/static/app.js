@@ -8,15 +8,18 @@ Date: October 6th, 2024
 
 const $searchButton = $("#book-search-button");
 const $searchOverlay = $("#book-search-section");
-const $bookListLoading = $("#book-list-loading-msg");
+const $bookSearchLoading = $("#book-list-loading-msg");
 const $bookSearchResults = $("#book-search-results");
 const $bookSearchForm = $("#book-search-form");
 const $bookSearchInput = $("#book-search-input");
-const $userPageLink = $("#user-page-link");
+const $detailsOverlay = $("#book-details-section");
+const $bookDetailsLoading = $("#book-details-loading-msg");
+const $bookDetails = $("#book-details");
 const userIsLogged = $("#user-page-link").length ? true : false;
+const $bookCover = $(".book-cover-image");
 
 //================================================================
-//Feature Functions
+//Supporting Functions
 
 //function to create book search result markup
 function addMarkup(book) {
@@ -24,7 +27,7 @@ function addMarkup(book) {
     const bookEntry = `
                 <div class="row">
                     <div class="col-2 img-fluid">
-                        <img
+                        <img class="book-cover-image" id="${book.id}"
                             src="${book.thumbnail}"
                         />
                     </div>
@@ -85,6 +88,7 @@ function addBookDetailsMarkup(book) {
                                 userIsLogged
                                     ? `<form action="/book/${book.id}/add-to-user" method="POST">
                                 <input name="book_title" value="${book.title}" hidden />
+                                <input name="book_cover" value="${book.thumbnail}" hidden />
                                 <button type="submit" class="btn btn-light m-2" >Add to my reading list</button>
                                 </form>`
                                     : ""
@@ -153,10 +157,15 @@ function convertSearchString(inputString) {
 }
 
 //================================================================
-//DOM Manipulation Functions
+//DOM Manipulation
+
+//----------------------------------------------------------------
+//Event Listeners
 
 //event listener to open the book search overlay
 $searchButton.on("click", () => {
+    $bookDetails.empty();
+    $detailsOverlay.hide();
     $searchOverlay.show();
 });
 
@@ -165,9 +174,17 @@ $(document).on("click", (event) => {
     if (
         $searchOverlay.css("display") !== "none" &&
         event.target.closest("section") !== $searchOverlay[0] &&
-        !$searchButton[0].contains(event.target)
+        event.target.id !== `book-search-button`
     ) {
         $searchOverlay.hide();
+    }
+    if (
+        $detailsOverlay.css("display") !== "none" &&
+        event.target.closest("section") !== $detailsOverlay[0] &&
+        !$(event.target).hasClass(`book-link`) &&
+        !$(event.target).hasClass(`book-cover-image`)
+    ) {
+        $detailsOverlay.hide();
     }
 });
 
@@ -175,9 +192,18 @@ $(document).on("click", (event) => {
 $bookSearchForm.on("submit", (event) => {
     event.preventDefault();
     $bookSearchResults.empty();
-    $bookListLoading.show();
+    $bookSearchLoading.show();
     updateBookSearch($bookSearchInput.val());
 });
+
+//create event listeners for book search results
+function setBookListeners() {
+    $(`.book-link`).on("click", showBookDetails);
+    $(`.book-cover-image`).on("click", showBookDetails);
+}
+
+//----------------------------------------------------------------
+// DOM manipulation procedures
 
 //procedure to update the overlay with book results
 async function updateBookSearch(searchInput) {
@@ -192,43 +218,37 @@ async function updateBookSearch(searchInput) {
     } else {
         bookList.forEach((bookVolume) => {
             const bookEntry = addMarkup(bookVolume);
-            console.log(bookEntry.html());
             $bookSearchResults.append(bookEntry);
-            console.log(
-                document.getElementById("book-search-results").outerHTML
-            );
         });
-        $(`.book-link`).on("click", showBookDetails);
+        setBookListeners();
     }
-    $bookListLoading.hide();
+    $bookSearchLoading.hide();
 }
 
 //procedure to clear search results and show specific book details content
 async function showBookDetails(event) {
-    console.log(
-        $searchOverlay.css("display") !== "none",
-        event.target.closest("section") !== $searchOverlay[0],
-        !$searchButton[0].contains(event.target)
-    );
-    $bookListLoading.show();
+    $searchOverlay.hide();
+    $bookDetails.empty();
+    $detailsOverlay.show();
+    $bookDetailsLoading.show();
     const bookId = event.target.id;
-    const bookDetails = await Book.getBookDetailById(bookId);
-    if (!bookDetails) {
-        $bookSearchResults.append(
+    const bookData = await Book.getBookDetailById(bookId);
+    if (!bookData) {
+        $bookDetails.append(
             $("<p>", {
                 text: "Error get book details from server, please try again.",
             })
         );
     } else {
-        $bookSearchResults.empty();
-        const bookEntry = addBookDetailsMarkup(bookDetails);
-        $bookSearchResults.append(bookEntry);
+        const bookEntry = addBookDetailsMarkup(bookData);
+        $bookDetails.append(bookEntry);
     }
-    $bookListLoading.hide();
+    $bookDetailsLoading.hide();
 }
 
 //================================================================
 //Setup for unit testing
+
 if (typeof module !== "undefined" && module.exports) {
     module.exports = {
         addMarkup,

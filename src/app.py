@@ -167,8 +167,16 @@ def logout_view():
 @login_required
 def user_page():
     """View function to open user homepage"""
-    reading_list = g.user.books
-    return render_template("user_page.html", list=reading_list)
+    reading_log = g.user.readlog
+    return render_template("user_page.html", list=reading_log)
+
+
+@app.route("/user/<volume_id>", methods=["GET"])
+@login_required
+def user_book_page(volume_id):
+    """View function to open book details and user information"""
+    book_statistics = db.get_or_404(Book, volume_id)
+    return render_template("user_book_page.html", book=book_statistics)
 
 
 """
@@ -219,14 +227,14 @@ def search_books():
         ), response.status_code
 
 
-@app.route("/book/<id>", methods=["GET"])
-def get_book_details(id):
+@app.route("/book/<volume_id>", methods=["GET"])
+def get_book_details(volume_id):
     """Route to collect detailed information for a particular book volume"""
     params = {
         "key": api_key,
     }
 
-    response = requests.get(url=f"{GOOGLE_BOOKS_API_URL}/{id}", params=params)
+    response = requests.get(url=f"{GOOGLE_BOOKS_API_URL}/{volume_id}", params=params)
     if response.status_code == 200:
         data = response.json()
         volume_info = data.get(
@@ -242,7 +250,7 @@ def get_book_details(id):
             "thumbnail": volume_info.get("imageLinks", {}).get("thumbnail"),
             "page_count": volume_info.get("pageCount"),
             "average_rating": volume_info.get("averageRating"),
-            "id": id,
+            "id": volume_id,
         }
         return jsonify(book_data)
     else:
@@ -259,8 +267,13 @@ def addBookToUserList(volume_id):
     """
     book_entry = db.session.get(Book, volume_id)
     if not book_entry:
-        title = request.form["book_title"]
-        book_entry = Book.saveBook({"api_id": volume_id, "title": title})
+        book_entry = Book.saveBook(
+            {
+                "api_id": volume_id,
+                "title": request.form["book_title"],
+                "cover": request.form["book_cover"],
+            }
+        )
     if book_entry in g.user.books:
         flash("Book already in your reading list", "danger")
     else:
