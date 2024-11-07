@@ -2,6 +2,7 @@
 Title: The BookWormDen
 Author: Fabricio Ribeiro
 Date: October 6th, 2024
+Description: This file handles the search functions and display of search results.
 */
 
 //Global variables
@@ -56,7 +57,7 @@ function addMarkup(book) {
     return $("<li>", { class: "list-group-item" }).html(bookEntry);
 }
 
-//function to create book rating with start icons
+//function to create book rating with star icons
 function starRating(rating) {
     const starContainer = $("<span>");
     //TODO Improve this function to round to 0.5 star and use "fas fa-star-half-stroke"

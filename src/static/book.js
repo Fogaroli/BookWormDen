@@ -1,4 +1,9 @@
-// Supporting Classes and Functions
+/*
+Title: The BookWormDen
+Author: Fabricio Ribeiro
+Date: October 6th, 2024
+Description: This file contains the Book class used in teh search mechanism.
+*/
 
 class Book {
     /**
