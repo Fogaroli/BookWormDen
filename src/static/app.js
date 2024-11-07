@@ -16,7 +16,6 @@ const $detailsOverlay = $("#book-details-section");
 const $bookDetailsLoading = $("#book-details-loading-msg");
 const $bookDetails = $("#book-details");
 const userIsLogged = $("#user-page-link").length ? true : false;
-const $bookCover = $(".book-cover-image");
 
 //================================================================
 //Supporting Functions
@@ -86,9 +85,14 @@ function addBookDetailsMarkup(book) {
                         <div class="row">
                             ${
                                 userIsLogged
-                                    ? `<form action="/book/${book.id}/add-to-user" method="POST">
-                                <input name="book_title" value="${book.title}" hidden />
-                                <input name="book_cover" value="${book.thumbnail}" hidden />
+                                    ? `<form action="/user/add-book" method="POST">
+                                <input name="api_id" value="${book.id}" hidden />
+                                <input name="title" value="${book.title}" hidden />
+                                <input name="cover" value="${book.thumbnail}" hidden />
+                                <input name="authors" value="${book.authors}" hidden />
+                                <input name="categories" value="${book.categories}" hidden />
+                                <input name="description" value="${book.description}" hidden />
+                                <input name="page_count" value="${book.page_count}" hidden />
                                 <button type="submit" class="btn btn-light m-2" >Add to my reading list</button>
                                 </form>`
                                     : ""

@@ -171,6 +171,29 @@ def user_page():
     return render_template("user_page.html", list=reading_log)
 
 
+@app.route("/user/add-book", methods=["POST"])
+@login_required
+def addBookToUserList():
+    """Function to add a volume to the user reading list.
+    If the book does not exist in the local dictionary, this function will add it before adding to the user reading list.
+    """
+    book_entry = db.session.get(Book, request.form["api_id"])
+    if not book_entry:
+        book_entry = Book.saveBook(request.form)
+    if book_entry in g.user.books:
+        flash("Book already in your reading list", "danger")
+    else:
+        try:
+            g.user.books.append(book_entry)
+            db.session.commit()
+            flash("Book added to you reading list", "success")
+        except:
+            db.session.rollback()
+            flash("Error adding book to your reading list", "danger")
+
+    return redirect(url_for("user_page"))
+
+
 @app.route("/user/<volume_id>", methods=["GET"])
 @login_required
 def user_book_page(volume_id):
@@ -257,32 +280,3 @@ def get_book_details(volume_id):
         return jsonify(
             {"error": "Failed to fetch data please try again"}
         ), response.status_code
-
-
-@app.route("/book/<volume_id>/add-to-user", methods=["POST"])
-@login_required
-def addBookToUserList(volume_id):
-    """Function to add a volume to the user reading list.
-    If the book does not exist in the local dictionary, this function will add it before adding to the user reading list.
-    """
-    book_entry = db.session.get(Book, volume_id)
-    if not book_entry:
-        book_entry = Book.saveBook(
-            {
-                "api_id": volume_id,
-                "title": request.form["book_title"],
-                "cover": request.form["book_cover"],
-            }
-        )
-    if book_entry in g.user.books:
-        flash("Book already in your reading list", "danger")
-    else:
-        try:
-            g.user.books.append(book_entry)
-            db.session.commit()
-            flash("Book added to you reading list", "success")
-        except:
-            db.session.rollback()
-            flash("Error adding book to your reading list", "danger")
-
-    return redirect(url_for("user_page"))
