@@ -11,6 +11,10 @@ const bookDescription = document.querySelector("#book-description");
 const bookStatistics = document.querySelector("#book-statistics");
 const bookComments = document.querySelector("#book-comments");
 const bookAddComment = document.querySelector("#book-addcomment");
+const divDescription = document.querySelector("#div-description");
+const divStatistics = document.querySelector("#div-statistics");
+const divComments = document.querySelector("#div-comments");
+const divAddComment = document.querySelector("#div-addcomment");
 
 //================================================================
 //Supporting Functions
@@ -32,14 +36,42 @@ bookAddComment.addEventListener("click", showAddComment);
 // Procedure to show the book description on user book details page
 
 function showDescription(event) {
-    console.log("test");
+    bookDescription.classList.add("active");
+    bookStatistics.classList.remove("active");
+    bookComments.classList.remove("active");
+    bookAddComment.classList.remove("active");
+    divDescription.hidden = false;
+    divStatistics.hidden = true;
+    divComments.hidden = true;
+    divAddComment.hidden = true;
 }
 function showStatistics(event) {
-    console.log("test");
+    bookDescription.classList.remove("active");
+    bookStatistics.classList.add("active");
+    bookComments.classList.remove("active");
+    bookAddComment.classList.remove("active");
+    divDescription.hidden = true;
+    divStatistics.hidden = false;
+    divComments.hidden = true;
+    divAddComment.hidden = true;
 }
 function showComments(event) {
-    console.log("test");
+    bookDescription.classList.remove("active");
+    bookStatistics.classList.remove("active");
+    bookComments.classList.add("active");
+    bookAddComment.classList.remove("active");
+    divDescription.hidden = true;
+    divStatistics.hidden = true;
+    divComments.hidden = false;
+    divAddComment.hidden = true;
 }
 function showAddComment(event) {
-    console.log("test");
+    bookDescription.classList.remove("active");
+    bookStatistics.classList.remove("active");
+    bookComments.classList.remove("active");
+    bookAddComment.classList.add("active");
+    divDescription.hidden = true;
+    divStatistics.hidden = true;
+    divComments.hidden = true;
+    divAddComment.hidden = false;
 }

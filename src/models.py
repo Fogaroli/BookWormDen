@@ -104,8 +104,8 @@ class UserBook(db.Model):
     book_id = db.Column(
         db.String, db.ForeignKey("books.api_id"), primary_key=True, nullable=False
     )
-    start_date = db.Column(db.DateTime)
-    finish_date = db.Column(db.DateTime)
+    start_date = db.Column(db.Date)
+    finish_date = db.Column(db.Date)
     current_page = db.Column(db.Integer)
     status = db.Column(
         db.Integer

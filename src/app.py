@@ -22,8 +22,8 @@ from flask import (
 from functools import wraps
 from flask_debugtoolbar import DebugToolbarExtension
 from dotenv import load_dotenv
-from models import db, connect_db, User, Book
-from forms import UserAddForm, LoginForm
+from models import db, connect_db, User, Book, UserBook
+from forms import UserAddForm, LoginForm, readStatisticsForm
 import requests
 
 # Load environmental variables file
@@ -194,12 +194,26 @@ def addBookToUserList():
     return redirect(url_for("user_page"))
 
 
-@app.route("/user/<volume_id>", methods=["GET"])
+@app.route("/user/<volume_id>", methods=["GET", "POST"])
 @login_required
 def user_book_page(volume_id):
     """View function to open book details and user information"""
-    book_statistics = db.get_or_404(Book, volume_id)
-    return render_template("user_book_page.html", book=book_statistics)
+    book_data = db.get_or_404(Book, volume_id)
+    readLog = db.get_or_404(UserBook, (g.user.id, volume_id))
+    statform = readStatisticsForm(obj=readLog)
+    if statform.validate_on_submit():
+        try:
+            readLog.start_date = statform.start_date.data
+            readLog.finish_date = statform.finish_date.data
+            readLog.current_page = statform.current_page.data
+            readLog.status = statform.status.data
+            db.session.commit()
+            print(">>>>>>>>>>>>>>>>>>>>>>>>>>commited")
+        except:
+            db.session.rollback()
+            print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< rolledback")
+            flash("Error updating reading data, please try again")
+    return render_template("user_book_page.html", book=book_data, form=statform)
 
 
 """

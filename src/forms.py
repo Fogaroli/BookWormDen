@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField
-from wtforms.validators import DataRequired, Length, Email
+from sqlalchemy import Integer
+from wtforms import StringField, PasswordField, DateField, SelectField, IntegerField
+from wtforms.validators import DataRequired, Length, Email, Optional
 
 
 class UserAddForm(FlaskForm):
@@ -18,3 +19,26 @@ class LoginForm(FlaskForm):
 
     username = StringField("Username", validators=[DataRequired()])
     password = PasswordField("Password", validators=[Length(min=6)])
+
+
+class readStatisticsForm(FlaskForm):
+    """Form to record the reading statistics for a specified book"""
+
+    start_date = DateField(
+        "Date I started reading the book", format="%Y-%m-%d", validators=[Optional()]
+    )
+    finish_date = DateField(
+        "Date I finished dreading the book", format="%Y-%m-%d", validators=[Optional()]
+    )
+    current_page = IntegerField("Page I last read", validators=[Optional()])
+    status = SelectField(
+        "Current Status",
+        choices=[
+            (0, "In the list"),
+            (1, "Reading"),
+            (2, "Taking a pause"),
+            (3, "Done"),
+        ],
+        coerce=int,
+        validators=[Optional()],
+    )

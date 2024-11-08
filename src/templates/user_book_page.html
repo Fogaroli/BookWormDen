@@ -39,19 +39,41 @@ body %}
                     <p class="nav-link" id="book-addcomment">Add comment</p>
                 </li>
             </ul>
+            <div id="div-description">
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <small> {{book.description | safe}} </small>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <small>
+                            <strong> Categories : </strong> {{book.categories}}
+                        </small>
+                    </div>
+                </div>
+            </div>
 
-            <div class="row mt-3">
-                <div class="col-12">
-                    <small> {{book.description | safe}} </small>
-                </div>
+            <div id="div-statistics" hidden>
+                <form method="POST">
+                    {{ form.hidden_tag() }} {% for field in form if
+                    field.widget.input_type != 'hidden'%}
+                    <div class="row">
+                        <div class="col">{{field.label}}</div>
+                        <div class="col">
+                            {{field}} {% for error in field.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {%endfor%}
+                    <div class="edit-btn-area">
+                        <button class="btn btn-success">Save</button>
+                    </div>
+                </form>
             </div>
-            <div class="row">
-                <div class="col-12">
-                    <small>
-                        <strong> Categories : </strong> {{book.categories}}
-                    </small>
-                </div>
-            </div>
+            <div id="div-comments" hidden></div>
+            <div id="div-addcomment" hidden></div>
         </div>
     </div>
 </div>
