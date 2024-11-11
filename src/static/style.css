@@ -4,10 +4,6 @@ h1 {
     font-weight: bold;
 }
 
-body {
-    /* background-color: lightgray; */
-}
-
 #book-search-section {
     position: fixed;
     top:10%;
@@ -18,7 +14,6 @@ body {
     z-index: 10;
     display: flex;
     flex-direction: column;
-    /* justify-content: center; */
     align-items: center;
     overflow-y: auto;
     display: none;
@@ -29,6 +24,40 @@ body {
     display: none;
 }
 
+#book-details-section {
+    position: fixed;
+    top:10%;
+    left: 10%;
+    right: 10%;
+    max-height: 80vh;
+    background-color: lightgray;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-y: auto;
+    display: none;
+    padding: 20px;
+}
+
+#book-details-loading-msg {
+    display: none;
+}
+
+
+.nav-link {
+    cursor: pointer;
+}
+
 .book-link {
     cursor: pointer;
+}
+
+.book-cover-image{
+    width: 100px;
+    cursor:pointer;
+}
+
+.book-cover{
+    width: 100px;
 }

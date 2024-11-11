@@ -10,7 +10,7 @@
             integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
             crossorigin="anonymous"
         />
-        <link rel="stylesheet" href="static/style.css" />
+        <link rel="stylesheet" href="/static/style.css" />
         <script src="http://unpkg.com/jquery"></script>
     </head>
     <body>
@@ -107,6 +107,13 @@
             <ul id="book-search-results" class="list-group"></ul>
         </section>
 
+        <section id="book-details-section">
+            <div id="book-details-loading-msg" class="text-center">
+                <div><i class="fa-solid fa-sync fa-spin"></i></div>
+            </div>
+            <div id="book-details"></div>
+        </section>
+
         <div class="container">
             {% with messages = get_flashed_messages(with_categories=True) %} {%
             if messages %}
@@ -144,7 +151,7 @@
             src="https://kit.fontawesome.com/35b9fbe0d0.js"
             crossorigin="anonymous"
         ></script>
-        <script src="static/book.js"></script>
-        <script src="static/app.js"></script>
+        <script src="/static/book.js"></script>
+        <script src="/static/app.js"></script>
     </body>
 </html>

@@ -22,8 +22,8 @@ from flask import (
 from functools import wraps
 from flask_debugtoolbar import DebugToolbarExtension
 from dotenv import load_dotenv
-from models import db, connect_db, User, Book
-from forms import UserAddForm, LoginForm
+from models import db, connect_db, User, Book, UserBook
+from forms import UserAddForm, LoginForm, readStatisticsForm
 import requests
 
 # Load environmental variables file
@@ -167,8 +167,53 @@ def logout_view():
 @login_required
 def user_page():
     """View function to open user homepage"""
-    reading_list = g.user.books
-    return render_template("user_page.html", list=reading_list)
+    reading_log = g.user.readlog
+    return render_template("user_page.html", list=reading_log)
+
+
+@app.route("/user/add-book", methods=["POST"])
+@login_required
+def addBookToUserList():
+    """Function to add a volume to the user reading list.
+    If the book does not exist in the local dictionary, this function will add it before adding to the user reading list.
+    """
+    book_entry = db.session.get(Book, request.form["api_id"])
+    if not book_entry:
+        book_entry = Book.saveBook(request.form)
+    if book_entry in g.user.books:
+        flash("Book already in your reading list", "danger")
+    else:
+        try:
+            g.user.books.append(book_entry)
+            db.session.commit()
+            flash("Book added to you reading list", "success")
+        except:
+            db.session.rollback()
+            flash("Error adding book to your reading list", "danger")
+
+    return redirect(url_for("user_page"))
+
+
+@app.route("/user/<volume_id>", methods=["GET", "POST"])
+@login_required
+def user_book_page(volume_id):
+    """View function to open book details and user information"""
+    book_data = db.get_or_404(Book, volume_id)
+    readLog = db.get_or_404(UserBook, (g.user.id, volume_id))
+    statform = readStatisticsForm(obj=readLog)
+    if statform.validate_on_submit():
+        try:
+            readLog.start_date = statform.start_date.data
+            readLog.finish_date = statform.finish_date.data
+            readLog.current_page = statform.current_page.data
+            readLog.status = statform.status.data
+            db.session.commit()
+            print(">>>>>>>>>>>>>>>>>>>>>>>>>>commited")
+        except:
+            db.session.rollback()
+            print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< rolledback")
+            flash("Error updating reading data, please try again")
+    return render_template("user_book_page.html", book=book_data, form=statform)
 
 
 """
@@ -219,14 +264,14 @@ def search_books():
         ), response.status_code
 
 
-@app.route("/book/<id>", methods=["GET"])
-def get_book_details(id):
+@app.route("/book/<volume_id>", methods=["GET"])
+def get_book_details(volume_id):
     """Route to collect detailed information for a particular book volume"""
     params = {
         "key": api_key,
     }
 
-    response = requests.get(url=f"{GOOGLE_BOOKS_API_URL}/{id}", params=params)
+    response = requests.get(url=f"{GOOGLE_BOOKS_API_URL}/{volume_id}", params=params)
     if response.status_code == 200:
         data = response.json()
         volume_info = data.get(
@@ -242,34 +287,10 @@ def get_book_details(id):
             "thumbnail": volume_info.get("imageLinks", {}).get("thumbnail"),
             "page_count": volume_info.get("pageCount"),
             "average_rating": volume_info.get("averageRating"),
-            "id": id,
+            "id": volume_id,
         }
         return jsonify(book_data)
     else:
         return jsonify(
             {"error": "Failed to fetch data please try again"}
         ), response.status_code
-
-
-@app.route("/book/<volume_id>/add-to-user", methods=["POST"])
-@login_required
-def addBookToUserList(volume_id):
-    """Function to add a volume to the user reading list.
-    If the book does not exist in the local dictionary, this function will add it before adding to the user reading list.
-    """
-    book_entry = db.session.get(Book, volume_id)
-    if not book_entry:
-        title = request.form["book_title"]
-        book_entry = Book.saveBook({"api_id": volume_id, "title": title})
-    if book_entry in g.user.books:
-        flash("Book already in your reading list", "danger")
-    else:
-        try:
-            g.user.books.append(book_entry)
-            db.session.commit()
-            flash("Book added to you reading list", "success")
-        except:
-            db.session.rollback()
-            flash("Error adding book to your reading list", "danger")
-
-    return redirect(url_for("user_page"))

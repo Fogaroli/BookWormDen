@@ -34,7 +34,7 @@ class User(db.Model):
     location = db.Column(db.String(30))
 
     books = db.relationship("Book", secondary="users_books", backref="users")
-    readlog = db.relationship("UserBook", overlaps="books,users")
+    readlog = db.relationship("UserBook", backref="users")
 
     def validate_user(self, password):
         """Function to validate entered password, comparing to stored hashed password"""
@@ -72,15 +72,19 @@ class Book(db.Model):
 
     api_id = db.Column(db.String(30), primary_key=True)
     title = db.Column(db.Text, nullable=False)
+    cover = db.Column(db.Text, nullable=False)
+    authors = db.Column(db.Text)
+    categories = db.Column(db.Text)
+    description = db.Column(db.Text)
+    page_count = db.Column(db.Integer)
+
+    userlog = db.relationship("UserBook", backref="books")
 
     @classmethod
     def saveBook(cls, data):
         """Class method to save a new book to the database"""
         try:
-            new_book = Book(
-                api_id=data["api_id"],
-                title=data["title"],
-            )
+            new_book = Book(**data)
             db.session.add(new_book)
             db.session.commit()
             return new_book
@@ -100,9 +104,9 @@ class UserBook(db.Model):
     book_id = db.Column(
         db.String, db.ForeignKey("books.api_id"), primary_key=True, nullable=False
     )
-    start_date = db.Column(db.DateTime)
-    finish_date = db.Column(db.DateTime)
+    start_date = db.Column(db.Date)
+    finish_date = db.Column(db.Date)
     current_page = db.Column(db.Integer)
     status = db.Column(
         db.Integer
-    )  # Status should indicate 0-backlog, 1-reading, 2-completed
+    )  # Status should indicate 0-backlog, 1-reading, 2-postponed, 3-completed
