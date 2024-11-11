@@ -22,7 +22,7 @@ from flask import (
 from functools import wraps
 from flask_debugtoolbar import DebugToolbarExtension
 from dotenv import load_dotenv
-from models import db, connect_db, User, Book, UserBook
+from models import db, connect_db, User, Book, UserBook, Comment
 from forms import UserAddForm, LoginForm, readStatisticsForm
 import requests
 
@@ -294,3 +294,23 @@ def get_book_details(volume_id):
         return jsonify(
             {"error": "Failed to fetch data please try again"}
         ), response.status_code
+
+
+"""
+Book Comments engine
+"""
+
+
+@app.route("/comments/<volume_id>", methods=["GET"])
+def get_all_book_comments(volume_id):
+    """Route to read all available comments from a given book. Replies with json file with comments array"""
+    comments = (
+        db.session.query(Comment)
+        .order_by(Comment.date)
+        .filter_by(Comment.domain == 2)
+        .all()
+    )
+    if not comments:
+        return jsonify({"error": "Book not found in teh database"}), 400
+
+    return jsonify(comments=[book.serialize() for book in comments])

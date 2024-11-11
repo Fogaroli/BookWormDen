@@ -36,6 +36,8 @@ class User(db.Model):
     books = db.relationship("Book", secondary="users_books", backref="users")
     readlog = db.relationship("UserBook", backref="users")
 
+    comments = db.relationship("Comment", backref="user")
+
     def validate_user(self, password):
         """Function to validate entered password, comparing to stored hashed password"""
         return self if bcrypt.check_password_hash(self.password, password) else False
@@ -80,6 +82,8 @@ class Book(db.Model):
 
     userlog = db.relationship("UserBook", backref="books")
 
+    comments = db.relationship("Comment", backref="book")
+
     @classmethod
     def saveBook(cls, data):
         """Class method to save a new book to the database"""
@@ -110,3 +114,23 @@ class UserBook(db.Model):
     status = db.Column(
         db.Integer
     )  # Status should indicate 0-backlog, 1-reading, 2-postponed, 3-completed
+
+
+class Comment(db.Model):
+    """Model for the book comments added by users to each book"""
+
+    __tablename__ = "comments"
+
+    user_id = db.Column(
+        db.Integer, db.ForeignKey("users.id"), primary_key=True, nullable=False
+    )
+    book_id = db.Column(
+        db.String, db.ForeignKey("books.api_id"), primary_key=True, nullable=False
+    )
+
+    date = db.Column(db.Date)
+    comment = db.Column(db.Text)
+    rating = db.Column(db.Numeric)
+    domain = db.Column(
+        db.Integer
+    )  # Should indicate the audience of the comment (1=Internal, 2 = Public)
