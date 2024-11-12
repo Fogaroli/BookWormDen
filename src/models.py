@@ -134,3 +134,13 @@ class Comment(db.Model):
     domain = db.Column(
         db.Integer
     )  # Should indicate the audience of the comment (1=Internal, 2 = Public)
+
+    def serialize(self):
+        return {
+            "user_id": self.user_id,
+            "book_id": self.book_id,
+            "date": self.date,
+            "comment": self.comment,
+            "rating": self.rating,
+            "username": self.user.first_name,
+        }

@@ -128,6 +128,14 @@ comments_data = [
         "domain": 1,  # private
         "date": today - timedelta(days=5),
     },
+    {
+        "user_id": 2,
+        "book_id": "gCtazG4ZXlQC",
+        "comment": "Interesting at most",
+        "rating": 2.0,
+        "domain": 2,  # Public
+        "date": today - timedelta(days=2),
+    },
 ]
 
 # Create comments

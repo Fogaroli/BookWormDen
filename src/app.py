@@ -7,6 +7,7 @@ Date: September 17, 2024
 ================================================================
 """
 
+from operator import and_
 import os
 from flask import (
     Flask,
@@ -208,10 +209,8 @@ def user_book_page(volume_id):
             readLog.current_page = statform.current_page.data
             readLog.status = statform.status.data
             db.session.commit()
-            print(">>>>>>>>>>>>>>>>>>>>>>>>>>commited")
         except:
             db.session.rollback()
-            print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< rolledback")
             flash("Error updating reading data, please try again")
     return render_template("user_book_page.html", book=book_data, form=statform)
 
@@ -302,15 +301,16 @@ Book Comments engine
 
 
 @app.route("/comments/<volume_id>", methods=["GET"])
+@login_required
 def get_all_book_comments(volume_id):
     """Route to read all available comments from a given book. Replies with json file with comments array"""
     comments = (
         db.session.query(Comment)
         .order_by(Comment.date)
-        .filter_by(Comment.domain == 2)
+        .filter(and_(Comment.book_id == volume_id, Comment.domain == 2))
         .all()
     )
     if not comments:
         return jsonify({"error": "Book not found in teh database"}), 400
 
-    return jsonify(comments=[book.serialize() for book in comments])
+    return jsonify(comments=[book_comment.serialize() for book_comment in comments])

@@ -34,10 +34,22 @@ body %}
                     <p class="nav-link" id="book-statistics">Statistics</p>
                 </li>
                 <li class="nav-item">
-                    <p class="nav-link" id="book-comments">Comments</p>
+                    <p
+                        class="nav-link"
+                        data-book="{{book.api_id}}"
+                        id="book-comments"
+                    >
+                        Comments
+                    </p>
                 </li>
                 <li class="nav-item">
-                    <p class="nav-link" id="book-addcomment">Add comment</p>
+                    <p
+                        class="nav-link"
+                        data-book="{{book.api_id}}"
+                        id="book-addcomment"
+                    >
+                        Add comment
+                    </p>
                 </li>
             </ul>
             <div id="div-description">
@@ -69,15 +81,20 @@ body %}
                     </div>
                     {%endfor%}
                     <div class="edit-btn-area">
-                        <button class="btn btn-success">Save</button>
+                        <button type="submit" class="btn btn-success">
+                            Save
+                        </button>
                     </div>
                 </form>
             </div>
-            <div id="div-comments" hidden></div>
+            <div id="div-comments" hidden>
+                <ul id="ul-comments" class="list-group list-group-flush"></ul>
+            </div>
             <div id="div-addcomment" hidden></div>
         </div>
     </div>
 </div>
 
-<script src="/static/user_statistics.js"></script>
+<script src="/static/user_book_page.js"></script>
+<script src="/static/comments.js"></script>
 {% endblock %}
