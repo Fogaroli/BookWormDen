@@ -7,6 +7,7 @@ Date: September 17, 2024
 ================================================================
 """
 
+from operator import and_
 import os
 from flask import (
     Flask,
@@ -22,9 +23,10 @@ from flask import (
 from functools import wraps
 from flask_debugtoolbar import DebugToolbarExtension
 from dotenv import load_dotenv
-from models import db, connect_db, User, Book, UserBook
-from forms import UserAddForm, LoginForm, readStatisticsForm
+from models import db, connect_db, User, Book, UserBook, Comment
+from forms import UserAddForm, LoginForm, ReadStatisticsForm, NewCommentForm
 import requests
+from datetime import date
 
 # Load environmental variables file
 load_dotenv()
@@ -199,21 +201,60 @@ def addBookToUserList():
 def user_book_page(volume_id):
     """View function to open book details and user information"""
     book_data = db.get_or_404(Book, volume_id)
-    readLog = db.get_or_404(UserBook, (g.user.id, volume_id))
-    statform = readStatisticsForm(obj=readLog)
-    if statform.validate_on_submit():
+    read_log = db.get_or_404(UserBook, (g.user.id, volume_id))
+    stat_form = ReadStatisticsForm(obj=read_log)
+    user_comment = db.session.get(Comment, (g.user.id, volume_id))
+    comment_form = NewCommentForm(obj=user_comment)
+
+    if stat_form.validate_on_submit() and request.form.get("submit") == "statform":
         try:
-            readLog.start_date = statform.start_date.data
-            readLog.finish_date = statform.finish_date.data
-            readLog.current_page = statform.current_page.data
-            readLog.status = statform.status.data
+            read_log.start_date = stat_form.start_date.data
+            read_log.finish_date = stat_form.finish_date.data
+            read_log.current_page = stat_form.current_page.data
+            read_log.status = stat_form.status.data
             db.session.commit()
-            print(">>>>>>>>>>>>>>>>>>>>>>>>>>commited")
         except:
             db.session.rollback()
-            print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< rolledback")
             flash("Error updating reading data, please try again")
-    return render_template("user_book_page.html", book=book_data, form=statform)
+
+    if (
+        comment_form.validate_on_submit()
+        and request.form.get("submit") == "commentform"
+    ):
+        if user_comment:
+            try:
+                user_comment.comment = comment_form.comment.data
+                user_comment.rating = comment_form.rating.data
+                user_comment.domain = comment_form.domain.data
+                user_comment.date = date.today()
+                db.session.commit()
+                flash("Comment updated successfully")
+            except:
+                db.session.rollback()
+                flash("Error updating your comment")
+        else:
+            try:
+                new_comment = Comment(
+                    user_id=g.user.id,
+                    book_id=volume_id,
+                    date=date.today(),
+                    comment=comment_form.comment.data,
+                    rating=comment_form.rating.data,
+                    domain=comment_form.domain.data,
+                )
+                db.session.add(new_comment)
+                db.session.commit()
+                flash("Comment added successfully")
+            except:
+                db.session.rollback()
+                flash("Error adding your comment")
+
+    return render_template(
+        "user_book_page.html",
+        book=book_data,
+        statform=stat_form,
+        commentform=comment_form,
+    )
 
 
 """
@@ -294,3 +335,24 @@ def get_book_details(volume_id):
         return jsonify(
             {"error": "Failed to fetch data please try again"}
         ), response.status_code
+
+
+"""
+Book Comments engine
+"""
+
+
+@app.route("/comments/<volume_id>", methods=["GET"])
+@login_required
+def get_all_book_comments(volume_id):
+    """Route to read all available comments from a given book. Replies with json file with comments array"""
+    comments = (
+        db.session.query(Comment)
+        .order_by(Comment.date)
+        .filter(and_(Comment.book_id == volume_id, Comment.domain == 2))
+        .all()
+    )
+    if not comments:
+        return jsonify({"error": "Book not found in the database"}), 400
+
+    return jsonify(comments=[book_comment.serialize() for book_comment in comments])

@@ -34,10 +34,22 @@ body %}
                     <p class="nav-link" id="book-statistics">Statistics</p>
                 </li>
                 <li class="nav-item">
-                    <p class="nav-link" id="book-comments">Comments</p>
+                    <p
+                        class="nav-link"
+                        data-book="{{book.api_id}}"
+                        id="book-comments"
+                    >
+                        Public Comments
+                    </p>
                 </li>
                 <li class="nav-item">
-                    <p class="nav-link" id="book-addcomment">Add comment</p>
+                    <p
+                        class="nav-link"
+                        data-book="{{book.api_id}}"
+                        id="book-addcomment"
+                    >
+                        Add comment
+                    </p>
                 </li>
             </ul>
             <div id="div-description">
@@ -57,7 +69,7 @@ body %}
 
             <div id="div-statistics" hidden>
                 <form method="POST">
-                    {{ form.hidden_tag() }} {% for field in form if
+                    {{ statform.hidden_tag() }} {% for field in statform if
                     field.widget.input_type != 'hidden'%}
                     <div class="row">
                         <div class="col">{{field.label}}</div>
@@ -69,15 +81,49 @@ body %}
                     </div>
                     {%endfor%}
                     <div class="edit-btn-area">
-                        <button class="btn btn-success">Save</button>
+                        <button
+                            type="submit"
+                            name="submit"
+                            value="statform"
+                            class="btn btn-success"
+                        >
+                            Save
+                        </button>
                     </div>
                 </form>
             </div>
-            <div id="div-comments" hidden></div>
-            <div id="div-addcomment" hidden></div>
+            <div id="div-comments" hidden>
+                <ul id="ul-comments" class="list-group list-group-flush"></ul>
+            </div>
+            <div id="div-addcomment" hidden>
+                <form method="POST">
+                    {{ commentform.hidden_tag() }} {% for field in commentform
+                    if field.widget.input_type != 'hidden'%}
+                    <div class="row">
+                        <div class="col-4">{{field.label}}</div>
+                        <div class="col-8">
+                            {{field}} {% for error in field.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {%endfor%}
+                    <div class="edit-btn-area">
+                        <button
+                            type="submit"
+                            name="submit"
+                            value="commentform"
+                            class="btn btn-success"
+                        >
+                            Save
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
 
-<script src="/static/user_statistics.js"></script>
+<script src="/static/user_book_page.js"></script>
+<script src="/static/comments.js"></script>
 {% endblock %}
