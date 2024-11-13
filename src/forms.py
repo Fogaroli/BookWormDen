@@ -1,7 +1,15 @@
 from flask_wtf import FlaskForm
 from sqlalchemy import Integer
-from wtforms import StringField, PasswordField, DateField, SelectField, IntegerField
-from wtforms.validators import DataRequired, Length, Email, Optional
+from wtforms import (
+    StringField,
+    PasswordField,
+    DateField,
+    SelectField,
+    IntegerField,
+    TextAreaField,
+    DecimalField,
+)
+from wtforms.validators import DataRequired, Length, Email, Optional, NumberRange
 
 
 class UserAddForm(FlaskForm):
@@ -21,7 +29,7 @@ class LoginForm(FlaskForm):
     password = PasswordField("Password", validators=[Length(min=6)])
 
 
-class readStatisticsForm(FlaskForm):
+class ReadStatisticsForm(FlaskForm):
     """Form to record the reading statistics for a specified book"""
 
     start_date = DateField(
@@ -41,4 +49,27 @@ class readStatisticsForm(FlaskForm):
         ],
         coerce=int,
         validators=[Optional()],
+    )
+
+
+class NewCommentForm(FlaskForm):
+    """Form used to register a new book comment"""
+
+    comment = TextAreaField(
+        "Enter your impressions about the book", validators=[Optional()]
+    )
+    rating = DecimalField(
+        "Enter a rating from 0 to 5",
+        places=1,
+        validators=[
+            Optional(),
+            NumberRange(min=0, max=5, message="Rating must be between 0 and 5"),
+        ],
+    )
+    domain = SelectField(
+        "Select audience for your comment",
+        choices=[
+            (1, "Private (my eyes only)"),
+            (2, "Public (visible to all Den's members)"),
+        ],
     )

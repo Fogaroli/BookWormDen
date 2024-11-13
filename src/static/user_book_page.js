@@ -22,14 +22,16 @@ const divAddComment = document.querySelector("#div-addcomment");
 
 function getCommentMarkup(comment) {
     return `
-          <div class="row">
+        <div class="row">
           <div class="story-data">
             <p>
             ${comment["comment"]}
             </p>
-            <small>(${comment["date"]})</small><br>
-            <small>by ${comment["username"]}</small><br>
-            <small>posted on ${comment["date"]}</small>
+          </div>
+          <div class="row">
+            <small class="col">by ${comment["username"]}</small>
+            <small class="col">Rating: ${comment["rating"]}</small>
+            <small class="col">posted on ${comment["date"]}</small>
           </div>
         </div>
         </li>
@@ -84,23 +86,23 @@ async function showComments(event) {
     const bookId = event.target.dataset.book;
     const commentsList = await Comment.getAllComments(bookId);
     if (!commentsList) {
+        listComments.innerHTML = "";
         new_line = document.createElement("p");
         new_line.style.color = "red";
         new_line.innerText =
             "Error reading comments from server, please try again";
-        divComments.appendChild(new_line);
+        listComments.appendChild(new_line);
+    } else {
+        listComments.innerHTML = "";
+        commentsList.forEach((comment) => {
+            const htmlComment = getCommentMarkup(comment);
+            const commentEntry = document.createElement("li");
+            commentEntry.id = `(${comment.user_id},${comment.bok_id})`;
+            commentEntry.classList.add("list-group-item");
+            commentEntry.innerHTML = htmlComment;
+            listComments.appendChild(commentEntry);
+        });
     }
-    listComments.innerHTML = "";
-    commentsList.forEach((comment) => {
-        const htmlComment = getCommentMarkup(comment);
-        const commentEntry = document.createElement("li");
-        commentEntry.id = `(${comment.user_id},${comment.bok_id})`;
-        commentEntry.classList.add("list-group-item");
-        commentEntry.innerHTML = htmlComment;
-        console.log(listComments);
-        listComments.appendChild(commentEntry);
-        console.log(listComments);
-    });
 }
 function showAddComment(event) {
     bookDescription.classList.remove("active");
