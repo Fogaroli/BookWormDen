@@ -1,5 +1,6 @@
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import false
 
 bcrypt = Bcrypt()
 db = SQLAlchemy()
@@ -37,6 +38,9 @@ class User(db.Model):
     readlog = db.relationship("UserBook", backref="users")
 
     comments = db.relationship("Comment", backref="user")
+
+    owned = db.relationship("Club", backref="owner")
+    clubs = db.relationship("Club", secondary="clubs_users", backref="members")
 
     def validate_user(self, password):
         """Function to validate entered password, comparing to stored hashed password"""
@@ -144,3 +148,42 @@ class Comment(db.Model):
             "rating": self.rating,
             "username": self.user.first_name,
         }
+
+
+class Club(db.Model):
+    """Reading club database model
+    Should contain basic information about the club"""
+
+    __tablename__ = "clubs"
+
+    id = db.Column(db.Integer, PrimaryKey=True)
+    owner_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    group_name = db.Column(db.String, nullable=False)
+    group_description = db.Column(db.Text)
+
+    @classmethod
+    def createClub(cls, data):
+        """Class method to create new reading club in the database"""
+        try:
+            new_club = Club(**data)
+            db.session.add(new_club)
+            db.session.commit()
+            return new_club
+        except:
+            db.session.rollback()
+            return False
+
+
+class clubMembers(db.Model):
+    """MAny to Many relationship between clubs and member users.
+    Should also store details if the user has been invited, have accepted or rejected joining"""
+
+    __tablename__ = "clubs_users"
+
+    club_id = db.Column(db.Integer, db.ForeignKey("clubs.id"), PrimaryKey=True)
+    member_id = db.Column(
+        db.Integer, db.ForeignKey("users.id"), PrimaryKey=True, nullable=False
+    )
+    status = db.Column(
+        db.Integer
+    )  # Should indicate the membership status (1=Invited, 2 = Rejected, 3 = Member)
