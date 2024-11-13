@@ -156,16 +156,18 @@ class Club(db.Model):
 
     __tablename__ = "clubs"
 
-    id = db.Column(db.Integer, PrimaryKey=True)
+    id = db.Column(db.Integer, primary_key=True)
     owner_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    group_name = db.Column(db.String, nullable=False)
-    group_description = db.Column(db.Text)
+    club_name = db.Column(db.String, nullable=False)
+    club_description = db.Column(db.Text)
 
     @classmethod
     def createClub(cls, data):
         """Class method to create new reading club in the database"""
         try:
+            print("<<<<<<<<<<<<<<<<<<<<<<<<", data)
             new_club = Club(**data)
+            print(">>>>>>>>>>>>>>>>>>>>>", new_club)
             db.session.add(new_club)
             db.session.commit()
             return new_club
@@ -174,15 +176,15 @@ class Club(db.Model):
             return False
 
 
-class clubMembers(db.Model):
+class ClubMembers(db.Model):
     """MAny to Many relationship between clubs and member users.
     Should also store details if the user has been invited, have accepted or rejected joining"""
 
     __tablename__ = "clubs_users"
 
-    club_id = db.Column(db.Integer, db.ForeignKey("clubs.id"), PrimaryKey=True)
+    club_id = db.Column(db.Integer, db.ForeignKey("clubs.id"), primary_key=True)
     member_id = db.Column(
-        db.Integer, db.ForeignKey("users.id"), PrimaryKey=True, nullable=False
+        db.Integer, db.ForeignKey("users.id"), primary_key=True, nullable=False
     )
     status = db.Column(
         db.Integer

@@ -2,5 +2,51 @@
 block body %}
 
 <h1>My Book Clubs</h1>
+<div class="row">
+    <div class="col-1">Owmer</div>
+    <div class="col-11">
+        <div class="row">
+            {%for club in owned%}
+            <div class="card col-3">
+                <h5 class="card-header">{{club.club_name}}</h5>
+                <div class="card-body">
+                    <p class="card-text">{{club.club_description}}</p>
+                    <a href="/clubs/{{club.id}}" class="btn btn-primary"
+                        >View Club</a
+                    >
+                </div>
+            </div>
+            {%endfor%}
+        </div>
+    </div>
+</div>
+<hr />
+<div class="row">
+    <div class="col-3">Member</div>
+    <div class="col-9"></div>
+</div>
+<hr />
+<div class="row">
+    <div class="col-3">Pending Invites</div>
+    <div class="col-9"></div>
+</div>
+<hr />
+<h2>Create a new reading club</h2>
+<form method="POST" action="{{url_for('add_new_club')}}">
+    {{ form.hidden_tag() }} {% for field in form if field.widget.input_type !=
+    'hidden'%}
+    <div class="row">
+        <div class="col">{{field.label}}</div>
+        <div class="col">
+            {{field}} {% for error in field.errors %}
+            <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    {%endfor%}
+    <div class="edit-btn-area">
+        <button type="submit" class="btn btn-success">Create</button>
+    </div>
+</form>
 
 {% endblock %}

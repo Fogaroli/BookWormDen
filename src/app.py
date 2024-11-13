@@ -23,8 +23,14 @@ from flask import (
 from functools import wraps
 from flask_debugtoolbar import DebugToolbarExtension
 from dotenv import load_dotenv
-from models import db, connect_db, User, Book, UserBook, Comment
-from forms import UserAddForm, LoginForm, ReadStatisticsForm, NewCommentForm
+from models import db, connect_db, User, Book, UserBook, Comment, Club, ClubMembers
+from forms import (
+    UserAddForm,
+    LoginForm,
+    ReadStatisticsForm,
+    NewCommentForm,
+    NewClubForm,
+)
 import requests
 from datetime import date
 
@@ -104,10 +110,6 @@ def load_user():
 # View functions
 """
 
-"""
-User registration and login
-"""
-
 
 @app.route("/", methods=["GET"])
 def homepage():
@@ -119,6 +121,11 @@ def homepage():
         Render Homepage template file
     """
     return render_template("homepage.html")
+
+
+"""
+User registration and login routes
+"""
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -170,6 +177,11 @@ def logout_view():
 def user_page():
     """View function to open user homepage"""
     return render_template("user_page.html", user=g.user)
+
+
+"""
+User den routes
+"""
 
 
 @app.route("/den", methods=["GET"])
@@ -265,7 +277,7 @@ def user_book_page(volume_id):
 
 
 """
-Book search engine
+Book search routes
 """
 
 
@@ -345,7 +357,7 @@ def get_book_details(volume_id):
 
 
 """
-Book Comments engine
+Book Comments route
 """
 
 
@@ -374,4 +386,27 @@ Book clubs
 @login_required
 def book_clubs_page():
     """View function to open user book clubs home"""
-    return render_template("clubs_page.html")
+    clubs_member = g.user.clubs
+    clubs_owner = g.user.owned
+    club_form = NewClubForm()
+    return render_template(
+        "clubs_page.html", form=club_form, owned=clubs_owner, member=clubs_member
+    )
+
+
+@app.route("/clubs/add", methods=["POST"])
+@login_required
+def add_new_club():
+    """View function to open user book clubs home"""
+    club_form = NewClubForm()
+    data = {}
+    if club_form.validate_on_submit():
+        data["club_name"] = club_form.club_name.data
+        data["club_description"] = club_form.club_description.data
+        data["owner_id"] = g.user.id
+        new_club = Club.createClub(data)
+        if new_club:
+            flash("Reading club added to the database", "success")
+        else:
+            flash("Error adding the reading club, please try again", "danger")
+    return redirect(url_for("book_clubs_page"))
