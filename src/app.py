@@ -151,7 +151,7 @@ def login_view():
         if user_attempt and user_attempt.validate_user(login_form.data["password"]):
             login(user_attempt)
             flash(f"Welcome back {user_attempt.first_name}", "success")
-            return redirect(url_for("user_page"))
+            return redirect(url_for("user_den_page"))
         else:
             flash("User and/or password invalid, please try again", "danger")
     return render_template("user_login.html", form=login_form)
@@ -169,11 +169,18 @@ def logout_view():
 @login_required
 def user_page():
     """View function to open user homepage"""
+    return render_template("user_page.html", user=g.user)
+
+
+@app.route("/den", methods=["GET"])
+@login_required
+def user_den_page():
+    """View function to open user homepage"""
     reading_log = g.user.readlog
-    return render_template("user_page.html", list=reading_log)
+    return render_template("den_page.html", list=reading_log)
 
 
-@app.route("/user/add-book", methods=["POST"])
+@app.route("/den/add-book", methods=["POST"])
 @login_required
 def addBookToUserList():
     """Function to add a volume to the user reading list.
@@ -193,10 +200,10 @@ def addBookToUserList():
             db.session.rollback()
             flash("Error adding book to your reading list", "danger")
 
-    return redirect(url_for("user_page"))
+    return redirect(url_for("user_den_page"))
 
 
-@app.route("/user/<volume_id>", methods=["GET", "POST"])
+@app.route("/den/<volume_id>", methods=["GET", "POST"])
 @login_required
 def user_book_page(volume_id):
     """View function to open book details and user information"""
@@ -215,7 +222,7 @@ def user_book_page(volume_id):
             db.session.commit()
         except:
             db.session.rollback()
-            flash("Error updating reading data, please try again")
+            flash("Error updating reading data, please try again", "danger")
 
     if (
         comment_form.validate_on_submit()
@@ -228,10 +235,10 @@ def user_book_page(volume_id):
                 user_comment.domain = comment_form.domain.data
                 user_comment.date = date.today()
                 db.session.commit()
-                flash("Comment updated successfully")
+                flash("Comment updated successfully", "success")
             except:
                 db.session.rollback()
-                flash("Error updating your comment")
+                flash("Error updating your comment", "danger")
         else:
             try:
                 new_comment = Comment(
@@ -244,10 +251,10 @@ def user_book_page(volume_id):
                 )
                 db.session.add(new_comment)
                 db.session.commit()
-                flash("Comment added successfully")
+                flash("Comment added successfully", "success")
             except:
                 db.session.rollback()
-                flash("Error adding your comment")
+                flash("Error adding your comment", "danger")
 
     return render_template(
         "user_book_page.html",
@@ -356,3 +363,15 @@ def get_all_book_comments(volume_id):
         return jsonify({"error": "Book not found in the database"}), 400
 
     return jsonify(comments=[book_comment.serialize() for book_comment in comments])
+
+
+"""
+Book clubs
+"""
+
+
+@app.route("/clubs", methods=["GET"])
+@login_required
+def book_clubs_page():
+    """View function to open user book clubs home"""
+    return render_template("clubs_page.html")

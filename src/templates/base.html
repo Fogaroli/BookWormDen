@@ -47,6 +47,21 @@
                         {%if g.user%}
 
                         <li class="nav-item">
+                            <a href="/den" class="nav-link" id="user-page-link"
+                                >Home Den</a
+                            >
+                        </li>
+
+                        <li class="nav-item">
+                            <a
+                                href="/clubs"
+                                class="nav-link"
+                                id="user-page-link"
+                                >Read Clubs</a
+                            >
+                        </li>
+
+                        <li class="nav-item">
                             <a href="/user" class="nav-link" id="user-page-link"
                                 >{{g.user.username}}</a
                             >
@@ -120,7 +135,7 @@
             <section class="messages">
                 {% for category , msg in messages %}
                 <div
-                    class="alert alert-{{category}} alert-dismissible"
+                    class="alert alert-{{category}} alert-dismissible fade show"
                     role="alert"
                 >
                     {{msg}}
