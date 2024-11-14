@@ -15,15 +15,19 @@ block body %}
         <div class="col-4">
             <div class="row">
                 <div class="col-3">Owner</div>
-                {%if club.owner.id == g.user.id%}
-                <div class="col-1">:)</div>
-                {%endif%}
                 <div class="col-8">
                     {{club.owner.first_name}} {{club.owner.last_name}}
                 </div>
             </div>
             <div class="row">
-                <div class="col">Members:</div>
+                <div class="col-4">Members:</div>
+                {%if club.owner.id == g.user.id%}
+                <div class="col-8">
+                    <button class="btn btn-primary" id="add-member-btn">
+                        Add Members
+                    </button>
+                </div>
+                {%endif%}
             </div>
             <div class="row">
                 <div class="col-2"></div>
@@ -33,12 +37,30 @@ block body %}
                         <div class="col">
                             {{membership.user.first_name}}
                             {{membership.user.last_name}} {%if membership.status
-                            == 3%}
-                            <span>V</span>
+                            == 2%}
+                            <span class="badge text-bg-warning"
+                                ><i class="fa-solid fa-hourglass-start"></i
+                            ></span>
+                            {%endif%} {%if membership.status == 3%}
+                            <span class="badge text-bg-danger"
+                                ><i class="fa-solid fa-circle-xmark"></i
+                            ></span>
+                            {%endif%} {%if membership.status == 1%}
+                            <span class="badge text-bg-success"
+                                ><i class="fa-solid fa-check"></i
+                            ></span>
                             {%endif%}
                         </div>
                     </div>
                     {%endfor%}
+                </div>
+            </div>
+            <div class="row" id="add-member-form" hidden>
+                <div class="col-8">
+                    <input />
+                </div>
+                <div class="col-4">
+                    <button class="btn btn-secondary">Send Invite</button>
                 </div>
             </div>
             <hr />
@@ -66,5 +88,8 @@ block body %}
     </div>
 </div>
 
+<script>
+    const users = {{users | tojson}}
+</script>
 <script src="/static/user_club.js"></script>
 {% endblock %}

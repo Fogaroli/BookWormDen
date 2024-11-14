@@ -194,6 +194,6 @@ class ClubMembers(db.Model):
     )
     status = db.Column(
         db.Integer
-    )  # Should indicate the membership status (1=Invited, 2 = Rejected, 3 = Member)
+    )  # Should indicate the membership status (1= Member, 2 = Invited, 3 = Rejected)
 
     # user -> User connected to membership

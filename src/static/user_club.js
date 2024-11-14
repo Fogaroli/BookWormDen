@@ -7,6 +7,11 @@ Description: This file handles club page with members and discussion forum.
 
 //global variables
 
+console.log(users);
+
+const addMemberButton = document.querySelector("#add-member-btn");
+const addMemberForm = document.querySelector("#add-member-form");
+
 //================================================================
 //Supporting Functions
 
@@ -16,7 +21,12 @@ Description: This file handles club page with members and discussion forum.
 //----------------------------------------------------------------
 //Event Listeners
 
+addMemberButton.addEventListener("click", showAddMember);
+
 //----------------------------------------------------------------
 // DOM manipulation procedures
 
-// Procedure to show the book description on user book details page
+// Procedure to show for to add members to the reading club
+function showAddMember() {
+    addMemberForm.hidden = false;
+}

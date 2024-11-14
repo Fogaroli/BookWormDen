@@ -412,6 +412,13 @@ def club_view(club_id):
     """View function to open book club information"""
     club = db.get_or_404(Club, club_id)
     memberships = (
-        db.session.query(ClubMembers).filter(ClubMembers.club_id == club_id).all()
+        db.session.query(ClubMembers)
+        .filter(ClubMembers.club_id == club_id)
+        .order_by(ClubMembers.status)
+        .all()
     )
-    return render_template("user_club.html", club=club, memberships=memberships)
+    users = db.session.query(User).order_by(User.first_name).all()
+    users_list = [f"{user.first_name} {user.last_name}" for user in users]
+    return render_template(
+        "user_club.html", club=club, memberships=memberships, users=users_list
+    )
