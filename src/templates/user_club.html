@@ -1,0 +1,70 @@
+{% extends 'base.html' %} {% block title %} Book Club Details {% endblock %} {%
+block body %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-8">
+            <div class="row">
+                <div class="col-12 h4">
+                    <strong>{{club.name}}</strong>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 h4">{{club.description}}</div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="row">
+                <div class="col-3">Owner</div>
+                {%if club.owner.id == g.user.id%}
+                <div class="col-1">:)</div>
+                {%endif%}
+                <div class="col-8">
+                    {{club.owner.first_name}} {{club.owner.last_name}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">Members:</div>
+            </div>
+            <div class="row">
+                <div class="col-2"></div>
+                <div class="col-10">
+                    {%for membership in memberships%}
+                    <div class="row">
+                        <div class="col">
+                            {{membership.user.first_name}}
+                            {{membership.user.last_name}} {%if membership.status
+                            == 3%}
+                            <span>V</span>
+                            {%endif%}
+                        </div>
+                    </div>
+                    {%endfor%}
+                </div>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col">Reading List:</div>
+            </div>
+            <div class="row">
+                <div class="col-2"></div>
+                <div class="col-10">
+                    <div class="row">
+                        <div class="col">name.name</div>
+                    </div>
+                    <div class="row">
+                        <div class="col">name.name</div>
+                    </div>
+                    <div class="row">
+                        <div class="col">name.name</div>
+                    </div>
+                    <div class="row">
+                        <div class="col">name.name</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/static/user_club.js"></script>
+{% endblock %}

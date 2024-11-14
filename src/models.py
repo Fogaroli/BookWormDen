@@ -35,12 +35,11 @@ class User(db.Model):
     location = db.Column(db.String(30))
 
     books = db.relationship("Book", secondary="users_books", backref="users")
-    readlog = db.relationship("UserBook", backref="users")
-
+    readlog = db.relationship("UserBook", backref="user")
     comments = db.relationship("Comment", backref="user")
-
     owned = db.relationship("Club", backref="owner")
     clubs = db.relationship("Club", secondary="clubs_users", backref="members")
+    membership = db.relationship("ClubMembers", backref="user")
 
     def validate_user(self, password):
         """Function to validate entered password, comparing to stored hashed password"""
@@ -84,9 +83,10 @@ class Book(db.Model):
     description = db.Column(db.Text)
     page_count = db.Column(db.Integer)
 
-    userlog = db.relationship("UserBook", backref="books")
-
+    userlog = db.relationship("UserBook", backref="book")
     comments = db.relationship("Comment", backref="book")
+
+    # users -> users through users_books
 
     @classmethod
     def saveBook(cls, data):
@@ -119,6 +119,9 @@ class UserBook(db.Model):
         db.Integer
     )  # Status should indicate 0-backlog, 1-reading, 2-postponed, 3-completed
 
+    # user -> User connected to a readlog
+    # book -> Book connected to the readlog
+
 
 class Comment(db.Model):
     """Model for the book comments added by users to each book"""
@@ -131,13 +134,15 @@ class Comment(db.Model):
     book_id = db.Column(
         db.String, db.ForeignKey("books.api_id"), primary_key=True, nullable=False
     )
-
     date = db.Column(db.Date)
     comment = db.Column(db.Text)
     rating = db.Column(db.Numeric)
     domain = db.Column(
         db.Integer
     )  # Should indicate the audience of the comment (1=Internal, 2 = Public)
+
+    # user -> User owner of the comment
+    # book -> Book connected to the comment
 
     def serialize(self):
         return {
@@ -158,16 +163,17 @@ class Club(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     owner_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    club_name = db.Column(db.String, nullable=False)
-    club_description = db.Column(db.Text)
+    name = db.Column(db.String, nullable=False)
+    description = db.Column(db.Text)
+
+    # owner -> User who created the Club
+    # members -> Users through club_users
 
     @classmethod
     def createClub(cls, data):
         """Class method to create new reading club in the database"""
         try:
-            print("<<<<<<<<<<<<<<<<<<<<<<<<", data)
             new_club = Club(**data)
-            print(">>>>>>>>>>>>>>>>>>>>>", new_club)
             db.session.add(new_club)
             db.session.commit()
             return new_club
@@ -177,7 +183,7 @@ class Club(db.Model):
 
 
 class ClubMembers(db.Model):
-    """MAny to Many relationship between clubs and member users.
+    """Many to Many relationship between clubs and member users.
     Should also store details if the user has been invited, have accepted or rejected joining"""
 
     __tablename__ = "clubs_users"
@@ -189,3 +195,5 @@ class ClubMembers(db.Model):
     status = db.Column(
         db.Integer
     )  # Should indicate the membership status (1=Invited, 2 = Rejected, 3 = Member)
+
+    # user -> User connected to membership

@@ -78,7 +78,5 @@ class NewCommentForm(FlaskForm):
 class NewClubForm(FlaskForm):
     """Form to create a mew reading club"""
 
-    club_name = StringField(
-        "Reading Club Name", validators=[DataRequired(), Length(max=50)]
-    )
-    club_description = TextAreaField("Club Description", validators=[Optional()])
+    name = StringField("Reading Club Name", validators=[DataRequired(), Length(max=50)])
+    description = TextAreaField("Club Description", validators=[Optional()])

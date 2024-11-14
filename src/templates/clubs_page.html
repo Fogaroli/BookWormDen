@@ -8,9 +8,9 @@ block body %}
         <div class="row">
             {%for club in owned%}
             <div class="card col-3">
-                <h5 class="card-header">{{club.club_name}}</h5>
+                <h5 class="card-header">{{club.name}}</h5>
                 <div class="card-body">
-                    <p class="card-text">{{club.club_description}}</p>
+                    <p class="card-text">{{club.description}}</p>
                     <a href="/clubs/{{club.id}}" class="btn btn-primary"
                         >View Club</a
                     >
@@ -32,7 +32,7 @@ block body %}
 </div>
 <hr />
 <h2>Create a new reading club</h2>
-<form method="POST" action="{{url_for('add_new_club')}}">
+<form method="POST" action="{{url_for('add_club')}}">
     {{ form.hidden_tag() }} {% for field in form if field.widget.input_type !=
     'hidden'%}
     <div class="row">

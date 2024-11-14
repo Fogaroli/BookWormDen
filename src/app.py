@@ -113,13 +113,7 @@ def load_user():
 
 @app.route("/", methods=["GET"])
 def homepage():
-    """View Function for the portal homepage.
-
-    Actions:
-
-    Returns:
-        Render Homepage template file
-    """
+    """View Function for the portal homepage."""
     return render_template("homepage.html")
 
 
@@ -174,7 +168,7 @@ def logout_view():
 
 @app.route("/user", methods=["GET"])
 @login_required
-def user_page():
+def user_view():
     """View function to open user homepage"""
     return render_template("user_page.html", user=g.user)
 
@@ -186,17 +180,17 @@ User den routes
 
 @app.route("/den", methods=["GET"])
 @login_required
-def user_den_page():
-    """View function to open user homepage"""
+def user_den_view():
+    """View function to open user home den"""
     reading_log = g.user.readlog
     return render_template("den_page.html", list=reading_log)
 
 
 @app.route("/den/add-book", methods=["POST"])
 @login_required
-def addBookToUserList():
-    """Function to add a volume to the user reading list.
-    If the book does not exist in the local dictionary, this function will add it before adding to the user reading list.
+def add_book_to_user():
+    """View function to add a volume to the user reading list.
+    If the book does not exist in the local database, this function will add it (to the database) before adding to the user reading list.
     """
     book_entry = db.session.get(Book, request.form["api_id"])
     if not book_entry:
@@ -212,12 +206,12 @@ def addBookToUserList():
             db.session.rollback()
             flash("Error adding book to your reading list", "danger")
 
-    return redirect(url_for("user_den_page"))
+    return redirect(url_for("user_view"))
 
 
 @app.route("/den/<volume_id>", methods=["GET", "POST"])
 @login_required
-def user_book_page(volume_id):
+def user_book_view(volume_id):
     """View function to open book details and user information"""
     book_data = db.get_or_404(Book, volume_id)
     read_log = db.get_or_404(UserBook, (g.user.id, volume_id))
@@ -269,7 +263,7 @@ def user_book_page(volume_id):
                 flash("Error adding your comment", "danger")
 
     return render_template(
-        "user_book_page.html",
+        "user_book.html",
         book=book_data,
         statform=stat_form,
         commentform=comment_form,
@@ -282,7 +276,7 @@ Book search routes
 
 
 @app.route("/search", methods=["GET"])
-def search_books():
+def books_search_route():
     """Route to execute book search queries. Replies with json file with search content"""
     title_search = request.args.get("q")
     if not title_search:
@@ -325,7 +319,7 @@ def search_books():
 
 
 @app.route("/book/<volume_id>", methods=["GET"])
-def get_book_details(volume_id):
+def book_details_route(volume_id):
     """Route to collect detailed information for a particular book volume"""
     params = {
         "key": api_key,
@@ -357,13 +351,13 @@ def get_book_details(volume_id):
 
 
 """
-Book Comments route
+Book Comments Route
 """
 
 
 @app.route("/comments/<volume_id>", methods=["GET"])
 @login_required
-def get_all_book_comments(volume_id):
+def book_comments_route(volume_id):
     """Route to read all available comments from a given book. Replies with json file with comments array"""
     comments = (
         db.session.query(Comment)
@@ -378,13 +372,13 @@ def get_all_book_comments(volume_id):
 
 
 """
-Book clubs
+Book clubs Views
 """
 
 
 @app.route("/clubs", methods=["GET"])
 @login_required
-def book_clubs_page():
+def book_clubs_view():
     """View function to open user book clubs home"""
     clubs_member = g.user.clubs
     clubs_owner = g.user.owned
@@ -396,17 +390,28 @@ def book_clubs_page():
 
 @app.route("/clubs/add", methods=["POST"])
 @login_required
-def add_new_club():
-    """View function to open user book clubs home"""
+def add_club():
+    """View function to create new book club"""
     club_form = NewClubForm()
     data = {}
     if club_form.validate_on_submit():
-        data["club_name"] = club_form.club_name.data
-        data["club_description"] = club_form.club_description.data
+        data["name"] = club_form.name.data
+        data["description"] = club_form.description.data
         data["owner_id"] = g.user.id
         new_club = Club.createClub(data)
         if new_club:
             flash("Reading club added to the database", "success")
         else:
             flash("Error adding the reading club, please try again", "danger")
-    return redirect(url_for("book_clubs_page"))
+    return redirect(url_for("book_clubs_view"))
+
+
+@app.route("/clubs/<club_id>", methods=["GET"])
+@login_required
+def club_view(club_id):
+    """View function to open book club information"""
+    club = db.get_or_404(Club, club_id)
+    memberships = (
+        db.session.query(ClubMembers).filter(ClubMembers.club_id == club_id).all()
+    )
+    return render_template("user_club.html", club=club, memberships=memberships)
