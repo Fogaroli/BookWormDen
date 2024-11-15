@@ -9,7 +9,14 @@ from wtforms import (
     TextAreaField,
     DecimalField,
 )
-from wtforms.validators import DataRequired, Length, Email, Optional, NumberRange
+from wtforms.validators import (
+    DataRequired,
+    Length,
+    Email,
+    Optional,
+    NumberRange,
+    ValidationError,
+)
 
 
 class UserAddForm(FlaskForm):
@@ -20,6 +27,10 @@ class UserAddForm(FlaskForm):
     email = StringField("E-mail", validators=[DataRequired(), Email()])
     username = StringField("Username", validators=[DataRequired()])
     password = PasswordField("Password", validators=[Length(min=6)])
+
+    def validate_username(form, field):
+        if " " in field.data or "-" in field.data:
+            raise ValidationError("Username must not contain spaces or dashes.")
 
 
 class LoginForm(FlaskForm):

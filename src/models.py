@@ -1,6 +1,6 @@
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import false
+# from sqlalchemy import false, func
 
 bcrypt = Bcrypt()
 db = SQLAlchemy()
@@ -37,8 +37,6 @@ class User(db.Model):
     books = db.relationship("Book", secondary="users_books", backref="users")
     readlog = db.relationship("UserBook", backref="user")
     comments = db.relationship("Comment", backref="user")
-    owned = db.relationship("Club", backref="owner")
-    clubs = db.relationship("Club", secondary="clubs_users", backref="members")
     membership = db.relationship("ClubMembers", backref="user")
 
     def validate_user(self, password):
@@ -162,21 +160,23 @@ class Club(db.Model):
     __tablename__ = "clubs"
 
     id = db.Column(db.Integer, primary_key=True)
-    owner_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    name = db.Column(db.String, nullable=False)
+    name = db.Column(db.String, nullable=False, unique=True)
     description = db.Column(db.Text)
 
-    # owner -> User who created the Club
-    # members -> Users through club_users
+    members = db.relationship("ClubMembers", backref="club")
 
     @classmethod
-    def createClub(cls, data):
+    def createClub(cls, name, description, owner_id):
         """Class method to create new reading club in the database"""
         try:
-            new_club = Club(**data)
+            new_club = Club(name=name, description=description)
             db.session.add(new_club)
             db.session.commit()
-            return new_club
+            owner = ClubMembers.enrolUser(
+                club_id=new_club.id, member_id=owner_id, status=1
+            )
+            if owner:
+                return new_club
         except:
             db.session.rollback()
             return False
@@ -194,6 +194,21 @@ class ClubMembers(db.Model):
     )
     status = db.Column(
         db.Integer
-    )  # Should indicate the membership status (1= Member, 2 = Invited, 3 = Rejected)
+    )  # Should indicate the membership status (1= owner, 2 = member, 3 = invited, 4 = rejected)
 
     # user -> User connected to membership
+    # club -> Club connected to membership
+
+    @classmethod
+    def enrolUser(cls, club_id, member_id, status):
+        """Class method to register a nem member to a club"""
+        try:
+            new_membership = ClubMembers(
+                club_id=club_id, member_id=member_id, status=status
+            )
+            db.session.add(new_membership)
+            db.session.commit()
+            return new_membership
+        except:
+            db.session.rollback()
+            return False

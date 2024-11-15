@@ -7,7 +7,7 @@ Date: September 17, 2024
 ================================================================
 """
 
-from operator import and_
+from operator import and_, methodcaller
 import os
 from flask import (
     Flask,
@@ -33,6 +33,7 @@ from forms import (
 )
 import requests
 from datetime import date
+from sqlalchemy import func
 
 # Load environmental variables file
 load_dotenv()
@@ -118,7 +119,7 @@ def homepage():
 
 
 """
-User registration and login routes
+User views
 """
 
 
@@ -152,7 +153,7 @@ def login_view():
         if user_attempt and user_attempt.validate_user(login_form.data["password"]):
             login(user_attempt)
             flash(f"Welcome back {user_attempt.first_name}", "success")
-            return redirect(url_for("user_den_page"))
+            return redirect(url_for("user_den_view"))
         else:
             flash("User and/or password invalid, please try again", "danger")
     return render_template("user_login.html", form=login_form)
@@ -171,6 +172,26 @@ def logout_view():
 def user_view():
     """View function to open user homepage"""
     return render_template("user_page.html", user=g.user)
+
+
+@app.route("/user/search", methods=["GET"])
+@login_required
+def user_search_route():
+    string = request.args.get("q", "")
+    if string:
+        users = (
+            db.session.query(User)
+            .filter(
+                func.concat(User.first_name, " ", User.last_name).ilike(f"%{string}%")
+            )
+            .all()
+        )
+        suggestions = [
+            f"{user.first_name} {user.last_name} - {user.username}" for user in users
+        ]
+    else:
+        suggestions = []
+    return jsonify(suggestions)
 
 
 """
@@ -278,7 +299,7 @@ Book search routes
 @app.route("/search", methods=["GET"])
 def books_search_route():
     """Route to execute book search queries. Replies with json file with search content"""
-    title_search = request.args.get("q")
+    title_search = request.args.get("q", "")
     if not title_search:
         return jsonify({"error": "Please enter a book title to search"}), 400
 
@@ -380,25 +401,36 @@ Book clubs Views
 @login_required
 def book_clubs_view():
     """View function to open user book clubs home"""
-    clubs_member = g.user.clubs
-    clubs_owner = g.user.owned
+    clubs_member = [
+        membership.club for membership in g.user.membership if membership.status == 2
+    ]
+    clubs_owner = [
+        membership.club for membership in g.user.membership if membership.status == 1
+    ]
+    clubs_invited = [
+        membership.club for membership in g.user.membership if membership.status == 3
+    ]
     club_form = NewClubForm()
     return render_template(
-        "clubs_page.html", form=club_form, owned=clubs_owner, member=clubs_member
+        "clubs_page.html",
+        form=club_form,
+        owned=clubs_owner,
+        member=clubs_member,
+        invited=clubs_invited,
     )
 
 
 @app.route("/clubs/add", methods=["POST"])
 @login_required
-def add_club():
+def add_club_route():
     """View function to create new book club"""
     club_form = NewClubForm()
-    data = {}
     if club_form.validate_on_submit():
-        data["name"] = club_form.name.data
-        data["description"] = club_form.description.data
-        data["owner_id"] = g.user.id
-        new_club = Club.createClub(data)
+        new_club = Club.createClub(
+            name=club_form.name.data,
+            description=club_form.description.data,
+            owner_id=g.user.id,
+        )
         if new_club:
             flash("Reading club added to the database", "success")
         else:
@@ -411,14 +443,30 @@ def add_club():
 def club_view(club_id):
     """View function to open book club information"""
     club = db.get_or_404(Club, club_id)
-    memberships = (
-        db.session.query(ClubMembers)
-        .filter(ClubMembers.club_id == club_id)
-        .order_by(ClubMembers.status)
-        .all()
-    )
-    users = db.session.query(User).order_by(User.first_name).all()
-    users_list = [f"{user.first_name} {user.last_name}" for user in users]
+    owner = next((member.user for member in club.members if member.status == 1), None)
+    # memberships = (
+    #     db.session.query(ClubMembers)
+    #     .filter(ClubMembers.club_id == club_id)
+    #     .order_by(ClubMembers.status)
+    #     .all()
+    # )
     return render_template(
-        "user_club.html", club=club, memberships=memberships, users=users_list
+        "user_club.html", club=club, memberships=club.members, owner=owner
     )
+
+
+@app.route("/clubs/<club_id>/add", methods=["POST"])
+@login_required
+def add_user_route(club_id):
+    """Route to add a member to a reading club"""
+    json_data = request.get_json()
+    user = db.session.query(User).filter(User.username == json_data["username"]).first()
+    new_membership = ClubMembers.enrolUser(club_id=club_id, member_id=user.id, status=3)
+    if new_membership:
+        data = {
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+        }
+        return jsonify(added_member=data), 200
+    else:
+        return jsonify(json_data), 400
