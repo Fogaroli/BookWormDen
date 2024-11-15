@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from sqlalchemy import Integer
+from models import db, Club
 from wtforms import (
     StringField,
     PasswordField,
@@ -91,3 +91,9 @@ class NewClubForm(FlaskForm):
 
     name = StringField("Reading Club Name", validators=[DataRequired(), Length(max=50)])
     description = TextAreaField("Club Description", validators=[Optional()])
+
+    def validate_name(form, field):
+        clubs = db.session.query(Club).all()
+        club_names = [club.name for club in clubs]
+        if field.data in club_names:
+            raise ValidationError("Club Name already taken")

@@ -58,22 +58,25 @@ block body %}
     </div>
 </div>
 <hr />
-<h2>Create a new reading club</h2>
-<form method="POST" action="{{url_for('add_club_route')}}">
-    {{ form.hidden_tag() }} {% for field in form if field.widget.input_type !=
-    'hidden'%}
-    <div class="row">
-        <div class="col">{{field.label}}</div>
-        <div class="col">
-            {{field}} {% for error in field.errors %}
-            <span class="text-danger">{{ error }}</span>
+<button class="btn btn-outline-secondary m-2 w-100" id="add-club-btn">
+    Add New Club
+</button>
+<div id="add-club-form" class="container" hidden>
+    <p class="h4 text-center">Create a new reading club</p>
+    <form method="POST" action="{{url_for('book_clubs_view')}}">
+        {{ form.hidden_tag() }} {% for field in form if field.widget.input_type
+        != 'hidden'%}
+        <div>{{field.label(class="form-label")}}</div>
+        <div>
+            {{field(class="form-control")}} {% for error in field.errors %}
+            <span class="form-text text-danger">{{error}}</span>
             {% endfor %}
         </div>
-    </div>
-    {%endfor%}
-    <div class="edit-btn-area">
-        <button type="submit" class="btn btn-success">Create</button>
-    </div>
-</form>
-
+        {%endfor%}
+        <div class="m-3">
+            <button type="submit" class="btn btn-success w-100">Create</button>
+        </div>
+    </form>
+</div>
+<script src="/static/clubs_page.js"></script>
 {% endblock %}

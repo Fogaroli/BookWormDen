@@ -397,7 +397,7 @@ Book clubs Views
 """
 
 
-@app.route("/clubs", methods=["GET"])
+@app.route("/clubs", methods=["GET", "POST"])
 @login_required
 def book_clubs_view():
     """View function to open user book clubs home"""
@@ -411,20 +411,6 @@ def book_clubs_view():
         membership.club for membership in g.user.membership if membership.status == 3
     ]
     club_form = NewClubForm()
-    return render_template(
-        "clubs_page.html",
-        form=club_form,
-        owned=clubs_owner,
-        member=clubs_member,
-        invited=clubs_invited,
-    )
-
-
-@app.route("/clubs/add", methods=["POST"])
-@login_required
-def add_club_route():
-    """View function to create new book club"""
-    club_form = NewClubForm()
     if club_form.validate_on_submit():
         new_club = Club.createClub(
             name=club_form.name.data,
@@ -435,7 +421,13 @@ def add_club_route():
             flash("Reading club added to the database", "success")
         else:
             flash("Error adding the reading club, please try again", "danger")
-    return redirect(url_for("book_clubs_view"))
+    return render_template(
+        "clubs_page.html",
+        form=club_form,
+        owned=clubs_owner,
+        member=clubs_member,
+        invited=clubs_invited,
+    )
 
 
 @app.route("/clubs/<club_id>", methods=["GET"])
@@ -444,12 +436,7 @@ def club_view(club_id):
     """View function to open book club information"""
     club = db.get_or_404(Club, club_id)
     owner = next((member.user for member in club.members if member.status == 1), None)
-    # memberships = (
-    #     db.session.query(ClubMembers)
-    #     .filter(ClubMembers.club_id == club_id)
-    #     .order_by(ClubMembers.status)
-    #     .all()
-    # )
+
     return render_template(
         "user_club.html", club=club, memberships=club.members, owner=owner
     )
