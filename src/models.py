@@ -34,9 +34,9 @@ class User(db.Model):
     location = db.Column(db.String(30))
 
     books = db.relationship("Book", secondary="users_books", backref="users")
-    readlog = db.relationship("UserBook", backref="users")
-
+    readlog = db.relationship("UserBook", backref="user")
     comments = db.relationship("Comment", backref="user")
+    membership = db.relationship("ClubMembers", backref="user")
 
     def validate_user(self, password):
         """Function to validate entered password, comparing to stored hashed password"""
@@ -80,9 +80,10 @@ class Book(db.Model):
     description = db.Column(db.Text)
     page_count = db.Column(db.Integer)
 
-    userlog = db.relationship("UserBook", backref="books")
-
+    userlog = db.relationship("UserBook", backref="book")
     comments = db.relationship("Comment", backref="book")
+
+    # users -> users through users_books
 
     @classmethod
     def saveBook(cls, data):
@@ -115,6 +116,9 @@ class UserBook(db.Model):
         db.Integer
     )  # Status should indicate 0-backlog, 1-reading, 2-postponed, 3-completed
 
+    # user -> User connected to a readlog
+    # book -> Book connected to the readlog
+
 
 class Comment(db.Model):
     """Model for the book comments added by users to each book"""
@@ -127,13 +131,15 @@ class Comment(db.Model):
     book_id = db.Column(
         db.String, db.ForeignKey("books.api_id"), primary_key=True, nullable=False
     )
-
     date = db.Column(db.Date)
     comment = db.Column(db.Text)
     rating = db.Column(db.Numeric)
     domain = db.Column(
         db.Integer
     )  # Should indicate the audience of the comment (1=Internal, 2 = Public)
+
+    # user -> User owner of the comment
+    # book -> Book connected to the comment
 
     def serialize(self):
         return {
@@ -144,3 +150,121 @@ class Comment(db.Model):
             "rating": self.rating,
             "username": self.user.first_name,
         }
+
+
+class Club(db.Model):
+    """Reading club database model
+    Should contain basic information about the club"""
+
+    __tablename__ = "clubs"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False, unique=True)
+    description = db.Column(db.Text)
+
+    members = db.relationship(
+        "ClubMembers", backref="club", cascade="all, delete-orphan"
+    )
+
+    def updateClub(self, name, description):
+        try:
+            self.name = name
+            self.description = description
+            db.session.commit()
+            return True
+        except:
+            db.session.rollback()
+            return False
+
+    def delete(self):
+        try:
+            db.session.delete(self)
+            db.session.commit()
+            return True
+        except:
+            db.session.rollback()
+            return False
+
+    @classmethod
+    def createClub(cls, name, description, owner_id):
+        """Class method to create new reading club in the database"""
+        try:
+            new_club = Club(name=name, description=description)
+            db.session.add(new_club)
+            db.session.flush()
+            owner = ClubMembers.enrolUser(
+                club_id=new_club.id, member_id=owner_id, status=1
+            )
+            if owner:
+                db.session.commit()
+                return new_club
+            else:
+                raise Exception()
+        except Exception:
+            db.session.rollback()
+            return False
+
+
+class ClubMembers(db.Model):
+    """Many to Many relationship between clubs and member users.
+    Should also store details if the user has been invited, have accepted or rejected joining"""
+
+    __tablename__ = "clubs_users"
+
+    club_id = db.Column(db.Integer, db.ForeignKey("clubs.id"), primary_key=True)
+    member_id = db.Column(
+        db.Integer, db.ForeignKey("users.id"), primary_key=True, nullable=False
+    )
+    status = db.Column(
+        db.Integer
+    )  # Should indicate the membership status (1= owner, 2 = member, 3 = invited, 4 = rejected)
+
+    # user -> User connected to membership
+    # club -> Club connected to membership
+
+    def acceptInvite(self):
+        try:
+            if self.status != 1:
+                self.status = 2
+                db.session.commit()
+                return True
+            else:
+                db.session.rollback()
+                raise Exception()
+        except:
+            return False
+
+    def rejectInvite(self):
+        try:
+            if self.status != 1:
+                self.status = 4
+                db.session.commit()
+                return True
+            else:
+                db.session.rollback()
+                raise Exception()
+        except:
+            return False
+
+    def delete(self):
+        try:
+            db.session.delete(self)
+            db.session.commit()
+            return True
+        except:
+            db.session.rollback()
+            return False
+
+    @classmethod
+    def enrolUser(cls, club_id, member_id, status):
+        """Class method to register a nem member to a club"""
+        try:
+            new_membership = ClubMembers(
+                club_id=club_id, member_id=member_id, status=status
+            )
+            db.session.add(new_membership)
+            db.session.commit()
+            return new_membership
+        except:
+            db.session.rollback()
+            return False

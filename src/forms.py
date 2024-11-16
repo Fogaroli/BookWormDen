@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from sqlalchemy import Integer
+from models import db, Club
 from wtforms import (
     StringField,
     PasswordField,
@@ -9,7 +9,14 @@ from wtforms import (
     TextAreaField,
     DecimalField,
 )
-from wtforms.validators import DataRequired, Length, Email, Optional, NumberRange
+from wtforms.validators import (
+    DataRequired,
+    Length,
+    Email,
+    Optional,
+    NumberRange,
+    ValidationError,
+)
 
 
 class UserAddForm(FlaskForm):
@@ -20,6 +27,10 @@ class UserAddForm(FlaskForm):
     email = StringField("E-mail", validators=[DataRequired(), Email()])
     username = StringField("Username", validators=[DataRequired()])
     password = PasswordField("Password", validators=[Length(min=6)])
+
+    def validate_username(form, field):
+        if " " in field.data or "-" in field.data:
+            raise ValidationError("Username must not contain spaces or dashes.")
 
 
 class LoginForm(FlaskForm):
@@ -73,3 +84,16 @@ class NewCommentForm(FlaskForm):
             (2, "Public (visible to all Den's members)"),
         ],
     )
+
+
+class NewClubForm(FlaskForm):
+    """Form to create a mew reading club"""
+
+    name = StringField("Reading Club Name", validators=[DataRequired(), Length(max=50)])
+    description = TextAreaField("Club Description", validators=[Optional()])
+
+    def validate_name(form, field):
+        clubs = db.session.query(Club).all()
+        club_names = [club.name for club in clubs]
+        if field.data in club_names:
+            raise ValidationError("Club Name already taken")

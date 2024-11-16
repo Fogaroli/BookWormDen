@@ -86,7 +86,7 @@ function addBookDetailsMarkup(book) {
                         <div class="row">
                             ${
                                 userIsLogged
-                                    ? `<form action="/user/add-book" method="POST">
+                                    ? `<form action="/den/add-book" method="POST">
                                 <input name="api_id" value="${book.id}" hidden />
                                 <input name="title" value="${book.title}" hidden />
                                 <input name="cover" value="${book.thumbnail}" hidden />

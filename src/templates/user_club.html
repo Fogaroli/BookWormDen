@@ -1,0 +1,128 @@
+{% extends 'base.html' %} {% block title %} Book Club Details {% endblock %} {%
+block body %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-8">
+            <div class="row">
+                <div class="col-12 h4">
+                    <strong>{{club.name}}</strong>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 h4">{{club.description}}</div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="row">
+                <div class="col-4 text-end">Members:</div>
+                <div class="col-8" id="members-list">
+                    {%for membership in memberships%}
+                    <div class="row">
+                        <div class="col">
+                            {{membership.user.first_name}}
+                            {{membership.user.last_name}} {%if membership.status
+                            == 1%}
+                            <span class="badge text-bg-primary"
+                                ><i
+                                    class="fa-solid fa-medal"
+                                    title="Club Creator"
+                                ></i
+                            ></span>
+                            {%endif%} {%if membership.status == 2%}
+                            <span class="badge text-bg-success"
+                                ><i
+                                    class="fa-solid fa-check"
+                                    title="Club Member"
+                                ></i
+                            ></span>
+                            {%endif%} {%if membership.status == 3%}
+                            <span class="badge text-bg-warning"
+                                ><i
+                                    class="fa-solid fa-hourglass-start"
+                                    title="Invited"
+                                ></i
+                            ></span>
+                            {%endif%} {%if membership.status == 4%}
+                            <span class="badge text-bg-danger"
+                                ><i
+                                    class="fa-solid fa-circle-xmark"
+                                    title="Rejected"
+                                ></i
+                            ></span>
+                            {%endif%} {%if owner.id == g.user.id and
+                            membership.status != 1 %}
+                            <span class="badge text-bg-light"
+                                ><i
+                                    class="fa-solid fa-burst"
+                                    title="Exclude"
+                                    data-delete-member-btn
+                                    data-username="{{membership.user.username}}"
+                                ></i
+                            ></span>
+                            {%endif%}
+                        </div>
+                    </div>
+                    {%endfor%}
+                </div>
+            </div>
+
+            {%if owner.id == g.user.id %}
+            <div class="row justify-content-center">
+                <div class="col-12">
+                    <button
+                        class="btn btn-outline-secondary m-2 w-100"
+                        id="add-member-btn"
+                    >
+                        Add Member
+                    </button>
+                </div>
+            </div>
+            {%endif%}
+            <div class="row mt-3" id="add-member-form" hidden>
+                <div class="input-group">
+                    <input
+                        type="text"
+                        class="form-control"
+                        placeholder="Enter name"
+                        id="user-input"
+                        aria-label="Enter user name"
+                        aria-describedby="user-input"
+                    />
+                    <span
+                        class="input-group-text btn btn-outline-secondary"
+                        id="send-invite-btn"
+                        >Send Invite</span
+                    >
+                    <div class="dropdown" id="user-dropdown-list"></div>
+                </div>
+            </div>
+            {%if owner.id == g.user.id %}
+            <div class="row justify-content-center">
+                <div class="col-12">
+                    <a
+                        href="{{url_for('edit_club_view', club_id = club.id)}}"
+                        class="btn btn-outline-secondary m-2 w-100"
+                        id="edit-club"
+                    >
+                        Edit Club
+                    </a>
+                </div>
+            </div>
+            {%endif%}
+            <hr />
+            <div class="row">
+                <div class="col">Reading List:</div>
+            </div>
+            <div class="row">
+                <div class="col-2"></div>
+                <div class="col-10" id="reading-list"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const club_id = {{club.id}}
+</script>
+<script src="/static/user_club.js"></script>
+{% endblock %}

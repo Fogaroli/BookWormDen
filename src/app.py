@@ -7,7 +7,7 @@ Date: September 17, 2024
 ================================================================
 """
 
-from operator import and_
+from operator import and_, methodcaller
 import os
 from flask import (
     Flask,
@@ -23,10 +23,17 @@ from flask import (
 from functools import wraps
 from flask_debugtoolbar import DebugToolbarExtension
 from dotenv import load_dotenv
-from models import db, connect_db, User, Book, UserBook, Comment
-from forms import UserAddForm, LoginForm, ReadStatisticsForm, NewCommentForm
+from models import db, connect_db, User, Book, UserBook, Comment, Club, ClubMembers
+from forms import (
+    UserAddForm,
+    LoginForm,
+    ReadStatisticsForm,
+    NewCommentForm,
+    NewClubForm,
+)
 import requests
 from datetime import date
+from sqlalchemy import func
 
 # Load environmental variables file
 load_dotenv()
@@ -104,21 +111,16 @@ def load_user():
 # View functions
 """
 
-"""
-User registration and login
-"""
-
 
 @app.route("/", methods=["GET"])
 def homepage():
-    """View Function for the portal homepage.
-
-    Actions:
-
-    Returns:
-        Render Homepage template file
-    """
+    """View Function for the portal homepage."""
     return render_template("homepage.html")
+
+
+"""
+User views
+"""
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -151,7 +153,7 @@ def login_view():
         if user_attempt and user_attempt.validate_user(login_form.data["password"]):
             login(user_attempt)
             flash(f"Welcome back {user_attempt.first_name}", "success")
-            return redirect(url_for("user_page"))
+            return redirect(url_for("user_den_view"))
         else:
             flash("User and/or password invalid, please try again", "danger")
     return render_template("user_login.html", form=login_form)
@@ -167,17 +169,49 @@ def logout_view():
 
 @app.route("/user", methods=["GET"])
 @login_required
-def user_page():
+def user_view():
     """View function to open user homepage"""
-    reading_log = g.user.readlog
-    return render_template("user_page.html", list=reading_log)
+    return render_template("user_page.html", user=g.user)
 
 
-@app.route("/user/add-book", methods=["POST"])
+@app.route("/user/search", methods=["GET"])
 @login_required
-def addBookToUserList():
-    """Function to add a volume to the user reading list.
-    If the book does not exist in the local dictionary, this function will add it before adding to the user reading list.
+def user_search_route():
+    string = request.args.get("q", "")
+    if string:
+        users = (
+            db.session.query(User)
+            .filter(
+                func.concat(User.first_name, " ", User.last_name).ilike(f"%{string}%")
+            )
+            .all()
+        )
+        suggestions = [
+            f"{user.first_name} {user.last_name} - {user.username}" for user in users
+        ]
+    else:
+        suggestions = []
+    return jsonify(suggestions)
+
+
+"""
+User den routes
+"""
+
+
+@app.route("/den", methods=["GET"])
+@login_required
+def user_den_view():
+    """View function to open user home den"""
+    reading_log = g.user.readlog
+    return render_template("den_page.html", list=reading_log)
+
+
+@app.route("/den/add-book", methods=["POST"])
+@login_required
+def add_book_to_user():
+    """View function to add a volume to the user reading list.
+    If the book does not exist in the local database, this function will add it (to the database) before adding to the user reading list.
     """
     book_entry = db.session.get(Book, request.form["api_id"])
     if not book_entry:
@@ -193,14 +227,13 @@ def addBookToUserList():
             db.session.rollback()
             flash("Error adding book to your reading list", "danger")
 
-    return redirect(url_for("user_page"))
+    return redirect(url_for("user_view"))
 
 
-@app.route("/user/<volume_id>", methods=["GET", "POST"])
+@app.route("/den/<volume_id>", methods=["GET", "POST"])
 @login_required
-def user_book_page(volume_id):
+def user_book_view(volume_id):
     """View function to open book details and user information"""
-    book_data = db.get_or_404(Book, volume_id)
     read_log = db.get_or_404(UserBook, (g.user.id, volume_id))
     stat_form = ReadStatisticsForm(obj=read_log)
     user_comment = db.session.get(Comment, (g.user.id, volume_id))
@@ -215,7 +248,7 @@ def user_book_page(volume_id):
             db.session.commit()
         except:
             db.session.rollback()
-            flash("Error updating reading data, please try again")
+            flash("Error updating reading data, please try again", "danger")
 
     if (
         comment_form.validate_on_submit()
@@ -228,10 +261,10 @@ def user_book_page(volume_id):
                 user_comment.domain = comment_form.domain.data
                 user_comment.date = date.today()
                 db.session.commit()
-                flash("Comment updated successfully")
+                flash("Comment updated successfully", "success")
             except:
                 db.session.rollback()
-                flash("Error updating your comment")
+                flash("Error updating your comment", "danger")
         else:
             try:
                 new_comment = Comment(
@@ -244,13 +277,13 @@ def user_book_page(volume_id):
                 )
                 db.session.add(new_comment)
                 db.session.commit()
-                flash("Comment added successfully")
+                flash("Comment added successfully", "success")
             except:
                 db.session.rollback()
-                flash("Error adding your comment")
-
+                flash("Error adding your comment", "danger")
+    book_data = db.get_or_404(Book, volume_id)
     return render_template(
-        "user_book_page.html",
+        "user_book.html",
         book=book_data,
         statform=stat_form,
         commentform=comment_form,
@@ -258,14 +291,14 @@ def user_book_page(volume_id):
 
 
 """
-Book search engine
+Book search routes
 """
 
 
 @app.route("/search", methods=["GET"])
-def search_books():
+def books_search_route():
     """Route to execute book search queries. Replies with json file with search content"""
-    title_search = request.args.get("q")
+    title_search = request.args.get("q", "")
     if not title_search:
         return jsonify({"error": "Please enter a book title to search"}), 400
 
@@ -306,7 +339,7 @@ def search_books():
 
 
 @app.route("/book/<volume_id>", methods=["GET"])
-def get_book_details(volume_id):
+def book_details_route(volume_id):
     """Route to collect detailed information for a particular book volume"""
     params = {
         "key": api_key,
@@ -338,13 +371,13 @@ def get_book_details(volume_id):
 
 
 """
-Book Comments engine
+Book Comments Route
 """
 
 
 @app.route("/comments/<volume_id>", methods=["GET"])
 @login_required
-def get_all_book_comments(volume_id):
+def book_comments_route(volume_id):
     """Route to read all available comments from a given book. Replies with json file with comments array"""
     comments = (
         db.session.query(Comment)
@@ -356,3 +389,148 @@ def get_all_book_comments(volume_id):
         return jsonify({"error": "Book not found in the database"}), 400
 
     return jsonify(comments=[book_comment.serialize() for book_comment in comments])
+
+
+"""
+Book clubs Views
+"""
+
+
+@app.route("/clubs", methods=["GET", "POST"])
+@login_required
+def book_clubs_view():
+    """View function to open user book clubs home"""
+
+    club_form = NewClubForm()
+    if club_form.validate_on_submit():
+        new_club = Club.createClub(
+            name=club_form.name.data,
+            description=club_form.description.data,
+            owner_id=g.user.id,
+        )
+        if new_club:
+            flash("Reading club added to the database", "success")
+        else:
+            flash("Error adding the reading club, please try again", "danger")
+    clubs_member = [
+        membership.club for membership in g.user.membership if membership.status == 2
+    ]
+    clubs_owner = [
+        membership.club for membership in g.user.membership if membership.status == 1
+    ]
+    clubs_invited = [
+        membership.club for membership in g.user.membership if membership.status == 3
+    ]
+    return render_template(
+        "clubs_page.html",
+        form=club_form,
+        owned=clubs_owner,
+        member=clubs_member,
+        invited=clubs_invited,
+    )
+
+
+@app.route("/clubs/<club_id>", methods=["GET"])
+@login_required
+def club_view(club_id):
+    """View function to open book club information"""
+    club = db.get_or_404(Club, club_id)
+    owner = next((member.user for member in club.members if member.status == 1), None)
+    memberships = (
+        db.session.query(ClubMembers)
+        .filter(ClubMembers.club_id == club_id)
+        .order_by(ClubMembers.status)
+    )
+
+    return render_template(
+        "user_club.html", club=club, memberships=memberships, owner=owner
+    )
+
+
+@app.route("/clubs/<club_id>/edit", methods=["GET", "POST"])
+@login_required
+def edit_club_view(club_id):
+    """View function to edit user book information"""
+    club = db.get_or_404(Club, club_id)
+    print("club>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", club)
+    club_form = NewClubForm(obj=club)
+    if club_form.validate_on_submit():
+        updated_club = club.updateClub(
+            name=club_form.name.data,
+            description=club_form.description.data,
+        )
+        if updated_club:
+            flash("Reading club updated", "success")
+        else:
+            flash("Error updating the reading club, please try again", "danger")
+    return render_template("club_edit_page.html", form=club_form, club_id=club_id)
+
+
+@app.route("/clubs/delete", methods=["POST"])
+@login_required
+def delete_club_route():
+    """View function to edit user book information"""
+    club_id = request.form["club_id"]
+    club = db.get_or_404(Club, club_id)
+    deleted = club.delete()
+    if deleted:
+        flash("Club deleted", "success")
+    else:
+        flash("Error deleting the reading club, please try again", "danger")
+    return redirect(url_for("book_clubs_view"))
+
+
+@app.route("/clubs/<club_id>/add", methods=["POST"])
+@login_required
+def add_user_route(club_id):
+    """Route to add a member to a reading club"""
+    json_data = request.get_json()
+    user = db.session.query(User).filter(User.username == json_data["username"]).first()
+    new_membership = ClubMembers.enrolUser(club_id=club_id, member_id=user.id, status=3)
+    if new_membership:
+        data = {
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+        }
+        return jsonify(added_member=data), 200
+    else:
+        return jsonify(json_data), 400
+
+
+@app.route("/clubs/<club_id>/delete", methods=["POST"])
+@login_required
+def delete_user_route(club_id):
+    """Route to add a member to a reading club"""
+    json_data = request.get_json()
+    user = db.session.query(User).filter(User.username == json_data["username"]).first()
+    membership = db.get_or_404(ClubMembers, (club_id, user.id))
+    delete = membership.delete()
+    if delete:
+        data = {
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+        }
+        return jsonify(removed_member=data), 200
+    else:
+        return jsonify(json_data), 400
+
+
+@app.route("/clubs/<club_id>/invite", methods=["POST"])
+@login_required
+def process_invite_route(club_id):
+    response = request.form.get("invite")
+    membership = db.get_or_404(ClubMembers, (club_id, g.user.id))
+    if response == "accept":
+        accept = membership.acceptInvite()
+        if accept:
+            flash(f"You joined {membership.club.name}", "success")
+        else:
+            flash("Error processing your response, please try again", "danger")
+
+    if response == "reject":
+        reject = membership.rejectInvite()
+        if reject:
+            flash(f"You reject to join {membership.club.name}", "warning")
+        else:
+            flash("Error processing your response, please try again", "danger")
+    return redirect(url_for("book_clubs_view"))
