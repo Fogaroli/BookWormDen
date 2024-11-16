@@ -9,6 +9,7 @@ Description: This file handles user clubs summary page and allow creating new cl
 
 const addClubButton = document.querySelector("#add-club-btn");
 const addClubForm = document.querySelector("#add-club-form");
+const errorElements = document.querySelector("[data-error]");
 
 //================================================================
 //Supporting Functions
@@ -29,4 +30,8 @@ addClubButton.addEventListener("click", showAddClub);
 function showAddClub() {
     addClubForm.hidden = false;
     addClubButton.hidden = true;
+}
+
+if (errorElements) {
+    showAddClub();
 }

@@ -234,7 +234,6 @@ def add_book_to_user():
 @login_required
 def user_book_view(volume_id):
     """View function to open book details and user information"""
-    book_data = db.get_or_404(Book, volume_id)
     read_log = db.get_or_404(UserBook, (g.user.id, volume_id))
     stat_form = ReadStatisticsForm(obj=read_log)
     user_comment = db.session.get(Comment, (g.user.id, volume_id))
@@ -282,7 +281,7 @@ def user_book_view(volume_id):
             except:
                 db.session.rollback()
                 flash("Error adding your comment", "danger")
-
+    book_data = db.get_or_404(Book, volume_id)
     return render_template(
         "user_book.html",
         book=book_data,
@@ -401,15 +400,7 @@ Book clubs Views
 @login_required
 def book_clubs_view():
     """View function to open user book clubs home"""
-    clubs_member = [
-        membership.club for membership in g.user.membership if membership.status == 2
-    ]
-    clubs_owner = [
-        membership.club for membership in g.user.membership if membership.status == 1
-    ]
-    clubs_invited = [
-        membership.club for membership in g.user.membership if membership.status == 3
-    ]
+
     club_form = NewClubForm()
     if club_form.validate_on_submit():
         new_club = Club.createClub(
@@ -421,6 +412,15 @@ def book_clubs_view():
             flash("Reading club added to the database", "success")
         else:
             flash("Error adding the reading club, please try again", "danger")
+    clubs_member = [
+        membership.club for membership in g.user.membership if membership.status == 2
+    ]
+    clubs_owner = [
+        membership.club for membership in g.user.membership if membership.status == 1
+    ]
+    clubs_invited = [
+        membership.club for membership in g.user.membership if membership.status == 3
+    ]
     return render_template(
         "clubs_page.html",
         form=club_form,

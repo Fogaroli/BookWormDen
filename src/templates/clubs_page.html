@@ -69,7 +69,7 @@ block body %}
         <div>{{field.label(class="form-label")}}</div>
         <div>
             {{field(class="form-control")}} {% for error in field.errors %}
-            <span class="form-text text-danger">{{error}}</span>
+            <span class="form-text text-danger" data-error>{{error}}</span>
             {% endfor %}
         </div>
         {%endfor%}

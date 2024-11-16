@@ -171,13 +171,16 @@ class Club(db.Model):
         try:
             new_club = Club(name=name, description=description)
             db.session.add(new_club)
-            db.session.commit()
+            db.session.flush()
             owner = ClubMembers.enrolUser(
                 club_id=new_club.id, member_id=owner_id, status=1
             )
             if owner:
+                db.session.commit()
                 return new_club
-        except:
+            else:
+                raise Exception()
+        except Exception:
             db.session.rollback()
             return False
 
