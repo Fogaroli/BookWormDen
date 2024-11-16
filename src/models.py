@@ -1,6 +1,5 @@
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
-# from sqlalchemy import false, func
 
 bcrypt = Bcrypt()
 db = SQLAlchemy()
@@ -201,6 +200,39 @@ class ClubMembers(db.Model):
 
     # user -> User connected to membership
     # club -> Club connected to membership
+
+    def acceptInvite(self):
+        try:
+            if self.status != 1:
+                self.status = 2
+                db.session.commit()
+                return True
+            else:
+                db.session.rollback()
+                raise Exception()
+        except:
+            return False
+
+    def rejectInvite(self):
+        try:
+            if self.status != 1:
+                self.status = 4
+                db.session.commit()
+                return True
+            else:
+                db.session.rollback()
+                raise Exception()
+        except:
+            return False
+
+    def delete(self):
+        try:
+            db.session.delete(self)
+            db.session.commit()
+            return True
+        except:
+            db.session.rollback()
+            return False
 
     @classmethod
     def enrolUser(cls, club_id, member_id, status):

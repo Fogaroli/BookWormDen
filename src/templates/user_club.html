@@ -23,19 +23,41 @@ block body %}
                             {{membership.user.last_name}} {%if membership.status
                             == 1%}
                             <span class="badge text-bg-primary"
-                                ><i class="fa-solid fa-medal"></i
+                                ><i
+                                    class="fa-solid fa-medal"
+                                    title="Club Creator"
+                                ></i
                             ></span>
                             {%endif%} {%if membership.status == 2%}
                             <span class="badge text-bg-success"
-                                ><i class="fa-solid fa-check"></i
+                                ><i
+                                    class="fa-solid fa-check"
+                                    title="Club Member"
+                                ></i
                             ></span>
                             {%endif%} {%if membership.status == 3%}
                             <span class="badge text-bg-warning"
-                                ><i class="fa-solid fa-hourglass-start"></i
+                                ><i
+                                    class="fa-solid fa-hourglass-start"
+                                    title="Invited"
+                                ></i
                             ></span>
                             {%endif%} {%if membership.status == 4%}
                             <span class="badge text-bg-danger"
-                                ><i class="fa-solid fa-circle-xmark"></i
+                                ><i
+                                    class="fa-solid fa-circle-xmark"
+                                    title="Rejected"
+                                ></i
+                            ></span>
+                            {%endif%} {%if owner.id == g.user.id and
+                            membership.status != 1 %}
+                            <span class="badge text-bg-light"
+                                ><i
+                                    class="fa-solid fa-burst"
+                                    title="Exclude"
+                                    data-delete-member-btn
+                                    data-username="{{membership.user.username}}"
+                                ></i
                             ></span>
                             {%endif%}
                         </div>
@@ -80,20 +102,7 @@ block body %}
             </div>
             <div class="row">
                 <div class="col-2"></div>
-                <div class="col-10">
-                    <div class="row">
-                        <div class="col">name.name</div>
-                    </div>
-                    <div class="row">
-                        <div class="col">name.name</div>
-                    </div>
-                    <div class="row">
-                        <div class="col">name.name</div>
-                    </div>
-                    <div class="row">
-                        <div class="col">name.name</div>
-                    </div>
-                </div>
+                <div class="col-10" id="reading-list"></div>
             </div>
         </div>
     </div>

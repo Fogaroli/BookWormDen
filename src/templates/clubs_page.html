@@ -49,8 +49,27 @@ block body %}
                 <h5 class="card-header">{{club.name}}</h5>
                 <div class="card-body">
                     <p class="card-text">{{club.description}}</p>
-                    <a href="" class="btn btn-primary">Accept</a>
-                    <a href="" class="btn btn-danger">Reject</a>
+                    <form
+                        method="POST"
+                        action="{{url_for('process_invite_route', club_id = club.id)}}"
+                    >
+                        <button
+                            type="submit"
+                            name="invite"
+                            value="accept"
+                            class="btn btn-success"
+                        >
+                            Join
+                        </button>
+                        <button
+                            type="submit"
+                            name="invite"
+                            value="reject"
+                            class="btn btn-danger"
+                        >
+                            Reject
+                        </button>
+                    </form>
                 </div>
             </div>
             {%endfor%}

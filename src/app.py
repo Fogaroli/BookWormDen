@@ -436,9 +436,14 @@ def club_view(club_id):
     """View function to open book club information"""
     club = db.get_or_404(Club, club_id)
     owner = next((member.user for member in club.members if member.status == 1), None)
+    memberships = (
+        db.session.query(ClubMembers)
+        .filter(ClubMembers.club_id == club_id)
+        .order_by(ClubMembers.status)
+    )
 
     return render_template(
-        "user_club.html", club=club, memberships=club.members, owner=owner
+        "user_club.html", club=club, memberships=memberships, owner=owner
     )
 
 
@@ -457,3 +462,42 @@ def add_user_route(club_id):
         return jsonify(added_member=data), 200
     else:
         return jsonify(json_data), 400
+
+
+@app.route("/clubs/<club_id>/delete", methods=["POST"])
+@login_required
+def delete_user_route(club_id):
+    """Route to add a member to a reading club"""
+    json_data = request.get_json()
+    user = db.session.query(User).filter(User.username == json_data["username"]).first()
+    membership = db.get_or_404(ClubMembers, (club_id, user.id))
+    delete = membership.delete()
+    if delete:
+        data = {
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+        }
+        return jsonify(removed_member=data), 200
+    else:
+        return jsonify(json_data), 400
+
+
+@app.route("/clubs/<club_id>/invite", methods=["POST"])
+@login_required
+def process_invite_route(club_id):
+    response = request.form.get("invite")
+    membership = db.get_or_404(ClubMembers, (club_id, g.user.id))
+    if response == "accept":
+        accept = membership.acceptInvite()
+        if accept:
+            flash(f"You joined {membership.club.name}", "success")
+        else:
+            flash("Error processing your response, please try again", "danger")
+
+    if response == "reject":
+        reject = membership.rejectInvite()
+        if reject:
+            flash(f"You reject to join {membership.club.name}", "warning")
+        else:
+            flash("Error processing your response, please try again", "danger")
+    return redirect(url_for("book_clubs_view"))
