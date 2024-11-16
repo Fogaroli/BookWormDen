@@ -56,10 +56,12 @@ Run in debug mode by using
 ## Unit Tests
 
 Unit tests are written and added to the repository. 
-Backend tests can be executed entering the `test` folder and triggering each python test script individually, example below:
+Backend tests can be executed entering the `src/backend_unit_test` folder and triggering each python test script individually, example below:
 
-`python -m unittest test_<file name>.py`
+`python -m pytest test_<file name>.py`
 
-Frontend tests can be executed by downloading Jasmine library from [This Address](https://github.com/jasmine/jasmine/releases) and then opening the file below on a live server:
+Frontend tests are developped in Node.js Jest, it is necessary to have node installed on the machine that will be used to run the tests.
+Navigate to the `src`folder and use:
 
-`frontend_test/FrontEdnTestRunner.html`
+`npm install`
+`npm run test`
