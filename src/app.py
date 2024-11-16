@@ -447,6 +447,39 @@ def club_view(club_id):
     )
 
 
+@app.route("/clubs/<club_id>/edit", methods=["GET", "POST"])
+@login_required
+def edit_club_view(club_id):
+    """View function to edit user book information"""
+    club = db.get_or_404(Club, club_id)
+    print("club>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", club)
+    club_form = NewClubForm(obj=club)
+    if club_form.validate_on_submit():
+        updated_club = club.updateClub(
+            name=club_form.name.data,
+            description=club_form.description.data,
+        )
+        if updated_club:
+            flash("Reading club updated", "success")
+        else:
+            flash("Error updating the reading club, please try again", "danger")
+    return render_template("club_edit_page.html", form=club_form, club_id=club_id)
+
+
+@app.route("/clubs/delete", methods=["POST"])
+@login_required
+def delete_club_route():
+    """View function to edit user book information"""
+    club_id = request.form["club_id"]
+    club = db.get_or_404(Club, club_id)
+    deleted = club.delete()
+    if deleted:
+        flash("Club deleted", "success")
+    else:
+        flash("Error deleting the reading club, please try again", "danger")
+    return redirect(url_for("book_clubs_view"))
+
+
 @app.route("/clubs/<club_id>/add", methods=["POST"])
 @login_required
 def add_user_route(club_id):

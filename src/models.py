@@ -162,7 +162,28 @@ class Club(db.Model):
     name = db.Column(db.String, nullable=False, unique=True)
     description = db.Column(db.Text)
 
-    members = db.relationship("ClubMembers", backref="club")
+    members = db.relationship(
+        "ClubMembers", backref="club", cascade="all, delete-orphan"
+    )
+
+    def updateClub(self, name, description):
+        try:
+            self.name = name
+            self.description = description
+            db.session.commit()
+            return True
+        except:
+            db.session.rollback()
+            return False
+
+    def delete(self):
+        try:
+            db.session.delete(self)
+            db.session.commit()
+            return True
+        except:
+            db.session.rollback()
+            return False
 
     @classmethod
     def createClub(cls, name, description, owner_id):
