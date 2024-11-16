@@ -82,6 +82,7 @@ class Book(db.Model):
 
     userlog = db.relationship("UserBook", backref="book")
     comments = db.relationship("Comment", backref="book")
+    clubs = db.relationship("Club", secondary="clubs_books", backref="books")
 
     # users -> users through users_books
 
@@ -166,6 +167,8 @@ class Club(db.Model):
         "ClubMembers", backref="club", cascade="all, delete-orphan"
     )
 
+    # books = book added to the club reading list through clubs_books
+
     def updateClub(self, name, description):
         try:
             self.name = name
@@ -203,6 +206,19 @@ class Club(db.Model):
         except Exception:
             db.session.rollback()
             return False
+
+
+class ClubBook(db.Model):
+    """Model for many to many relationship between reading clubs and books"""
+
+    __tablename__ = "clubs_books"
+
+    club_id = db.Column(
+        db.Integer, db.ForeignKey("clubs.id"), primary_key=True, nullable=False
+    )
+    book_id = db.Column(
+        db.String, db.ForeignKey("books.api_id"), primary_key=True, nullable=False
+    )
 
 
 class ClubMembers(db.Model):
