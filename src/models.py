@@ -1,5 +1,6 @@
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
+from datetime import date, datetime, timezone
 
 bcrypt = Bcrypt()
 db = SQLAlchemy()
@@ -312,4 +313,44 @@ class ClubMembers(db.Model):
             return new_membership
         except:
             db.session.rollback()
+            return False
+
+
+class Message(db.Model):
+    """Model for the messages int he forum for the reading clubs"""
+
+    __tablename__ = "messages"
+
+    club_id = db.Column(db.Integer, db.ForeignKey("clubs.id"), primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), primary_key=True)
+    message = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(
+        db.DateTime, nullable=False, default=datetime.now(timezone.utc)
+    )
+
+    def delete(self):
+        try:
+            db.session.delete(self)
+            db.session.commit()
+            return True
+        except:
+            return False
+
+    def updateMessage(self, message):
+        try:
+            self.message = message
+            self.timestamp = datetime.now(timezone.utc)
+            db.session.commit()
+            return True
+        except:
+            return False
+
+    @classmethod
+    def addMessage(cls, club_id, user_id, message):
+        new_message = Message(club_id, user_id, message)
+        try:
+            db.session.add(new_message)
+            db.session.commit()
+            return new_message
+        except:
             return False
