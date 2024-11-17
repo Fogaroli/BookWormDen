@@ -100,6 +100,16 @@ body %}
                         </button>
                     </div>
                 </form>
+                <form
+                    method="post"
+                    action="{{url_for('remove_book_from_user', volume_id = book.api_id)}}"
+                >
+                    <div class="m-3 col">
+                        <button type="submit" class="btn btn-danger w-100">
+                            Remove book from my Den
+                        </button>
+                    </div>
+                </form>
             </div>
             <div id="div-comments" hidden>
                 <ul id="ul-comments" class="list-group list-group-flush"></ul>

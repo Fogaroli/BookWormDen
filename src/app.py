@@ -23,7 +23,17 @@ from flask import (
 from functools import wraps
 from flask_debugtoolbar import DebugToolbarExtension
 from dotenv import load_dotenv
-from models import db, connect_db, User, Book, UserBook, Comment, Club, ClubMembers
+from models import (
+    ClubBook,
+    db,
+    connect_db,
+    User,
+    Book,
+    UserBook,
+    Comment,
+    Club,
+    ClubMembers,
+)
 from forms import (
     UserAddForm,
     LoginForm,
@@ -81,6 +91,28 @@ def login_required(f):
         if "CURRENT_USER" not in session:
             flash("Please login first", "danger")
             return redirect(url_for("login_view", next=request.url))
+        return f(*args, **kwargs)
+
+    return decorated_function
+
+
+def club_access_required(f):
+    """
+    Decorator to check if the current user has access to the specified club.
+    """
+
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        club_id = int(kwargs.get("club_id"))
+        member_club_ids = [
+            membership.club.id
+            for membership in g.user.membership
+            if membership.status in [1, 2]
+        ]
+        if club_id not in member_club_ids:
+            flash("You don't have access to this club", "danger")
+            return redirect(url_for("book_clubs_view"))
+
         return f(*args, **kwargs)
 
     return decorated_function
@@ -227,6 +259,21 @@ def add_book_to_user():
             db.session.rollback()
             flash("Error adding book to your reading list", "danger")
 
+    return redirect(url_for("user_den_view"))
+
+
+@app.route("/den/<volume_id>/delete", methods=["POST"])
+@login_required
+def remove_book_from_user(volume_id):
+    """View function to remove a volume from the user reading list.
+    The book should remain in the database.
+    """
+    readlog = db.get_or_404(UserBook, (g.user.id, volume_id))
+    deleted = readlog.delete()
+    if deleted:
+        flash("Book removed from your reading list", "success")
+    else:
+        flash("Error removing the book, please try again", "danger")
     return redirect(url_for("user_den_view"))
 
 
@@ -396,9 +443,35 @@ def add_book_club_reading_list(volume_id):
     club = db.session.query(Club).filter(Club.name == club_name).first()
     added = club.addBookToList(book)
     if added:
-        return jsonify(book=book.title, club=club.name), 200
+        data = {"book": book.title, "club": club.name}
+        return jsonify(added=data), 200
     else:
         return jsonify(json_data), 400
+
+
+@app.route("/book/<volume_id>/delete", methods=["POST"])
+@login_required
+def remove_book_club_reading_list(volume_id):
+    """Route to remove a book from the reading club book list"""
+    json_data = request.get_json()
+    club_id = json_data.get("club_id")
+    club = db.get_or_404(Club, club_id)
+    book = db.get_or_404(Book, volume_id)
+    owner = (
+        db.session.query(ClubMembers)
+        .filter(and_(ClubMembers.club_id == club_id, ClubMembers.status == 1))
+        .first()
+    )
+    if owner.member_id == g.user.id:
+        book_list = db.get_or_404(ClubBook, (club_id, volume_id))
+        deleted = book_list.delete()
+        if deleted:
+            data = {"book": book.title, "club": club.name}
+            return jsonify(deleted=data), 200
+        else:
+            return jsonify(json_data), 400
+    else:
+        return jsonify(json_data), 500
 
 
 """
@@ -463,6 +536,7 @@ def book_clubs_view():
 
 @app.route("/clubs/<club_id>", methods=["GET"])
 @login_required
+@club_access_required
 def club_view(club_id):
     """View function to open book club information"""
     club = db.get_or_404(Club, club_id)

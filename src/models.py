@@ -121,6 +121,15 @@ class UserBook(db.Model):
     # user -> User connected to a readlog
     # book -> Book connected to the readlog
 
+    def delete(self):
+        try:
+            db.session.delete(self)
+            db.session.commit()
+            return True
+        except:
+            db.session.rollback()
+            return False
+
 
 class Comment(db.Model):
     """Model for the book comments added by users to each book"""
@@ -230,6 +239,15 @@ class ClubBook(db.Model):
     book_id = db.Column(
         db.String, db.ForeignKey("books.api_id"), primary_key=True, nullable=False
     )
+
+    def delete(self):
+        try:
+            db.session.delete(self)
+            db.session.commit()
+            return True
+        except:
+            db.session.rollback()
+            return False
 
 
 class ClubMembers(db.Model):

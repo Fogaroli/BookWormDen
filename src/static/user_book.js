@@ -182,5 +182,8 @@ async function addReadingClub(event) {
     if (added) {
         const new_li = getClubLi(club);
         listClubs.appendChild(new_li);
+        option = document.querySelector(`option[value="${club}"]`);
+        console.log(option);
+        option.remove();
     }
 }

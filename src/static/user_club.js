@@ -16,6 +16,7 @@ const addMemberForm = document.querySelector("#add-member-form");
 const userSearchInput = document.querySelector("#user-input");
 const userDropdown = document.querySelector("#user-dropdown-list");
 const membersListDiv = document.querySelector("#members-list");
+const deleteBookButton = document.querySelectorAll("[data-delete-book-btn]");
 
 //================================================================
 //Supporting Functions
@@ -49,11 +50,25 @@ async function sendInvite(club, username) {
     return response.data;
 }
 
-async function sendDelete(club, username) {
+async function sendDeleteMember(club, username) {
     const response = await axios({
         url: `/clubs/${club}/delete`,
         method: "Post",
         data: { username: username },
+    }).catch((error) => {
+        return error;
+    });
+    if (response instanceof Error) {
+        return false;
+    }
+    return true;
+}
+
+async function sendDeleteBook(book_id, club_id) {
+    const response = await axios({
+        url: `/book/${book_id}/delete`,
+        method: "Post",
+        data: { club_id: club_id },
     }).catch((error) => {
         return error;
     });
@@ -72,6 +87,9 @@ async function sendDelete(club, username) {
 addMemberButton.addEventListener("click", showAddMember);
 deleteMemberButton.forEach((button) => {
     button.addEventListener("click", deleteMember);
+});
+deleteBookButton.forEach((button) => {
+    button.addEventListener("click", deleteBook);
 });
 sendInviteButton.addEventListener("click", addMember);
 userSearchInput.addEventListener("input", showDropdown);
@@ -143,7 +161,6 @@ async function addMember() {
             new_member_row.appendChild(new_member);
 
             membersListDiv.appendChild(new_member_row);
-            updateEventListener();
             userSearchInput.value = "";
         } else {
             userSearchInput.value = "ERROR - Try Again";
@@ -153,9 +170,21 @@ async function addMember() {
 
 //procedure to delete user from book club
 async function deleteMember(event) {
-    const deleted = await sendDelete(club_id, event.target.dataset.username);
+    const deleted = await sendDeleteMember(
+        club_id,
+        event.target.dataset.username
+    );
     if (deleted) {
         userDiv = event.target.closest("div").parentElement;
         userDiv.remove();
+    }
+}
+
+//procedure to delete book from book club reading list
+async function deleteBook(event) {
+    const deleted = await sendDeleteBook(event.target.dataset.book, club_id);
+    if (deleted) {
+        bookDiv = event.target.closest("div").parentElement;
+        bookDiv.remove();
     }
 }
