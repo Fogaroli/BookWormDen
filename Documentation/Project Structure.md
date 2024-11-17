@@ -46,3 +46,5 @@ Features to be added.
 - Order names on the club members list.
 
 TODO > To be Expanded
+
+- refactor file and function naming, too confusing

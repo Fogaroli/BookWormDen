@@ -37,6 +37,7 @@ class User(db.Model):
     readlog = db.relationship("UserBook", backref="user")
     comments = db.relationship("Comment", backref="user")
     membership = db.relationship("ClubMembers", backref="user")
+    clubs = db.relationship("Club", secondary="clubs_users", backref="members")
 
     def validate_user(self, password):
         """Function to validate entered password, comparing to stored hashed password"""
@@ -82,6 +83,7 @@ class Book(db.Model):
 
     userlog = db.relationship("UserBook", backref="book")
     comments = db.relationship("Comment", backref="book")
+    clubs = db.relationship("Club", secondary="clubs_books", backref="books")
 
     # users -> users through users_books
 
@@ -118,6 +120,15 @@ class UserBook(db.Model):
 
     # user -> User connected to a readlog
     # book -> Book connected to the readlog
+
+    def delete(self):
+        try:
+            db.session.delete(self)
+            db.session.commit()
+            return True
+        except:
+            db.session.rollback()
+            return False
 
 
 class Comment(db.Model):
@@ -162,9 +173,11 @@ class Club(db.Model):
     name = db.Column(db.String, nullable=False, unique=True)
     description = db.Column(db.Text)
 
-    members = db.relationship(
+    membership = db.relationship(
         "ClubMembers", backref="club", cascade="all, delete-orphan"
     )
+    # members = User added to the club by clubs_users
+    # books = book added to the club reading list through clubs_books
 
     def updateClub(self, name, description):
         try:
@@ -181,6 +194,16 @@ class Club(db.Model):
             db.session.delete(self)
             db.session.commit()
             return True
+        except:
+            db.session.rollback()
+            return False
+
+    def addBookToList(self, book):
+        try:
+            if book not in self.books:
+                self.books.append(book)
+                db.session.commit()
+                return True
         except:
             db.session.rollback()
             return False
@@ -205,9 +228,31 @@ class Club(db.Model):
             return False
 
 
+class ClubBook(db.Model):
+    """Model for many to many relationship between reading clubs and books"""
+
+    __tablename__ = "clubs_books"
+
+    club_id = db.Column(
+        db.Integer, db.ForeignKey("clubs.id"), primary_key=True, nullable=False
+    )
+    book_id = db.Column(
+        db.String, db.ForeignKey("books.api_id"), primary_key=True, nullable=False
+    )
+
+    def delete(self):
+        try:
+            db.session.delete(self)
+            db.session.commit()
+            return True
+        except:
+            db.session.rollback()
+            return False
+
+
 class ClubMembers(db.Model):
-    """Many to Many relationship between clubs and member users.
-    Should also store details if the user has been invited, have accepted or rejected joining"""
+    """Many to Many relationship between clubs and member users describing membership status.
+    Should store details if the user has been invited, have accepted or rejected joining"""
 
     __tablename__ = "clubs_users"
 

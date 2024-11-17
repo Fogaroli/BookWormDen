@@ -113,10 +113,35 @@ block body %}
             <div class="row">
                 <div class="col">Reading List:</div>
             </div>
+            {%for book in club.books%}
             <div class="row">
-                <div class="col-2"></div>
-                <div class="col-10" id="reading-list"></div>
+                <div
+                    class="col-2 d-flex justify-content-center align-items-center"
+                >
+                    {%if owner.id == g.user.id %}
+                    <i
+                        class="fa-solid fa-burst btn"
+                        title="Exclude"
+                        data-delete-book-btn
+                        data-book="{{book.api_id}}"
+                    ></i>
+                    {%endif%}
+                </div>
+                <div class="col-10" id="reading-list">
+                    <div class="row">
+                        <div class="col-2 m-1">
+                            <img class="img-fluid" src="{{book.cover}}" />
+                        </div>
+                        <div class="col-8">
+                            <a
+                                href="{{url_for('user_book_view', volume_id = book.api_id)}}"
+                                >{{book.title}}</a
+                            >
+                        </div>
+                    </div>
+                </div>
             </div>
+            {%endfor%}
         </div>
     </div>
 </div>
