@@ -33,6 +33,7 @@ from models import (
     Comment,
     Club,
     ClubMembers,
+    Message,
 )
 from forms import (
     UserAddForm,
@@ -640,3 +641,67 @@ def process_invite_route(club_id):
         else:
             flash("Error processing your response, please try again", "danger")
     return redirect(url_for("book_clubs_view"))
+
+
+"""
+Club messages route
+"""
+
+
+@app.route("/clubs/<club_id>/messages", methods=["GET"])
+@login_required
+@club_access_required
+def club_messages_route(club_id):
+    """Route to read all available messages for a given club"""
+    start = request.args.get("start", 0)
+    quantity = request.args.get("quantity", 20)
+    messages = (
+        db.session.query(Message)
+        .filter(Message.club_id == club_id)
+        .offset(start)
+        .limit(quantity)
+    )
+    data = [message.serialize() for message in messages]
+    return jsonify(messages=data), 200
+
+
+@app.route("/clubs/<club_id>/messages", methods=["POST"])
+@login_required
+@club_access_required
+def add_club_messages_route(club_id):
+    """Route to add a new message to the club forum"""
+    json_data = request.get_json()
+    new_message = Message.addMessage(**json_data)
+    if new_message:
+        return jsonify(message=new_message.serialize()), 200
+    return jsonify(json_data), 400
+
+
+@app.route("/clubs/<club_id>/messages/<message_id>", methods=["PATCH"])
+@login_required
+@club_access_required
+def update_club_messages_route(club_id, message_id):
+    """Route to update message content from am existing message"""
+    json_data = request.get_json()
+    message = db.get_or_404(Message, message_id)
+    if message.user_id != g.user.id or message.club_id != club_id:
+        return jsonify(json_data), 403
+    modified = message.updateMessage(json_data.get("message", message.message))
+    if modified:
+        return jsonify(message=modified.serialize()), 200
+    return jsonify(json_data), 400
+
+
+@app.route("/clubs/<club_id>/messages/<message_id>", methods=["DELETE"])
+@login_required
+@club_access_required
+def delete_club_messages_route(club_id, message_id):
+    """Route to delete an existing message"""
+    json_data = request.get_json()
+    message = db.get_or_404(Message, message_id)
+    if message.user_id != g.user.id or message.club_id != club_id:
+        return jsonify(json_data), 403
+    deleted = message.delete()
+    if deleted:
+        return jsonify(message="deleted"), 200
+    return jsonify(json_data), 400

@@ -18,6 +18,8 @@ const userDropdown = document.querySelector("#user-dropdown-list");
 const membersListDiv = document.querySelector("#members-list");
 const deleteBookButton = document.querySelectorAll("[data-delete-book-btn]");
 
+// club_id = club.id variable injected from backend
+
 //================================================================
 //Supporting Functions
 

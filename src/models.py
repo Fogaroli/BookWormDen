@@ -39,6 +39,7 @@ class User(db.Model):
     comments = db.relationship("Comment", backref="user")
     membership = db.relationship("ClubMembers", backref="user")
     clubs = db.relationship("Club", secondary="clubs_users", backref="members")
+    messages = db.relationship("Message", backref="user")
 
     def validate_user(self, password):
         """Function to validate entered password, comparing to stored hashed password"""
@@ -321,12 +322,24 @@ class Message(db.Model):
 
     __tablename__ = "messages"
 
-    club_id = db.Column(db.Integer, db.ForeignKey("clubs.id"), primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
+    club_id = db.Column(db.Integer, db.ForeignKey("clubs.id"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     message = db.Column(db.Text, nullable=False)
     timestamp = db.Column(
         db.DateTime, nullable=False, default=datetime.now(timezone.utc)
     )
+
+    # user -> User who posted the message
+
+    def serialize(self):
+        return {
+            "message": self.message,
+            "timestamp": self.timestamp,
+            "user_first_name": self.user.first_name,
+            "user_last_name": self.user.last_name,
+            "user_username": self.user.username,
+        }
 
     def delete(self):
         try:
@@ -341,12 +354,12 @@ class Message(db.Model):
             self.message = message
             self.timestamp = datetime.now(timezone.utc)
             db.session.commit()
-            return True
+            return self
         except:
             return False
 
     @classmethod
-    def addMessage(cls, club_id, user_id, message):
+    def addMessage(cls, club_id, user_id, message, **kwargs):
         new_message = Message(club_id, user_id, message)
         try:
             db.session.add(new_message)
