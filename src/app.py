@@ -49,9 +49,9 @@ api_key = os.environ.get("GOOGLE_API_KEY")
 # Setup Flask app
 app = Flask(__name__)
 app.config["SECRET_KEY"] = secret_code
-app.config["DEBUG_TB_INTERCEPT_REDIRECTS"] = True
+app.config["DEBUG_TB_INTERCEPT_REDIRECTS"] = False
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["SQLALCHEMY_ECHO"] = True
+app.config["SQLALCHEMY_ECHO"] = False
 debug = DebugToolbarExtension(app)
 
 # Detect if testing environmental variable is set to True
@@ -227,7 +227,7 @@ def add_book_to_user():
             db.session.rollback()
             flash("Error adding book to your reading list", "danger")
 
-    return redirect(url_for("user_view"))
+    return redirect(url_for("user_den_view"))
 
 
 @app.route("/den/<volume_id>", methods=["GET", "POST"])
@@ -352,15 +352,15 @@ def book_details_route(volume_id):
             "volumeInfo", {}
         )  # volume is the google book term for an item (book, magazine or other content)
         book_data = {
-            "title": volume_info.get("title"),
+            "title": volume_info.get("title", ""),
             "authors": volume_info.get("authors", []),
             "categories": volume_info.get("categories", []),
-            "publisher": volume_info.get("publisher"),
+            "publisher": volume_info.get("publisher", ""),
             "publishedDate": volume_info.get("publishedDate"),
-            "description": volume_info.get("description"),
+            "description": volume_info.get("description", ""),
             "thumbnail": volume_info.get("imageLinks", {}).get("thumbnail"),
-            "page_count": volume_info.get("pageCount"),
-            "average_rating": volume_info.get("averageRating"),
+            "page_count": volume_info.get("pageCount", 0),
+            "average_rating": volume_info.get("averageRating", 0),
             "id": volume_id,
         }
         return jsonify(book_data)
@@ -368,6 +368,37 @@ def book_details_route(volume_id):
         return jsonify(
             {"error": "Failed to fetch data please try again"}
         ), response.status_code
+
+
+@app.route("/book/<volume_id>/clubs", methods=["GET"])
+@login_required
+def book_club_reading_list(volume_id):
+    """Route to collect the reading clubs from a the connected user and if the given book is already in the reading list"""
+    book = db.get_or_404(Book, volume_id)
+    user_member_clubs = [
+        membership.club
+        for membership in g.user.membership
+        if membership.status in [1, 2]
+    ]
+    included_clubs = [club.name for club in user_member_clubs if club in book.clubs]
+    club_choices = [club.name for club in user_member_clubs if club not in book.clubs]
+
+    return jsonify(included=included_clubs, choices=club_choices)
+
+
+@app.route("/book/<volume_id>/add", methods=["POST"])
+@login_required
+def add_book_club_reading_list(volume_id):
+    """Route to add a book to the reading club book list"""
+    json_data = request.get_json()
+    club_name = json_data.get("club_name")
+    book = db.get_or_404(Book, volume_id)
+    club = db.session.query(Club).filter(Club.name == club_name).first()
+    added = club.addBookToList(book)
+    if added:
+        return jsonify(book=book.title, club=club.name), 200
+    else:
+        return jsonify(json_data), 400
 
 
 """
@@ -435,7 +466,9 @@ def book_clubs_view():
 def club_view(club_id):
     """View function to open book club information"""
     club = db.get_or_404(Club, club_id)
-    owner = next((member.user for member in club.members if member.status == 1), None)
+    owner = next(
+        (member.user for member in club.membership if member.status == 1), None
+    )
     memberships = (
         db.session.query(ClubMembers)
         .filter(ClubMembers.club_id == club_id)
@@ -452,7 +485,6 @@ def club_view(club_id):
 def edit_club_view(club_id):
     """View function to edit user book information"""
     club = db.get_or_404(Club, club_id)
-    print("club>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", club)
     club_form = NewClubForm(obj=club)
     if club_form.validate_on_submit():
         updated_club = club.updateClub(

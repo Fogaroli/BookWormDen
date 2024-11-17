@@ -37,6 +37,7 @@ class User(db.Model):
     readlog = db.relationship("UserBook", backref="user")
     comments = db.relationship("Comment", backref="user")
     membership = db.relationship("ClubMembers", backref="user")
+    clubs = db.relationship("Club", secondary="clubs_users", backref="members")
 
     def validate_user(self, password):
         """Function to validate entered password, comparing to stored hashed password"""
@@ -163,10 +164,10 @@ class Club(db.Model):
     name = db.Column(db.String, nullable=False, unique=True)
     description = db.Column(db.Text)
 
-    members = db.relationship(
+    membership = db.relationship(
         "ClubMembers", backref="club", cascade="all, delete-orphan"
     )
-
+    # members = User added to the club by clubs_users
     # books = book added to the club reading list through clubs_books
 
     def updateClub(self, name, description):
@@ -184,6 +185,16 @@ class Club(db.Model):
             db.session.delete(self)
             db.session.commit()
             return True
+        except:
+            db.session.rollback()
+            return False
+
+    def addBookToList(self, book):
+        try:
+            if book not in self.books:
+                self.books.append(book)
+                db.session.commit()
+                return True
         except:
             db.session.rollback()
             return False
@@ -222,8 +233,8 @@ class ClubBook(db.Model):
 
 
 class ClubMembers(db.Model):
-    """Many to Many relationship between clubs and member users.
-    Should also store details if the user has been invited, have accepted or rejected joining"""
+    """Many to Many relationship between clubs and member users describing membership status.
+    Should store details if the user has been invited, have accepted or rejected joining"""
 
     __tablename__ = "clubs_users"
 

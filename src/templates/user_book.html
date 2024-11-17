@@ -46,9 +46,18 @@ body %}
                     <p
                         class="nav-link"
                         data-book="{{book.api_id}}"
-                        id="book-addcomment"
+                        id="book-add-comment"
                     >
                         Add comment
+                    </p>
+                </li>
+                <li class="nav-item">
+                    <p
+                        class="nav-link"
+                        data-book="{{book.api_id}}"
+                        id="book-clubs"
+                    >
+                        Reading Clubs
                     </p>
                 </li>
             </ul>
@@ -95,7 +104,7 @@ body %}
             <div id="div-comments" hidden>
                 <ul id="ul-comments" class="list-group list-group-flush"></ul>
             </div>
-            <div id="div-addcomment" hidden>
+            <div id="div-add-comment" hidden>
                 <form method="POST">
                     {{ commentform.hidden_tag() }} {% for field in commentform
                     if field.widget.input_type != 'hidden'%}
@@ -120,10 +129,20 @@ body %}
                     </div>
                 </form>
             </div>
+            <div id="div-book-clubs" hidden>
+                <ul id="ul-clubs" class="list-group list-group-flush"></ul>
+                <select id="club-select-list" class="form-select m-4"></select>
+                <p
+                    class="btn btn-outline-secondary"
+                    id="add-reading-club"
+                    data-book="{{book.api_id}}"
+                >
+                    Add to reading Club
+                </p>
+            </div>
         </div>
     </div>
 </div>
 
 <script src="/static/user_book.js"></script>
-<script src="/static/comments.js"></script>
 {% endblock %}
