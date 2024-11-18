@@ -116,7 +116,7 @@ class Message {
             return false;
         }
         return response.data.messages.map((message) => new Message(message));
-        //messages format from server: {message, timestamp, user_first_name, user_last_name, user_username}
+        //messages format from server: {id, message, timestamp, user_first_name, user_last_name, user_username}
     }
 
     static async sendNewMessage(club_id, message) {
@@ -132,6 +132,21 @@ class Message {
             return false;
         }
         return new Message(message);
+    }
+
+    static async sendDelete(club_id, message_id) {
+        /**Class method to delete a message from the server */
+        const response = await axios({
+            url: `/clubs/${club_id}/messages/${message_id}`,
+            method: "DELETE",
+            data: { message: message_id },
+        }).catch((error) => {
+            return error;
+        });
+        if (response instanceof Error) {
+            return false;
+        }
+        return true;
     }
 }
 

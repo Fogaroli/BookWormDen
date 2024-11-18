@@ -332,6 +332,7 @@ class Message(db.Model):
 
     def serialize(self):
         return {
+            "id": self.id,
             "message": self.message,
             "timestamp": self.timestamp,
             "user_first_name": self.user.first_name,

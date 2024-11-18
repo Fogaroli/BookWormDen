@@ -81,3 +81,11 @@ h1 {
 [data-delete-member-btn]{
     cursor: pointer;
 }
+
+.action{
+    cursor: pointer;
+}
+
+.error{
+    color: red;
+}
