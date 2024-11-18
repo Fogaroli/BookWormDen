@@ -2,7 +2,7 @@
 Title: The BookWormDen
 Author: Fabricio Ribeiro
 Date: October 6th, 2024
-Description: This file handles club page with members and discussion forum.
+Description: This file handles club page with members.
 */
 
 //global variables
@@ -17,6 +17,8 @@ const userSearchInput = document.querySelector("#user-input");
 const userDropdown = document.querySelector("#user-dropdown-list");
 const membersListDiv = document.querySelector("#members-list");
 const deleteBookButton = document.querySelectorAll("[data-delete-book-btn]");
+
+// club_id = club.id variable injected from backend
 
 //================================================================
 //Supporting Functions
@@ -84,7 +86,10 @@ async function sendDeleteBook(book_id, club_id) {
 //----------------------------------------------------------------
 //Event Listeners
 
-addMemberButton.addEventListener("click", showAddMember);
+if (addMemberButton) {
+    addMemberButton.addEventListener("click", showAddMember);
+}
+
 deleteMemberButton.forEach((button) => {
     button.addEventListener("click", deleteMember);
 });
