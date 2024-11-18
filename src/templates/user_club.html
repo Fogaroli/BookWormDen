@@ -3,13 +3,36 @@ block body %}
 <div class="container mt-5">
     <div class="row">
         <div class="col-8">
-            <div class="row">
-                <div class="col-12 h4">
-                    <strong>{{club.name}}</strong>
+            <div class="p-3 mb-3 bg-body-tertiary rounded-3">
+                <div class="container-fluid">
+                    <div class="col-12 h2 text-center">
+                        <strong>{{club.name}}</strong>
+                    </div>
+                </div>
+                <div class="row justify-content-center">
+                    <div class="col-8 h4 m-3">{{club.description}}</div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-12 h4">{{club.description}}</div>
+            <hr />
+            <div>
+                <p class="h5 text-center">Forum</p>
+            </div>
+            <div class="input-group mb-3" id="new-message-form">
+                <textarea
+                    class="form-control"
+                    id="new-message-content"
+                    placeholder="Enter new message"
+                    aria-label="New forum message"
+                ></textarea>
+                <span
+                    class="input-group-text btn btn-dark"
+                    id="send-message-btn"
+                    >Send</span
+                >
+            </div>
+            <ul class="list-group" id="club-forum"></ul>
+            <div id="forum-loading-msg" class="text-center" hidden>
+                <div><i class="fa-solid fa-sync fa-spin"></i></div>
             </div>
         </div>
         <div class="col-4">
@@ -150,4 +173,5 @@ block body %}
     const club_id = {{club.id}}
 </script>
 <script src="/static/user_club.js"></script>
+<script src="/static/club_forum.js"></script>
 {% endblock %}

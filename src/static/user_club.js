@@ -2,7 +2,7 @@
 Title: The BookWormDen
 Author: Fabricio Ribeiro
 Date: October 6th, 2024
-Description: This file handles club page with members and discussion forum.
+Description: This file handles club page with members.
 */
 
 //global variables

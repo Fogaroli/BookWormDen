@@ -658,6 +658,7 @@ def club_messages_route(club_id):
     messages = (
         db.session.query(Message)
         .filter(Message.club_id == club_id)
+        .order_by(Message.timestamp.desc())
         .offset(start)
         .limit(quantity)
     )
@@ -671,7 +672,9 @@ def club_messages_route(club_id):
 def add_club_messages_route(club_id):
     """Route to add a new message to the club forum"""
     json_data = request.get_json()
-    new_message = Message.addMessage(**json_data)
+    new_message = Message.addMessage(
+        club_id=club_id, user_id=g.user.id, message=json_data["message"]
+    )
     if new_message:
         return jsonify(message=new_message.serialize()), 200
     return jsonify(json_data), 400

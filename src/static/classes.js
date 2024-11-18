@@ -16,9 +16,6 @@ class Book {
 
     static async getBookByTitle(titleString) {
         /**Class method to get a book list based on the book title. Title sent as parameter */
-        // const response = await axios({
-        //     url: `/search?q=${titleString}`,
-        //     method: "GET",
         const response = await axios
             .get(`/search`, {
                 params: { q: titleString },
@@ -97,8 +94,49 @@ class Club {
     }
 }
 
+class Message {
+    /**
+     * Class to store information about each book obtained from API.
+     * Requests from frontend are managed by the backend, which provides data from search topics.
+     */
+    constructor(properties) {
+        Object.assign(this, { ...properties });
+    }
+
+    static async getClubMessages(club_id, offset, quantity) {
+        /**Class method to get club messages from the server*/
+        const response = await axios
+            .get(`/clubs/${club_id}/messages`, {
+                params: { start: offset, quantity: quantity },
+            })
+            .catch((error) => {
+                return error;
+            });
+        if (response instanceof Error) {
+            return false;
+        }
+        return response.data.messages.map((message) => new Message(message));
+        //messages format from server: {message, timestamp, user_first_name, user_last_name, user_username}
+    }
+
+    static async sendNewMessage(club_id, message) {
+        /**Class method to send a new forum message to the server */
+        const response = await axios({
+            url: `/clubs/${club_id}/messages`,
+            method: "POST",
+            data: { message: message },
+        }).catch((error) => {
+            return error;
+        });
+        if (response instanceof Error) {
+            return false;
+        }
+        return new Message(message);
+    }
+}
+
 //================================================================
 //Setup for unit testing
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = { Book, Comment, Club };
+    module.exports = { Book, Comment, Club, Message };
 }

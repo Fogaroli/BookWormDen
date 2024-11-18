@@ -326,9 +326,7 @@ class Message(db.Model):
     club_id = db.Column(db.Integer, db.ForeignKey("clubs.id"), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     message = db.Column(db.Text, nullable=False)
-    timestamp = db.Column(
-        db.DateTime, nullable=False, default=datetime.now(timezone.utc)
-    )
+    timestamp = db.Column(db.DateTime, nullable=False)
 
     # user -> User who posted the message
 
@@ -359,8 +357,13 @@ class Message(db.Model):
             return False
 
     @classmethod
-    def addMessage(cls, club_id, user_id, message, **kwargs):
-        new_message = Message(club_id, user_id, message)
+    def addMessage(cls, club_id, user_id, message):
+        new_message = Message(
+            club_id=club_id,
+            user_id=user_id,
+            message=message,
+            timestamp=datetime.now(timezone.utc),
+        )
         try:
             db.session.add(new_message)
             db.session.commit()
