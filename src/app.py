@@ -687,7 +687,7 @@ def update_club_messages_route(club_id, message_id):
     """Route to update message content from am existing message"""
     json_data = request.get_json()
     message = db.get_or_404(Message, message_id)
-    if message.user_id != g.user.id or message.club_id != club_id:
+    if message.user_id != g.user.id or message.club_id != int(club_id):
         return jsonify(json_data), 403
     modified = message.updateMessage(json_data.get("message", message.message))
     if modified:

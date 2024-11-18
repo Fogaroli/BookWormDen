@@ -334,7 +334,7 @@ class Message(db.Model):
         return {
             "id": self.id,
             "message": self.message,
-            "timestamp": self.timestamp,
+            "timestamp": self.timestamp.strftime("%d/%b/%y %I:%M %p"),
             "user_first_name": self.user.first_name,
             "user_last_name": self.user.last_name,
             "user_username": self.user.username,
@@ -351,7 +351,7 @@ class Message(db.Model):
     def updateMessage(self, message):
         try:
             self.message = message
-            self.timestamp = datetime.now(timezone.utc)
+            # self.timestamp = datetime.now(timezone.utc) #Not sure if the timestamp should be updated when edited.
             db.session.commit()
             return self
         except:

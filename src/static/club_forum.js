@@ -22,10 +22,8 @@ const $messageForm = $("#new-message-form");
 // Function to create a li element with a message text based on the message map provided
 function getMessageMarkup(message) {
     const messageEntry = `
-        <div class="row">
-            <div class="col-1 d-flex justify-content-center align-items-center" data-messageid=${
-                message.id
-            }>
+        <div class="row" data-messageid=${message.id}>
+            <div class="col-1 d-flex justify-content-center align-items-center">
             ${
                 userUsername === message["user_username"]
                     ? `<i class="fa-solid fa-burst m-1 action" id="remove-message" title="Remove message"></i>
@@ -33,19 +31,20 @@ function getMessageMarkup(message) {
                     : ""
             }
             </div>
-            <div class="col-11">
-                <div class="row">
-                    <div class="col">${message["message"]}</div>
-                </div>
-                <div class="row justify-content-evenly">
-                    <div class="col-3">
-                        <small>${message["user_first_name"]} ${
+
+            <div class="col-3 text-center">
+                <p class="fw-bold">${message["user_first_name"]} ${
         message["user_last_name"]
-    }</small>
-                    </div>
-                    <div class="col-3">
-                        <small>${message["timestamp"]}</small>
-                    </div>
+    }</p>
+                <small>${message["timestamp"]}</small>
+            </div>
+
+            <div class="col-8">
+                <div class="row" data-messagecontent=${message.id}>
+                    <div class="col fw-bold">${message["message"].replace(
+                        /\n/g,
+                        "<br>"
+                    )}</div>
                 </div>
             </div>
         </div>
@@ -53,14 +52,30 @@ function getMessageMarkup(message) {
     return $("<li>", { class: "list-group-item" }).html(messageEntry);
 }
 
+// Function to create the input text area for a message edit. Event listener to handle updates
+function getMessageEditMarkup(message) {
+    const inputMarkup = `
+        <textarea class="form-control" aria-label="edit message input">${message}</textarea>
+        <span class="input-group-text btn btn-dark" id="send-update-btn">Update</span>  
+    `;
+    const newDiv = $("<div>", { class: "input-group mb-3" }).html(inputMarkup);
+    newDiv.on("click", (event) => {
+        if (event.target.id === "send-update-btn") {
+            updateMessage(event);
+        }
+    });
+    return newDiv;
+}
+
 // Function to process the event listener for the message action icons, delete and edit
 function processMessageIcon(event) {
-    const message_id = event.target.parentElement.dataset.messageid;
+    const message_id =
+        event.target.parentElement.parentElement.dataset.messageid;
     if (event.target.id === "remove-message") {
         removeMessage(message_id);
     }
     if (event.target.id === "edit-message") {
-        console.log(`edit ${message_id}`);
+        showEditMessage(message_id);
     }
 }
 
@@ -101,6 +116,7 @@ async function sendNewMessage() {
     const message = await Message.sendNewMessage(club_id, messageContent);
     if (message) {
         loadInitialMessages();
+        $newMessageContent.val("");
     } else {
         const error = $("<small>", { class: "error" }).text(
             "Error - Failed to send the message"
@@ -117,6 +133,33 @@ async function removeMessage(message_id) {
     } else {
         const error = $("<small>", { class: "error" }).text(
             "Error - Failed to remove message"
+        );
+        $messagesUl.prepend(error);
+    }
+}
+
+// Procedure to open an input field to allow message editing
+function showEditMessage(message_id) {
+    const $messageDiv = $(`[data-messagecontent=${message_id}]`);
+    const formDiv = getMessageEditMarkup($messageDiv.text().trim());
+    $messageDiv.empty();
+    $messageDiv.append(formDiv);
+}
+
+// Procedure to update message content
+async function updateMessage(event) {
+    const messageInput = event.target.parentElement.firstElementChild;
+    const messageDiv = messageInput.parentElement.parentElement;
+    const update = await Message.sendUpdate(
+        club_id,
+        (message_id = messageDiv.dataset.messagecontent),
+        (message = messageInput.value)
+    );
+    if (update) {
+        loadInitialMessages();
+    } else {
+        const error = $("<small>", { class: "error" }).text(
+            "Error - Failed to update message"
         );
         $messagesUl.prepend(error);
     }

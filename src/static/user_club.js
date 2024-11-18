@@ -86,7 +86,10 @@ async function sendDeleteBook(book_id, club_id) {
 //----------------------------------------------------------------
 //Event Listeners
 
-addMemberButton.addEventListener("click", showAddMember);
+if (addMemberButton) {
+    addMemberButton.addEventListener("click", showAddMember);
+}
+
 deleteMemberButton.forEach((button) => {
     button.addEventListener("click", deleteMember);
 });

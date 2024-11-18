@@ -148,6 +148,21 @@ class Message {
         }
         return true;
     }
+
+    static async sendUpdate(club_id, message_id, message) {
+        /**Class method to update a message content from the club forum */
+        const response = await axios({
+            url: `/clubs/${club_id}/messages/${message_id}`,
+            method: "PATCH",
+            data: { message: message },
+        }).catch((error) => {
+            return error;
+        });
+        if (response instanceof Error) {
+            return false;
+        }
+        return new Message(message);
+    }
 }
 
 //================================================================
