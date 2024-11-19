@@ -45,7 +45,7 @@ class UserAddForm(FlaskForm):
 
     def validate_email(form, field):
         database_list = db.session.query(User.email).all()
-        if field.data in database_list:
+        if field.data in [email[0] for email in database_list]:
             raise ValidationError("This E-mail is already in the database")
 
 

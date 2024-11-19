@@ -45,6 +45,30 @@ class User(db.Model):
         """Function to validate entered password, comparing to stored hashed password"""
         return self if bcrypt.check_password_hash(self.password, password) else False
 
+    def update_info(self, data):
+        self.first_name = data.get("first_name", self.first_name)
+        self.last_name = data.get("last_name", self.last_name)
+        self.email = data.get("email", self.email)
+        self.image_url = data.get("image_url", self.image_url)
+        self.bio = data.get("bio", self.bio)
+        self.location = data.get("location", self.location)
+        try:
+            db.session.commit()
+            return self
+        except:
+            db.session.rollback()
+            return False
+
+    def update_password(self, new_password):
+        try:
+            hashed_password = bcrypt.generate_password_hash(new_password).decode("utf8")
+            self.password = hashed_password
+            db.session.commit()
+            return self
+        except:
+            db.session.rollback()
+            return False
+
     @classmethod
     def signup(cls, data):
         """Class method to create new users in the database"""

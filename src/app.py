@@ -41,6 +41,7 @@ from forms import (
     ReadStatisticsForm,
     NewCommentForm,
     NewClubForm,
+    UserEditForm,
 )
 import requests
 from datetime import date
@@ -203,13 +204,33 @@ def logout_view():
 @app.route("/user", methods=["GET"])
 @login_required
 def user_view():
-    """View function to open user homepage"""
-    return render_template("user_page.html", user=g.user)
+    """View function to open user info and edit page"""
+    edit_form = UserEditForm(obj=g.user)
+    if edit_form.validate_on_submit():
+        button = request.edit_form.get("button")
+        if button == "save":
+            updated = g.user.update_info(edit_form.data)
+            if updated:
+                flash("User profile updated", "success")
+            else:
+                flash("Error updating profile, please try again", "danger")
+        if button == "change_password":
+            if g.user.validate_user(edit_form.new_password.data):
+                password_updated = g.user.update_password(edit_form.new_password.data)
+                if password_updated:
+                    flash("Password updated", "success")
+                else:
+                    flash(
+                        "Error changing password, please use old password and try again",
+                        "danger",
+                    )
+    return render_template("user_page.html", user=g.user, form=edit_form)
 
 
 @app.route("/user/search", methods=["GET"])
 @login_required
 def user_search_route():
+    """Route to search for users based on a provided argument"""
     string = request.args.get("q", "")
     if string:
         users = (
