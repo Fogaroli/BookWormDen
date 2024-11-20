@@ -18,6 +18,7 @@ from wtforms.validators import (
     ValidationError,
     URL,
     Regexp,
+    NumberRange,
 )
 
 
@@ -57,12 +58,12 @@ class UserEditForm(FlaskForm):
     email = StringField("E-mail", validators=[DataRequired(), Email()])
     image_url = StringField("Portrait (Avatar) URL", validators=[Optional(), URL()])
     bio = TextAreaField("A bit about yorself", validators=[Optional()])
-    location = StringField("City, Country", validators=[Optional])
-    password = PasswordField("Password", validators=[Length(min=6)])
+    location = StringField("City, Country", validators=[Optional()])
+    password = PasswordField("Old Password", validators=[Optional()])
     new_password = PasswordField(
-        "Password",
+        "New Password",
         validators=[
-            DataRequired(),
+            Optional(),
             Regexp(
                 regex="^(?=.{6,})(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s).*$",
                 message="Password must have 6 characters minimum, UPPERCASE, lowercase and numeric character",

@@ -1,7 +1,147 @@
 {% extends 'base.html' %} {% block title %} User Details {% endblock %} {% block
 body %}
 
-<h1>User Data</h1>
+<h1>User Profile</h1>
 
-First Name: {{user.first_name}} Last Name: {{user.last_name}} Bio: {{user.bio}}
-Location: {{user.location}} {% endblock %}
+<div id="show-profile">
+    <div class="row">
+        <div class="col-3">
+            <img
+                src="{{user.image_url}}"
+                class="img-fluid"
+                alt="{{user.first_name}} image"
+            />
+        </div>
+        <div class="col-9">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <div class="row">
+                        <div class="col-3">First Name</div>
+                        <div class="col-9">{{user.first_name}}</div>
+                    </div>
+                </li>
+                <li class="list-group-item">
+                    <div class="row">
+                        <div class="col-3">Last Name</div>
+                        <div class="col-9">{{user.last_name}}</div>
+                    </div>
+                </li>
+                <li class="list-group-item">
+                    <div class="row">
+                        <div class="col-3">E-mail</div>
+                        <div class="col-9">{{user.email}}</div>
+                    </div>
+                </li>
+                <li class="list-group-item">
+                    <div class="row">
+                        <div class="col-3">Image URL addess</div>
+                        <div class="col-9">{{user.image_url}}</div>
+                    </div>
+                </li>
+                <li class="list-group-item">
+                    <div class="row">
+                        <div class="col-3">Location</div>
+                        <div class="col-9">{{user.location}}</div>
+                    </div>
+                </li>
+                <li class="list-group-item">
+                    <div class="row">
+                        <div class="col-3">Biography</div>
+                        <div class="col-9">{{user.bio}}</div>
+                    </div>
+                </li>
+            </ul>
+            <div class="row">
+                <div class="col">
+                    <button id="edit-user-btn" class="btn btn-secondary w-100">
+                        Edit User Info
+                    </button>
+                </div>
+                <div class="col">
+                    <button
+                        id="update-password-btn"
+                        class="btn btn-danger w-100"
+                    >
+                        Update Password
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<form action="{{url_for('user_view')}}" method="post">
+    {{ form.hidden_tag() }}
+    <div id="edit-form" hidden>
+        {% for field in form if field.widget.input_type != 'hidden' and
+        field.name not in ["password", "new_password"]%}
+        <div class="mb-3">
+            <div class="input-group">
+                <span>{{field.label(class="input-group-text")}}</span>
+                {{field(class="form-control")}}
+            </div>
+            {% for error in field.errors %}
+            <span class="form-text text-danger" data-error>{{error}}</span>
+            {% endfor %}
+        </div>
+        {%endfor%}
+        <button
+            type="submit"
+            name="button"
+            value="save"
+            class="btn btn-primary w-100"
+        >
+            Save
+        </button>
+    </div>
+    <div id="password-change" hidden>
+        {% for field in form if field.widget.input_type != 'hidden' and
+        field.name in ["password", "new_password"]%}
+        <div class="mb-3">
+            <div class="input-group">
+                <span>{{field.label(class="input-group-text")}}</span>
+                {{field(class="form-control")}}
+            </div>
+            {% for error in field.errors %}
+            <span class="form-text text-danger" data-error-password
+                >{{error}}</span
+            >
+            {% endfor %}
+        </div>
+        {%endfor%}
+        <div class="row justify-content-md-center">
+            <div class="col-4">
+                <i
+                    class="fa-solid fa-circle-check text-secondary"
+                    id="validate-digits"
+                ></i>
+                Minimum 6 Character<br />
+                <i
+                    class="fa-solid fa-circle-check text-secondary"
+                    id="validate-uppercase"
+                ></i>
+                Uppercase<br />
+                <i
+                    class="fa-solid fa-circle-check text-secondary"
+                    id="validate-lowercase"
+                ></i>
+                Lowercase<br />
+                <i
+                    class="fa-solid fa-circle-check text-secondary"
+                    id="validate-numeric"
+                ></i>
+                Numeric Character<br />
+            </div>
+        </div>
+        <button
+            type="submit"
+            name="button"
+            value="change_password"
+            class="btn btn-primary w-100 mt-3"
+        >
+            Change Password
+        </button>
+    </div>
+</form>
+
+<script src="static/user.js"></script>
+{% endblock %}

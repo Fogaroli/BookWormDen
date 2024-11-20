@@ -201,24 +201,26 @@ def logout_view():
     return redirect(url_for("homepage"))
 
 
-@app.route("/user", methods=["GET"])
+@app.route("/user", methods=["GET", "POST"])
 @login_required
 def user_view():
     """View function to open user info and edit page"""
     edit_form = UserEditForm(obj=g.user)
-    if edit_form.validate_on_submit():
-        button = request.edit_form.get("button")
+    if request.method == "POST" and edit_form.validate_on_submit():
+        button = request.form.get("button")
         if button == "save":
             updated = g.user.update_info(edit_form.data)
             if updated:
                 flash("User profile updated", "success")
+                return redirect(url_for("user_view"))
             else:
                 flash("Error updating profile, please try again", "danger")
         if button == "change_password":
-            if g.user.validate_user(edit_form.new_password.data):
+            if g.user.validate_user(edit_form.password.data):
                 password_updated = g.user.update_password(edit_form.new_password.data)
                 if password_updated:
                     flash("Password updated", "success")
+                    return redirect(url_for("user_view"))
                 else:
                     flash(
                         "Error changing password, please use old password and try again",
