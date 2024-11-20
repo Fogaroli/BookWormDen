@@ -141,7 +141,7 @@ class UserBook(db.Model):
     finish_date = db.Column(db.Date)
     current_page = db.Column(db.Integer)
     status = db.Column(
-        db.Integer
+        db.Integer, default=0
     )  # Status should indicate 0-backlog, 1-reading, 2-postponed, 3-completed
 
     # user -> User connected to a readlog

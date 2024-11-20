@@ -97,10 +97,10 @@ class ReadStatisticsForm(FlaskForm):
     status = SelectField(
         "Current Status",
         choices=[
-            (0, "In the list"),
+            (0, "In the backlog"),
             (1, "Reading"),
-            (2, "Taking a pause"),
-            (3, "Done"),
+            (2, "Postponed"),
+            (3, "Completed"),
         ],
         coerce=int,
         validators=[Optional()],

@@ -1,8 +1,36 @@
 {% extends 'base.html' %} {% block title %} The Book Worm Den {% endblock %} {%
 block body %}
 
-<h1>Welcome to the Book Worm Den </h1>
-<p>This portal is dedicated to book passionate people that want to connect to other book lovers</p>
-<p>Use this platform to search for nw books, create and participate on reading clubs, monitor your progress and create you book reading list</p>
+<div class="container m-5">
+    <div class="p-3 mb-3 bg-body-tertiary rounded-3">
+        <div class="container-fluid">
+            <div class="col-12 h1 text-center">
+                <strong>Welcome to the Bookworm Den</strong>
+            </div>
+        </div>
+        <div class="row justify-content-center text-center">
+            <div class="col-8 h4 m-3">
+                Where book passionate people get together
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container text-center">
+    This portal was designed as an educational project to allow people to search
+    for book and record their reading adventures, also allowing friends and
+    family to get together and share their passion for books by creating reading
+    clubs.
+</div>
+
+<hr />
+<div class="container text-center">
+    Create your account today and start recording your adventure.
+    <a
+        href="{{url_for('registration_view')}}"
+        class="btn btn-secondary w-100 m-5"
+        >Sign-up</a
+    >
+</div>
 
 {% endblock %}

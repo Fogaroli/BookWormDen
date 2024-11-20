@@ -16,10 +16,20 @@ block body %}
         /></a>
         <div class="card-body">
             <p class="card-text">
-                Started reading date: {{log.start_date}} <br />
-                Stopped reading date:{{log.finish_date}} <br />
-                Current page reading: {{log.current_page}}<br />
-                Status: {{log.status}}
+                Started: {{ log.start_date if log.start_date != None else ""
+                }}<br />
+                Stopped: {{log.finish_date if log.finish_date != None else "" }}
+                <br />
+                Current page: {{log.current_page if log.current_page != None
+                else "" }}<br />
+                Status: {%if log.status == 0%}
+                <i class="fa-solid fa-table-list"></i> In the backlog {%elif
+                log.status == 1%}
+                <i class="fa-solid fa-book-open-reader"></i> Reading it {%elif
+                log.status == 2%} <i class="fa-solid fa-clock"></i> Postponed
+                {%else%}
+                <i class="fa-solid fa-square-check text-success"></i> Completed
+                {%endif%}
             </p>
         </div>
     </div>

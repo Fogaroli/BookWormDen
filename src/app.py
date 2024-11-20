@@ -260,6 +260,7 @@ User den routes
 def user_den_view():
     """View function to open user home den"""
     reading_log = g.user.readlog
+    print([log.start_date for log in reading_log])
     return render_template("den_page.html", list=reading_log)
 
 
