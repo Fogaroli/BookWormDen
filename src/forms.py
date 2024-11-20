@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
-from models import db, Club
+from sqlalchemy import URL
+from models import db, Club, User
 from wtforms import (
     StringField,
     PasswordField,
@@ -14,8 +15,10 @@ from wtforms.validators import (
     Length,
     Email,
     Optional,
-    NumberRange,
     ValidationError,
+    URL,
+    Regexp,
+    NumberRange,
 )
 
 
@@ -26,11 +29,52 @@ class UserAddForm(FlaskForm):
     last_name = StringField("Last name", validators=[DataRequired(), Length(max=50)])
     email = StringField("E-mail", validators=[DataRequired(), Email()])
     username = StringField("Username", validators=[DataRequired()])
-    password = PasswordField("Password", validators=[Length(min=6)])
+    password = PasswordField(
+        "Password",
+        validators=[
+            DataRequired(),
+            Regexp(
+                regex="^(?=.{6,})(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s).*$",
+                message="Password must have 6 characters minimum, UPPERCASE, lowercase and numeric character",
+            ),
+        ],
+    )
 
     def validate_username(form, field):
         if " " in field.data or "-" in field.data:
             raise ValidationError("Username must not contain spaces or dashes.")
+
+    def validate_email(form, field):
+        database_list = db.session.query(User.email).all()
+        if field.data in [email[0] for email in database_list]:
+            raise ValidationError("This E-mail is already in the database")
+
+
+class UserEditForm(FlaskForm):
+    """Form for user information editing."""
+
+    first_name = StringField("First name", validators=[DataRequired(), Length(max=50)])
+    last_name = StringField("Last name", validators=[DataRequired(), Length(max=50)])
+    email = StringField("E-mail", validators=[DataRequired(), Email()])
+    image_url = StringField("Portrait (Avatar) URL", validators=[Optional(), URL()])
+    bio = TextAreaField("A bit about yorself", validators=[Optional()])
+    location = StringField("City, Country", validators=[Optional()])
+    password = PasswordField("Old Password", validators=[Optional()])
+    new_password = PasswordField(
+        "New Password",
+        validators=[
+            Optional(),
+            Regexp(
+                regex="^(?=.{6,})(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s).*$",
+                message="Password must have 6 characters minimum, UPPERCASE, lowercase and numeric character",
+            ),
+        ],
+    )
+
+    def validate_email(form, field):
+        database_list = db.session.query(User.email).all()
+        if field.data in database_list:
+            raise ValidationError("This E-mail is already in the database")
 
 
 class LoginForm(FlaskForm):
@@ -53,10 +97,10 @@ class ReadStatisticsForm(FlaskForm):
     status = SelectField(
         "Current Status",
         choices=[
-            (0, "In the list"),
+            (0, "In the backlog"),
             (1, "Reading"),
-            (2, "Taking a pause"),
-            (3, "Done"),
+            (2, "Postponed"),
+            (3, "Completed"),
         ],
         coerce=int,
         validators=[Optional()],

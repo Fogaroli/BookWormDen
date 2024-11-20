@@ -25,26 +25,29 @@ This document describes the project structure and steps to be followed in order 
 1. ~~Create functionality for users to log reading status and statistics (associated database model update/creation).~~
 1. ~~Create model for book clubs.~~
 1. ~~Create functionality to create book clubs (Create clubs, add users)~~
-1. Add functionality to add books to the club reading list.
+1. ~~Add functionality to add books to the club reading list.~~
 1. ~~Create book feedback/comments functionality (differentiate private and public comments, update search engine logic to include locally stored feedback).~~
- 1. ~~Users feedback could be set to private (only to themselves), Friends (Only for people that share a book club), Public (all Den's users). Anonymous users cannot see any review.~~ (Friends is not an option anymore, either public or private)
-1. Create RESTful api to handle a message board within the club.
-1. Create message board frontend.
+1. ~~Users feedback could be set to private (only to themselves), Friends (Only for people that share a book club), Public (all Den's users). Anonymous users cannot see any review.~~ (Friends is not an option anymore, either public or private)
+1. ~~Create RESTful api to handle a message board within the club.~~
+1. ~~Create message board frontend~~
 1. ~~Book view could have multiple tabs, one for public comments / reviews if available in the API, one for "Den" reviews, other the user to record information about the reading status, and one for the users review. (the data for each tab is build within other tasks below)~~
+
 
 Features to be added.
 
+- Improve apparence in the entire site
 - Add passsword reset.
 - ~~Migrate Unittest to use Pytest~~
-- Add Google user Signin option
+- Add Google user Signin option (Might not be a good idea anymore)
 - Add dropdown for books already in the database during book search
 - Add option for advanced search, MVP only book title search.
 - Add an option to mark a feedback abusive, ir multiple reports are received, feedback is marked as private and notification sent to the owner.
-- Migrate all url to `url_for('function_name')`
-- replace search and add book to readinglist to forms instead of button actions for security?
+- replace search and add book to reading list to forms instead of button actions for security?
 - Improve rating on book search to use half start grading
 - Order names on the club members list.
 
 TODO > To be Expanded
 
 - refactor file and function naming, too confusing
+- Add a confirm password field to the sign up form
+- Migrate all url to `url_for('function_name')`
