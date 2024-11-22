@@ -85,7 +85,7 @@ today = date.today()
 # Create books
 created_books = []
 for book in books_data:
-    new_book = Book.saveBook(book)
+    new_book = Book.save_book(book)
 
 comments_data = [
     {

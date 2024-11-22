@@ -41,10 +41,12 @@ class UserAddForm(FlaskForm):
     )
 
     def validate_username(form, field):
+        """Additional validator to check for invalid character in the username <space> and '-'"""
         if " " in field.data or "-" in field.data:
             raise ValidationError("Username must not contain spaces or dashes.")
 
     def validate_email(form, field):
+        """Additional validator to confirm the E-mail was not previously used"""
         database_list = db.session.query(User.email).all()
         if field.data in [email[0] for email in database_list]:
             raise ValidationError("This E-mail is already in the database")
@@ -72,6 +74,7 @@ class UserEditForm(FlaskForm):
     )
 
     def validate_email(form, field):
+        """Additional validator to confirm the E-mail was not previously used"""
         database_list = db.session.query(User.email).all()
         if field.data in database_list:
             raise ValidationError("This E-mail is already in the database")
@@ -133,10 +136,17 @@ class NewCommentForm(FlaskForm):
 class NewClubForm(FlaskForm):
     """Form to create a mew reading club"""
 
+    def __init__(self, current_name=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.current_name = current_name
+
     name = StringField("Reading Club Name", validators=[DataRequired(), Length(max=50)])
     description = TextAreaField("Club Description", validators=[Optional()])
 
     def validate_name(form, field):
+        """Additional validator to check for existing clubs with the same name, exception in case it is updating an existing club"""
+        if form.current_name and form.current_name == field.data:
+            return
         clubs = db.session.query(Club).all()
         club_names = [club.name for club in clubs]
         if field.data in club_names:

@@ -157,7 +157,7 @@ block body %}
                         </div>
                         <div class="col-8">
                             <a
-                                href="{{url_for('user_book_view', volume_id = book.api_id)}}"
+                                href="{{url_for('book_view', volume_id = book.api_id)}}"
                                 >{{book.title}}</a
                             >
                         </div>
@@ -170,7 +170,7 @@ block body %}
 </div>
 
 <script>
-    const club_id = {{club.id}}
+    const clubId = {{club.id}}
 </script>
 <script src="/static/user_club.js"></script>
 <script src="/static/club_forum.js"></script>

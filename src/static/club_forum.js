@@ -14,7 +14,7 @@ const $newMessageContent = $("#new-message-content");
 const $sendMessageButton = $("#send-message-btn");
 const $messageForm = $("#new-message-form");
 
-// club_id = club.id variable injected from backend
+// clubId = club.id variable injected from backend
 
 //================================================================
 //Supporting Functions
@@ -69,13 +69,13 @@ function getMessageEditMarkup(message) {
 
 // Function to process the event listener for the message action icons, delete and edit
 function processMessageIcon(event) {
-    const message_id =
+    const messageId =
         event.target.parentElement.parentElement.dataset.messageid;
     if (event.target.id === "remove-message") {
-        removeMessage(message_id);
+        removeMessage(messageId);
     }
     if (event.target.id === "edit-message") {
-        showEditMessage(message_id);
+        showEditMessage(messageId);
     }
 }
 
@@ -85,10 +85,13 @@ function processMessageIcon(event) {
 //----------------------------------------------------------------
 //Event Listeners
 
+// Event listener to monitor the button to send a new message
 $sendMessageButton.on("click", sendNewMessage);
 
+// Event listener to process user click to delete or edit a message
 $messagesUl.on("click", processMessageIcon);
 
+// Event listener to process the forum messages once the page load is complete
 $(document).ready(() => {
     loadInitialMessages();
 });
@@ -100,7 +103,7 @@ $(document).ready(() => {
 async function loadInitialMessages() {
     $forumMessageLoading.prop("hidden", false);
     $messagesUl.empty();
-    const messageList = await Message.getClubMessages(club_id, 0, 20);
+    const messageList = await Message.getClubMessages(clubId, 0, 20);
     if (messageList) {
         messageList.forEach((message) => {
             const messageContent = getMessageMarkup(message);
@@ -113,7 +116,7 @@ async function loadInitialMessages() {
 // Procedure to add a new message to the forum.
 async function sendNewMessage() {
     const messageContent = $newMessageContent.val();
-    const message = await Message.sendNewMessage(club_id, messageContent);
+    const message = await Message.sendNewMessage(clubId, messageContent);
     if (message) {
         loadInitialMessages();
         $newMessageContent.val("");
@@ -126,8 +129,8 @@ async function sendNewMessage() {
 }
 
 // Procedure to delete a message from the forum
-async function removeMessage(message_id) {
-    const deleted = await Message.sendDelete(club_id, message_id);
+async function removeMessage(messageId) {
+    const deleted = await Message.sendDelete(clubId, messageId);
     if (deleted) {
         loadInitialMessages();
     } else {
@@ -139,8 +142,8 @@ async function removeMessage(message_id) {
 }
 
 // Procedure to open an input field to allow message editing
-function showEditMessage(message_id) {
-    const $messageDiv = $(`[data-messagecontent=${message_id}]`);
+function showEditMessage(messageId) {
+    const $messageDiv = $(`[data-messagecontent=${messageId}]`);
     const formDiv = getMessageEditMarkup($messageDiv.text().trim());
     $messageDiv.empty();
     $messageDiv.append(formDiv);
@@ -151,8 +154,8 @@ async function updateMessage(event) {
     const messageInput = event.target.parentElement.firstElementChild;
     const messageDiv = messageInput.parentElement.parentElement;
     const update = await Message.sendUpdate(
-        club_id,
-        (message_id = messageDiv.dataset.messagecontent),
+        clubId,
+        (messageId = messageDiv.dataset.messagecontent),
         (message = messageInput.value)
     );
     if (update) {

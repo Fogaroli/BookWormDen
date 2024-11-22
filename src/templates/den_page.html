@@ -3,8 +3,25 @@ block body %}
 
 <h1>Home Den</h1>
 
+<div class="container text-center">
+    <div class="row justify-content-center m-4">
+        <div class="col-6">
+            <p>
+                Welcome to your den, here you will find all the books in your
+                reading list.
+            </p>
+            {% if list|length == 0%}
+            <p>
+                No Books yet? Start adding books to your den, search for book in
+                teh search engine from the title bar and add as many as you
+                want.
+            </p>
+            {%endif%}
+        </div>
+    </div>
+</div>
+
 {% if list|length > 0%}
-<h4>Books in your list</h4>
 <div class="row">
     {%for log in list%}
     <div class="card col-4">

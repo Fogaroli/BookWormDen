@@ -82,7 +82,7 @@ block body %}
 </button>
 <div id="add-club-form" class="container" hidden>
     <p class="h4 text-center">Create a new reading club</p>
-    <form method="POST" action="{{url_for('book_clubs_view')}}">
+    <form method="POST" action="{{url_for('clubs_view')}}">
         {{ form.hidden_tag() }} {% for field in form if field.widget.input_type
         != 'hidden'%}
         <div>{{field.label(class="form-label")}}</div>
