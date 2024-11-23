@@ -1,0 +1,91 @@
+h1 {
+    color: darkblue;
+    text-align: center;
+    font-weight: bold;
+}
+
+#book-search-section {
+    position: fixed;
+    top:10%;
+    left: 10%;
+    right: 10%;
+    max-height: 80vh;
+    background-color: lightgray;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-y: auto;
+    display: none;
+    padding: 20px;
+}
+
+#book-list-loading-msg {
+    display: none;
+}
+
+#book-details-section {
+    position: fixed;
+    top:10%;
+    left: 10%;
+    right: 10%;
+    max-height: 80vh;
+    background-color: lightgray;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-y: auto;
+    display: none;
+    padding: 20px;
+}
+
+#book-details-loading-msg {
+    display: none;
+}
+
+
+.nav-link {
+    cursor: pointer;
+}
+
+.book-link {
+    cursor: pointer;
+}
+
+.book-cover-image{
+    width: 100px;
+    cursor:pointer;
+}
+
+.book-cover{
+    width: 100px;
+}
+
+#user-dropdown-list{
+    top: 35px;
+    position:absolute;
+    border: 1px solid black;
+    background-color: lightgray;
+    width: 100%;
+    max-height: 150px;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.dropdown-item{
+    padding: 5px;
+    cursor: pointer;
+}
+
+[data-delete-member-btn]{
+    cursor: pointer;
+}
+
+.action{
+    cursor: pointer;
+}
+
+.error{
+    color: red;
+}

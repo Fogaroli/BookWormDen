@@ -1,0 +1,157 @@
+{% extends 'base.html' %} {% block title %} Book Details {% endblock %} {% block
+body %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-2 img-fluid">
+            <div class="row">
+                <img src="{{book.cover}}" />
+            </div>
+        </div>
+        <div class="col-10">
+            <div class="row">
+                <div class="col-12 h4">
+                    <strong>{{book.title}}</strong>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-4">{{book.authors}}</div>
+            </div>
+            <div class="row">
+                <div class="col-4">Total {{book.page_count}} pages</div>
+            </div>
+
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <p
+                        class="nav-link active"
+                        aria-current="book description"
+                        id="book-description"
+                    >
+                        Description
+                    </p>
+                </li>
+                <li class="nav-item">
+                    <p class="nav-link" id="book-statistics">Statistics</p>
+                </li>
+                <li class="nav-item">
+                    <p
+                        class="nav-link"
+                        data-book="{{book.api_id}}"
+                        id="book-comments"
+                    >
+                        Public Comments
+                    </p>
+                </li>
+                <li class="nav-item">
+                    <p
+                        class="nav-link"
+                        data-book="{{book.api_id}}"
+                        id="book-add-comment"
+                    >
+                        Add comment
+                    </p>
+                </li>
+                <li class="nav-item">
+                    <p
+                        class="nav-link"
+                        data-book="{{book.api_id}}"
+                        id="book-clubs"
+                    >
+                        Reading Clubs
+                    </p>
+                </li>
+            </ul>
+            <div id="div-description">
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <small> {{book.description | safe}} </small>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <small>
+                            <strong> Categories : </strong> {{book.categories}}
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <div id="div-statistics" hidden>
+                <form method="POST">
+                    {{ statform.hidden_tag() }} {% for field in statform if
+                    field.widget.input_type != 'hidden'%}
+                    <div class="row">
+                        <div class="col">{{field.label}}</div>
+                        <div class="col">
+                            {{field}} {% for error in field.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {%endfor%}
+                    <div class="edit-btn-area">
+                        <button
+                            type="submit"
+                            name="submit"
+                            value="statform"
+                            class="btn btn-success w-100 mt-3"
+                        >
+                            Save
+                        </button>
+                    </div>
+                </form>
+                <form
+                    method="post"
+                    action="{{url_for('remove_book_from_user', volume_id = book.api_id)}}"
+                >
+                    <button type="submit" class="btn btn-danger w-100 mt-3">
+                        Remove book from my Den
+                    </button>
+                </form>
+            </div>
+            <div id="div-comments" hidden>
+                <ul id="ul-comments" class="list-group list-group-flush"></ul>
+            </div>
+            <div id="div-add-comment" hidden>
+                <form method="POST">
+                    {{ commentform.hidden_tag() }} {% for field in commentform
+                    if field.widget.input_type != 'hidden'%}
+                    <div class="row">
+                        <div class="col-4">{{field.label}}</div>
+                        <div class="col-8">
+                            {{field(class="m-2")}} {% for error in field.errors
+                            %}
+                            <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {%endfor%}
+                    <div class="edit-btn-area">
+                        <button
+                            type="submit"
+                            name="submit"
+                            value="commentform"
+                            class="btn btn-success w-100 mt-3"
+                        >
+                            Save
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div id="div-book-clubs" hidden>
+                <ul id="ul-clubs" class="list-group list-group-flush"></ul>
+                <select id="club-select-list" class="form-select m-4"></select>
+                <p
+                    class="btn btn-outline-secondary"
+                    id="add-reading-club"
+                    data-book="{{book.api_id}}"
+                >
+                    Add to reading Club
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/static/book.js"></script>
+{% endblock %}

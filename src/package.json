@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "axios": "^1.7.7",
+    "axios-mock-adapter": "^2.1.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "jquery": "^3.7.1"
+  },
+  "scripts": {
+    "test": "jest --config frontend_unit_test/jest.config.js frontend_unit_test/app.test.js"
+}
+}

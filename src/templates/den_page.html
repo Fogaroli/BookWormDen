@@ -1,0 +1,57 @@
+{% extends 'base.html' %} {% block title %} User Home Den {% endblock %} {%
+block body %}
+
+<h1>Home Den</h1>
+
+<div class="container text-center">
+    <div class="row justify-content-center m-4">
+        <div class="col-6">
+            <p>
+                Welcome to your den, here you will find all the books in your
+                reading list.
+            </p>
+            {% if list|length == 0%}
+            <p>
+                No Books yet? Start adding books to your den, search for book in
+                teh search engine from the title bar and add as many as you
+                want.
+            </p>
+            {%endif%}
+        </div>
+    </div>
+</div>
+
+{% if list|length > 0%}
+<div class="row">
+    {%for log in list%}
+    <div class="card col-4">
+        <a href="/den/{{log.book_id}}" class="mx-auto"
+            ><img
+                src="{{log.book.cover}}"
+                class="card-img-top book-cover img-thumbnail img-fluid mx-auto"
+                alt="{{log.book.title}} cover image"
+        /></a>
+        <div class="card-body">
+            <p class="card-text">
+                Started: {{ log.start_date if log.start_date != None else ""
+                }}<br />
+                Stopped: {{log.finish_date if log.finish_date != None else "" }}
+                <br />
+                Current page: {{log.current_page if log.current_page != None
+                else "" }}<br />
+                Status: {%if log.status == 0%}
+                <i class="fa-solid fa-table-list"></i> In the backlog {%elif
+                log.status == 1%}
+                <i class="fa-solid fa-book-open-reader"></i> Reading it {%elif
+                log.status == 2%} <i class="fa-solid fa-clock"></i> Postponed
+                {%else%}
+                <i class="fa-solid fa-square-check text-success"></i> Completed
+                {%endif%}
+            </p>
+        </div>
+    </div>
+
+    {%endfor%}
+</div>
+
+{%endif%} {% endblock %}

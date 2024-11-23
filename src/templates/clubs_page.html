@@ -1,0 +1,101 @@
+{% extends 'base.html' %} {% block title %} User Book Clubs {% endblock %} {%
+block body %}
+
+<h1>My Book Clubs</h1>
+<div class="row">
+    <div class="col-1">Owner</div>
+    <div class="col-11">
+        <div class="row">
+            {%for club in owned%}
+            <div class="card col-3">
+                <h5 class="card-header">{{club.name}}</h5>
+                <div class="card-body">
+                    <p class="card-text">{{club.description}}</p>
+                    <a href="/clubs/{{club.id}}" class="btn btn-primary"
+                        >View Club</a
+                    >
+                </div>
+            </div>
+            {%endfor%}
+        </div>
+    </div>
+</div>
+<hr />
+<div class="row">
+    <div class="col-1">Member</div>
+    <div class="col-11">
+        <div class="row">
+            {%for club in member%}
+            <div class="card col-3">
+                <h5 class="card-header">{{club.name}}</h5>
+                <div class="card-body">
+                    <p class="card-text">{{club.description}}</p>
+                    <a href="/clubs/{{club.id}}" class="btn btn-primary"
+                        >View Club</a
+                    >
+                </div>
+            </div>
+            {%endfor%}
+        </div>
+    </div>
+</div>
+<hr />
+<div class="row">
+    <div class="col-1">Pending Invites</div>
+    <div class="col-11">
+        <div class="row">
+            {%for club in invited%}
+            <div class="card col-3">
+                <h5 class="card-header">{{club.name}}</h5>
+                <div class="card-body">
+                    <p class="card-text">{{club.description}}</p>
+                    <form
+                        method="POST"
+                        action="{{url_for('process_invite_route', club_id = club.id)}}"
+                    >
+                        <button
+                            type="submit"
+                            name="invite"
+                            value="accept"
+                            class="btn btn-success"
+                        >
+                            Join
+                        </button>
+                        <button
+                            type="submit"
+                            name="invite"
+                            value="reject"
+                            class="btn btn-danger"
+                        >
+                            Reject
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {%endfor%}
+        </div>
+    </div>
+</div>
+<hr />
+<button class="btn btn-outline-secondary m-2 w-100" id="add-club-btn">
+    Add New Club
+</button>
+<div id="add-club-form" class="container" hidden>
+    <p class="h4 text-center">Create a new reading club</p>
+    <form method="POST" action="{{url_for('clubs_view')}}">
+        {{ form.hidden_tag() }} {% for field in form if field.widget.input_type
+        != 'hidden'%}
+        <div>{{field.label(class="form-label")}}</div>
+        <div>
+            {{field(class="form-control")}} {% for error in field.errors %}
+            <span class="form-text text-danger" data-error>{{error}}</span>
+            {% endfor %}
+        </div>
+        {%endfor%}
+        <div class="m-3">
+            <button type="submit" class="btn btn-success w-100">Create</button>
+        </div>
+    </form>
+</div>
+<script src="/static/clubs_page.js"></script>
+{% endblock %}
