@@ -41,10 +41,7 @@ function getMessageMarkup(message) {
 
             <div class="col-8">
                 <div class="row" data-messagecontent=${message.id}>
-                    <div class="col fw-bold">${message["message"].replace(
-                        /\n/g,
-                        "<br>"
-                    )}</div>
+                    <div class="col fw-bold" id="message-text"></div>
                 </div>
             </div>
         </div>
@@ -107,6 +104,10 @@ async function loadInitialMessages() {
     if (messageList) {
         messageList.forEach((message) => {
             const messageContent = getMessageMarkup(message);
+            messageContent
+                .find("#message-text")
+                .text(message["message"])
+                .css("white-space", "pre-wrap");
             $messagesUl.append(messageContent);
         });
         $forumMessageLoading.prop("hidden", true);
