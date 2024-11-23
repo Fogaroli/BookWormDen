@@ -1,6 +1,4 @@
-# The  BookWorm Den
-
-The Bookworm Den is an education project intended to be delivered as a capstone project for the first half of the Software Engineering Course from Springboard.
+# The  Bookworm Den
 
 The project completed the first cycle fo the course consolidating the knowledge acquired to that point.
 

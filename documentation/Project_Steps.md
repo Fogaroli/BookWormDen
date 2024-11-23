@@ -1,11 +1,11 @@
-# The BookWormDen project document
+# The BookwormDen project document
 
 This document describes the project structure and steps to be followed in order to complete the project design.
 
 ## Considerations
 
 - Detailed documentation about the project should be created along with the project.
-- Unit testing should be developed along with the features implemented, and not accumulated to the end of the project.
+- ~~Unit testing should be developed along with the features implemented, and not accumulated to the end of the project. ~~ Due to challenges to create unit testing and project time constraints, the development focussed into delivering the project MVP and documentation ready as soon as possible, and creating the unit testing in the end, intended to control any regressions during future improvements.
 - Continuous deployment should be considered if the site hosting platform allows, to streamline the steps from features implementation to production.
 - The repository should be organized in 3 basic branch category. The Main branch should store the production quality product. Only after the complete MVP is completed data should be pulled to Main. The dev branch should accumulate all new features implemented, in order to be validated before being pulled into production. Feature and bugfix branch should be derived from the dev branch and once completed and tested should be merged into dev.
 
@@ -34,19 +34,12 @@ This document describes the project structure and steps to be followed in order 
 
 Features to be added.
 
-- Improve apparence in the entire site
-- Add passsword reset.
+- Improve appearance in the entire site
+- Add password reset option using the registered E-mail for a temporary password.
 - ~~Migrate Unittest to use Pytest~~
 - Add Google user Signin option (Might not be a good idea anymore)
 - Add dropdown for books already in the database during book search
 - Add option for advanced search, MVP only book title search.
 - Add an option to mark a feedback abusive, ir multiple reports are received, feedback is marked as private and notification sent to the owner.
-- replace search and add book to reading list to forms instead of button actions for security?
 - Improve rating on book search to use half start grading
 - Order names on the club members list.
-
-TODO > To be Expanded
-
-- refactor file and function naming, too confusing
-- Add a confirm password field to the sign up form
-- Migrate all url to `url_for('function_name')`
