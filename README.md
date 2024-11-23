@@ -1,10 +1,10 @@
-# Book Wom Den
+# Bookwom Den
 
 The Book Worm Den is a web portal for book readers to meet and exchange their knowledge.
 
-The application is developed using a backend written in Python Flask, the details of hte technologies should be documented in the `docs` folder.
+The application is developed using a backend written in Python Flask and front end using vanilla javascript, the details of the technologies should be documented in the [BookwormDen_Description](./documentation/BookwormDen_Description.md).
 
-The development steps and tasks are documented in the `Project Structure`document inside the `src` folder.
+The development steps and tasks are documented in the [Project_Steps](./documentation/Project_Steps.md) document.
 
 
 
@@ -12,9 +12,9 @@ The development steps and tasks are documented in the `Project Structure`documen
 
 The BookWormDen web application is planned to be deployed to 2 different instances:
 
-A development server, running the latest code found on the dev branch. It can be accessed on the link https://dev-bookwormden.onrender.com.
+A development server, running the latest code found on the `dev` branch. It can be accessed on the link https://dev-bookwormden.onrender.com.
 
-A production server, running the latest code found on the main branch. URL TBD
+A production server, running the latest code found on the `main` branch. It can be accessed on the link https://bookwormden.onrender.com
 
 
 
@@ -40,10 +40,11 @@ The .env file should contain the variables:
 ```
 DB_URI=postgresql:///<database name>
 TEST_DB_URI=postgresql:///<test database name>
-SECRETE_KEY=<password> # To be used by flask
+SECRETE_KEY=<a passphrase of your choice> # To be used by flask
+GOOGLE_API_KEY=<key generated on google API with access to goog books> # Used to search for new books from Google Books
 ```
 
-## run
+## Run
 
 The source code for the application is found on /src. It is possible to run the web application locally by starting flask internal web app using:
 
