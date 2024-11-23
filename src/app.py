@@ -7,7 +7,7 @@ Date: September 17, 2024
 ================================================================
 """
 
-from operator import and_, methodcaller
+from operator import and_
 import os
 from flask import (
     Flask,
@@ -51,9 +51,8 @@ from sqlalchemy import func
 load_dotenv()
 
 # Import Environmental Variables
-production_db = os.environ.get(
-    "DB_URI"
-)  # If local database should have the format: "postgresql:///<dbname>"
+production_db = os.environ.get("DB_URI")
+# If local database should have the format: "postgresql:///<dbname>"
 testrun = os.environ.get("TESTRUN")  # True or False
 secret_code = os.environ.get("SECRETE_KEY")
 api_key = os.environ.get("GOOGLE_API_KEY")
@@ -113,7 +112,7 @@ def club_access_required(f):
         ]
         if club_id not in member_club_ids:
             flash("You don't have access to this club", "danger")
-            return redirect(url_for("book_clubs_view"))
+            return redirect(url_for("clubs_view"))
 
         return f(*args, **kwargs)
 
@@ -165,9 +164,9 @@ def registration_view():
     if registration_form.validate_on_submit():
         new_user = User.signup(registration_form.data)
         if new_user:
-            flash(f"Welcome {new_user.first_name} to the BookWormDen", "success")
+            flash(f"Welcome {new_user.first_name} to the BookwormDen", "success")
             login(new_user)
-            return redirect(url_for("homepage"))
+            return redirect(url_for("user_den_view"))
         else:
             flash("Error creating new user, please try again", "danger")
 
@@ -203,7 +202,7 @@ def logout_view():
 
 @app.route("/user", methods=["GET", "POST"])
 @login_required
-def user_view():
+def profile_view():
     """View function to open user info and edit page"""
     edit_form = UserEditForm(obj=g.user)
     if request.method == "POST" and edit_form.validate_on_submit():
@@ -212,21 +211,21 @@ def user_view():
             updated = g.user.update_info(edit_form.data)
             if updated:
                 flash("User profile updated", "success")
-                return redirect(url_for("user_view"))
             else:
                 flash("Error updating profile, please try again", "danger")
+            return redirect(url_for("profile_view"))
         if button == "change_password":
             if g.user.validate_user(edit_form.password.data):
                 password_updated = g.user.update_password(edit_form.new_password.data)
                 if password_updated:
                     flash("Password updated", "success")
-                    return redirect(url_for("user_view"))
                 else:
                     flash(
                         "Error changing password, please use old password and try again",
                         "danger",
                     )
-    return render_template("user_page.html", user=g.user, form=edit_form)
+                return redirect(url_for("profile_view"))
+    return render_template("profile_page.html", user=g.user, form=edit_form)
 
 
 @app.route("/user/search", methods=["GET"])
@@ -260,7 +259,6 @@ User den routes
 def user_den_view():
     """View function to open user home den"""
     reading_log = g.user.readlog
-    print([log.start_date for log in reading_log])
     return render_template("den_page.html", list=reading_log)
 
 
@@ -272,16 +270,14 @@ def add_book_to_user():
     """
     book_entry = db.session.get(Book, request.form["api_id"])
     if not book_entry:
-        book_entry = Book.saveBook(request.form)
+        book_entry = Book.save_book(request.form)
     if book_entry in g.user.books:
         flash("Book already in your reading list", "danger")
     else:
-        try:
-            g.user.books.append(book_entry)
-            db.session.commit()
+        book_added = g.user.add_to_reading_list(book_entry)
+        if book_added:
             flash("Book added to you reading list", "success")
-        except:
-            db.session.rollback()
+        else:
             flash("Error adding book to your reading list", "danger")
 
     return redirect(url_for("user_den_view"))
@@ -304,58 +300,53 @@ def remove_book_from_user(volume_id):
 
 @app.route("/den/<volume_id>", methods=["GET", "POST"])
 @login_required
-def user_book_view(volume_id):
+def book_view(volume_id):
     """View function to open book details and user information"""
-    read_log = db.get_or_404(UserBook, (g.user.id, volume_id))
-    stat_form = ReadStatisticsForm(obj=read_log)
+    readlog = db.get_or_404(UserBook, (g.user.id, volume_id))
+    stat_form = ReadStatisticsForm(obj=readlog)
     user_comment = db.session.get(Comment, (g.user.id, volume_id))
     comment_form = NewCommentForm(obj=user_comment)
 
-    if stat_form.validate_on_submit() and request.form.get("submit") == "statform":
-        try:
-            read_log.start_date = stat_form.start_date.data
-            read_log.finish_date = stat_form.finish_date.data
-            read_log.current_page = stat_form.current_page.data
-            read_log.status = stat_form.status.data
-            db.session.commit()
-        except:
-            db.session.rollback()
-            flash("Error updating reading data, please try again", "danger")
-
     if (
-        comment_form.validate_on_submit()
+        request.method == "POST"
+        and stat_form.validate_on_submit()
+        and request.form.get("submit") == "statform"
+    ):
+        updated = readlog.update_info(stat_form.data)
+        if updated:
+            flash("Information updated", "success")
+        else:
+            flash("Error updating information, please try again", "success")
+        return redirect(url_for("book_view", volume_id=volume_id))
+    if (
+        request.method == "POST"
+        and comment_form.validate_on_submit()
         and request.form.get("submit") == "commentform"
     ):
         if user_comment:
-            try:
-                user_comment.comment = comment_form.comment.data
-                user_comment.rating = comment_form.rating.data
-                user_comment.domain = comment_form.domain.data
-                user_comment.date = date.today()
-                db.session.commit()
+            updated = user_comment.update(comment_form.data)
+            if updated:
                 flash("Comment updated successfully", "success")
-            except:
-                db.session.rollback()
+            else:
                 flash("Error updating your comment", "danger")
+            return redirect(url_for("book_view", volume_id=volume_id))
         else:
-            try:
-                new_comment = Comment(
-                    user_id=g.user.id,
-                    book_id=volume_id,
-                    date=date.today(),
-                    comment=comment_form.comment.data,
-                    rating=comment_form.rating.data,
-                    domain=comment_form.domain.data,
-                )
-                db.session.add(new_comment)
-                db.session.commit()
+            new_comment_data = {
+                **comment_form.data,
+                "user_id": g.user.id,
+                "book_id": volume_id,
+                "date": date.today(),
+            }
+            new_comment = Comment.create_comment(new_comment_data)
+            if new_comment:
                 flash("Comment added successfully", "success")
-            except:
-                db.session.rollback()
+            else:
                 flash("Error adding your comment", "danger")
+            return redirect(url_for("book_view", volume_id=volume_id))
+
     book_data = db.get_or_404(Book, volume_id)
     return render_template(
-        "user_book.html",
+        "book.html",
         book=book_data,
         statform=stat_form,
         commentform=comment_form,
@@ -466,7 +457,7 @@ def add_book_club_reading_list(volume_id):
     club_name = json_data.get("club_name")
     book = db.get_or_404(Book, volume_id)
     club = db.session.query(Club).filter(Club.name == club_name).first()
-    added = club.addBookToList(book)
+    added = club.add_book_to_list(book)
     if added:
         data = {"book": book.title, "club": club.name}
         return jsonify(added=data), 200
@@ -527,12 +518,12 @@ Book clubs Views
 
 @app.route("/clubs", methods=["GET", "POST"])
 @login_required
-def book_clubs_view():
+def clubs_view():
     """View function to open user book clubs home"""
 
     club_form = NewClubForm()
-    if club_form.validate_on_submit():
-        new_club = Club.createClub(
+    if request.method == "POST" and club_form.validate_on_submit():
+        new_club = Club.create_club(
             name=club_form.name.data,
             description=club_form.description.data,
             owner_id=g.user.id,
@@ -541,6 +532,7 @@ def book_clubs_view():
             flash("Reading club added to the database", "success")
         else:
             flash("Error adding the reading club, please try again", "danger")
+        return redirect(url_for("clubs_view"))
     clubs_member = [
         membership.club for membership in g.user.membership if membership.status == 2
     ]
@@ -574,9 +566,7 @@ def club_view(club_id):
         .order_by(ClubMembers.status)
     )
 
-    return render_template(
-        "user_club.html", club=club, memberships=memberships, owner=owner
-    )
+    return render_template("club.html", club=club, memberships=memberships, owner=owner)
 
 
 @app.route("/clubs/<club_id>/edit", methods=["GET", "POST"])
@@ -584,9 +574,9 @@ def club_view(club_id):
 def edit_club_view(club_id):
     """View function to edit user book information"""
     club = db.get_or_404(Club, club_id)
-    club_form = NewClubForm(obj=club)
-    if club_form.validate_on_submit():
-        updated_club = club.updateClub(
+    club_form = NewClubForm(obj=club, current_name=club.name)
+    if request.method == "POST" and club_form.validate_on_submit():
+        updated_club = club.update(
             name=club_form.name.data,
             description=club_form.description.data,
         )
@@ -594,7 +584,8 @@ def edit_club_view(club_id):
             flash("Reading club updated", "success")
         else:
             flash("Error updating the reading club, please try again", "danger")
-    return render_template("club_edit_page.html", form=club_form, club_id=club_id)
+        return redirect(url_for("edit_club_view", club_id=club_id))
+    return render_template("edit_club_page.html", form=club_form, club_id=club_id)
 
 
 @app.route("/clubs/delete", methods=["POST"])
@@ -608,7 +599,7 @@ def delete_club_route():
         flash("Club deleted", "success")
     else:
         flash("Error deleting the reading club, please try again", "danger")
-    return redirect(url_for("book_clubs_view"))
+    return redirect(url_for("clubs_view"))
 
 
 @app.route("/clubs/<club_id>/add", methods=["POST"])
@@ -617,7 +608,9 @@ def add_user_route(club_id):
     """Route to add a member to a reading club"""
     json_data = request.get_json()
     user = db.session.query(User).filter(User.username == json_data["username"]).first()
-    new_membership = ClubMembers.enrolUser(club_id=club_id, member_id=user.id, status=3)
+    new_membership = ClubMembers.enrol_user(
+        club_id=club_id, member_id=user.id, status=3
+    )
     if new_membership:
         data = {
             "first_name": user.first_name,
@@ -649,22 +642,23 @@ def delete_user_route(club_id):
 @app.route("/clubs/<club_id>/invite", methods=["POST"])
 @login_required
 def process_invite_route(club_id):
+    """Route to process a reading club invitation, either accept or reject"""
     response = request.form.get("invite")
     membership = db.get_or_404(ClubMembers, (club_id, g.user.id))
     if response == "accept":
-        accept = membership.acceptInvite()
+        accept = membership.accept_invite()
         if accept:
             flash(f"You joined {membership.club.name}", "success")
         else:
             flash("Error processing your response, please try again", "danger")
 
     if response == "reject":
-        reject = membership.rejectInvite()
+        reject = membership.reject_invite()
         if reject:
             flash(f"You reject to join {membership.club.name}", "warning")
         else:
             flash("Error processing your response, please try again", "danger")
-    return redirect(url_for("book_clubs_view"))
+    return redirect(url_for("clubs_view"))
 
 
 """
@@ -696,7 +690,7 @@ def club_messages_route(club_id):
 def add_club_messages_route(club_id):
     """Route to add a new message to the club forum"""
     json_data = request.get_json()
-    new_message = Message.addMessage(
+    new_message = Message.add_message(
         club_id=club_id, user_id=g.user.id, message=json_data["message"]
     )
     if new_message:
@@ -713,7 +707,7 @@ def update_club_messages_route(club_id, message_id):
     message = db.get_or_404(Message, message_id)
     if message.user_id != g.user.id or message.club_id != int(club_id):
         return jsonify(json_data), 403
-    modified = message.updateMessage(json_data.get("message", message.message))
+    modified = message.update_message(json_data.get("message", message.message))
     if modified:
         return jsonify(message=modified.serialize()), 200
     return jsonify(json_data), 400

@@ -25,6 +25,7 @@ const addReadingClubButton = document.querySelector("#add-reading-club");
 //================================================================
 //Supporting Functions
 
+// Function to generate html markup for book comments
 function getCommentMarkup(comment) {
     return `
         <div class="row">
@@ -43,13 +44,15 @@ function getCommentMarkup(comment) {
       `;
 }
 
-function getClubLi(club_name) {
-    new_li = document.createElement("li");
-    new_li.classList.add("list-group-item");
-    new_li.innerText = club_name;
-    return new_li;
+// Function to create li element with rading club name
+function getClubLi(clubName) {
+    newLi = document.createElement("li");
+    newLi.classList.add("list-group-item");
+    newLi.innerText = clubName;
+    return newLi;
 }
 
+// Function to send request to the backend to add book to a new reading club
 async function addClub(club, bookId) {
     const response = await axios({
         url: `/book/${bookId}/add`,
@@ -68,20 +71,22 @@ async function addClub(club, bookId) {
 //DOM Manipulation
 
 //----------------------------------------------------------------
-//Event Listeners
+// Event Listeners
 
+// Event Listener for tab navigation
 bookDescription.addEventListener("click", showDescription);
 bookStatistics.addEventListener("click", showStatistics);
 bookComments.addEventListener("click", showComments);
 bookAddComment.addEventListener("click", showAddComment);
 bookClubs.addEventListener("click", showBookClubs);
+
+// Event Listener to add book to a reading club
 addReadingClubButton.addEventListener("click", addReadingClub);
 
 //----------------------------------------------------------------
 // DOM manipulation procedures
 
-// Procedure to show the book description on user book details page
-
+// Procedure to process opening the description tab
 function showDescription(event) {
     bookDescription.classList.add("active");
     bookStatistics.classList.remove("active");
@@ -94,6 +99,8 @@ function showDescription(event) {
     divAddComment.hidden = true;
     divBookClubs.hidden = true;
 }
+
+// Procedure to process opening the statistics tab
 function showStatistics(event) {
     bookDescription.classList.remove("active");
     bookStatistics.classList.add("active");
@@ -106,6 +113,8 @@ function showStatistics(event) {
     divAddComment.hidden = true;
     divBookClubs.hidden = true;
 }
+
+// Procedure to process opening the commments tab
 async function showComments(event) {
     bookDescription.classList.remove("active");
     bookStatistics.classList.remove("active");
@@ -121,21 +130,23 @@ async function showComments(event) {
     const commentsList = await Comment.getAllComments(bookId);
     if (!commentsList) {
         listComments.innerHTML = "";
-        new_line = document.createElement("p");
-        new_line.innerText = "No comments found in teh server.";
-        listComments.appendChild(new_line);
+        const newLine = document.createElement("p");
+        newLine.innerText = "No comments found in the server.";
+        listComments.appendChild(newLine);
     } else {
         listComments.innerHTML = "";
         commentsList.forEach((comment) => {
             const htmlComment = getCommentMarkup(comment);
             const commentEntry = document.createElement("li");
-            commentEntry.id = `(${comment.user_id},${comment.bok_id})`;
+            commentEntry.id = `(${comment.user_id},${comment.book_id})`;
             commentEntry.classList.add("list-group-item");
             commentEntry.innerHTML = htmlComment;
             listComments.appendChild(commentEntry);
         });
     }
 }
+
+// Procedure to process opening the tab to add a new comment/ update comment
 function showAddComment(event) {
     bookDescription.classList.remove("active");
     bookStatistics.classList.remove("active");
@@ -148,6 +159,8 @@ function showAddComment(event) {
     divAddComment.hidden = false;
     divBookClubs.hidden = true;
 }
+
+// Procedure to process opening the book clubs tab
 async function showBookClubs(event) {
     bookDescription.classList.remove("active");
     bookStatistics.classList.remove("active");
@@ -164,26 +177,28 @@ async function showBookClubs(event) {
     listClubs.innerHTML = "";
     clubSelectList.innerHTML = "";
     clubsMap.included.forEach((club) => {
-        const new_li = getClubLi(club.name);
-        listClubs.appendChild(new_li);
+        const newLi = getClubLi(club.name);
+        listClubs.appendChild(newLi);
     });
     clubsMap.choices.forEach((club) => {
-        new_option = document.createElement("option");
-        new_option.value = club.name;
-        new_option.innerText = club.name;
-        clubSelectList.appendChild(new_option);
+        newOption = document.createElement("option");
+        newOption.value = club.name;
+        newOption.innerText = club.name;
+        clubSelectList.appendChild(newOption);
     });
 }
 
+// Procedure to add the book to a new reading club
 async function addReadingClub(event) {
     const bookId = event.target.dataset.book;
     club = clubSelectList.value;
-    const added = await addClub(club, bookId);
-    if (added) {
-        const new_li = getClubLi(club);
-        listClubs.appendChild(new_li);
-        option = document.querySelector(`option[value="${club}"]`);
-        console.log(option);
-        option.remove();
+    if (club !== "") {
+        const added = await addClub(club, bookId);
+        if (added) {
+            const newLi = getClubLi(club);
+            listClubs.appendChild(newLi);
+            option = document.querySelector(`option[value="${club}"]`);
+            option.remove();
+        }
     }
 }

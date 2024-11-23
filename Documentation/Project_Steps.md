@@ -32,7 +32,6 @@ This document describes the project structure and steps to be followed in order 
 1. ~~Create message board frontend~~
 1. ~~Book view could have multiple tabs, one for public comments / reviews if available in the API, one for "Den" reviews, other the user to record information about the reading status, and one for the users review. (the data for each tab is build within other tasks below)~~
 
-
 Features to be added.
 
 - Improve apparence in the entire site

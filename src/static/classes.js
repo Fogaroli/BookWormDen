@@ -50,10 +50,10 @@ class Comment {
         Object.assign(this, { ...properties });
     }
 
-    static async getAllComments(volume_id) {
+    static async getAllComments(volumeId) {
         /**Class method to get all available comments for a given book */
         const response = await axios
-            .get(`/comments/${volume_id}`)
+            .get(`/comments/${volumeId}`)
             .catch((error) => {
                 return error;
             });
@@ -73,24 +73,24 @@ class Club {
         this.name = name;
     }
 
-    static async getMemberClubs(volume_id) {
+    static async getMemberClubs(volumeId) {
         /**Class method to get all reading clubs a give user is member or owner */
 
         const response = await axios
-            .get(`/book/${volume_id}/clubs`)
+            .get(`/book/${volumeId}/clubs`)
             .catch((error) => {
                 return error;
             });
         if (response instanceof Error) {
             return;
         }
-        const included_club_list = response.data.included.map((name) => {
+        const includedClubList = response.data.included.map((name) => {
             return new Club(name);
         });
-        const choices_club_list = response.data.choices.map((name) => {
+        const choicesClubList = response.data.choices.map((name) => {
             return new Club(name);
         });
-        return { included: included_club_list, choices: choices_club_list };
+        return { included: includedClubList, choices: choicesClubList };
     }
 }
 
@@ -103,10 +103,10 @@ class Message {
         Object.assign(this, { ...properties });
     }
 
-    static async getClubMessages(club_id, offset, quantity) {
+    static async getClubMessages(clubId, offset, quantity) {
         /**Class method to get club messages from the server*/
         const response = await axios
-            .get(`/clubs/${club_id}/messages`, {
+            .get(`/clubs/${clubId}/messages`, {
                 params: { start: offset, quantity: quantity },
             })
             .catch((error) => {
@@ -119,10 +119,10 @@ class Message {
         //messages format from server: {id, message, timestamp, user_first_name, user_last_name, user_username}
     }
 
-    static async sendNewMessage(club_id, message) {
+    static async sendNewMessage(clubId, message) {
         /**Class method to send a new forum message to the server */
         const response = await axios({
-            url: `/clubs/${club_id}/messages`,
+            url: `/clubs/${clubId}/messages`,
             method: "POST",
             data: { message: message },
         }).catch((error) => {
@@ -134,12 +134,12 @@ class Message {
         return new Message(message);
     }
 
-    static async sendDelete(club_id, message_id) {
+    static async sendDelete(clubId, messageId) {
         /**Class method to delete a message from the server */
         const response = await axios({
-            url: `/clubs/${club_id}/messages/${message_id}`,
+            url: `/clubs/${clubId}/messages/${messageId}`,
             method: "DELETE",
-            data: { message: message_id },
+            data: { message: messageId },
         }).catch((error) => {
             return error;
         });
@@ -149,10 +149,10 @@ class Message {
         return true;
     }
 
-    static async sendUpdate(club_id, message_id, message) {
+    static async sendUpdate(clubId, messageId, message) {
         /**Class method to update a message content from the club forum */
         const response = await axios({
-            url: `/clubs/${club_id}/messages/${message_id}`,
+            url: `/clubs/${clubId}/messages/${messageId}`,
             method: "PATCH",
             data: { message: message },
         }).catch((error) => {

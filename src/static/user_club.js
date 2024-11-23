@@ -18,11 +18,12 @@ const userDropdown = document.querySelector("#user-dropdown-list");
 const membersListDiv = document.querySelector("#members-list");
 const deleteBookButton = document.querySelectorAll("[data-delete-book-btn]");
 
-// club_id = club.id variable injected from backend
+// clubId = club.id variable injected from backend
 
 //================================================================
 //Supporting Functions
 
+// Function to request a users list to the backend matching the give string
 async function searchUser(q) {
     if (q.length > 2) {
         const response = await axios({
@@ -38,6 +39,7 @@ async function searchUser(q) {
     }
 }
 
+// Function to request the backend to send a invite to a user to join a reading club
 async function sendInvite(club, username) {
     const response = await axios({
         url: `/clubs/${club}/add`,
@@ -52,6 +54,7 @@ async function sendInvite(club, username) {
     return response.data;
 }
 
+// Function to send a request to the backend to delete a member from the reading club
 async function sendDeleteMember(club, username) {
     const response = await axios({
         url: `/clubs/${club}/delete`,
@@ -66,11 +69,12 @@ async function sendDeleteMember(club, username) {
     return true;
 }
 
-async function sendDeleteBook(book_id, club_id) {
+// Function to send a request to the backend to remove a book from the reading club
+async function sendDeleteBook(bookId, clubId) {
     const response = await axios({
-        url: `/book/${book_id}/delete`,
+        url: `/book/${bookId}/delete`,
         method: "Post",
-        data: { club_id: club_id },
+        data: { club_id: clubId },
     }).catch((error) => {
         return error;
     });
@@ -86,19 +90,28 @@ async function sendDeleteBook(book_id, club_id) {
 //----------------------------------------------------------------
 //Event Listeners
 
+// Event listener to process clicks to add a new member
 if (addMemberButton) {
     addMemberButton.addEventListener("click", showAddMember);
 }
 
+// Event listener to process clicks on the icon to delete a user
 deleteMemberButton.forEach((button) => {
     button.addEventListener("click", deleteMember);
 });
+
+// Event listener to process clicks on the icon to remove a book from the club
 deleteBookButton.forEach((button) => {
     button.addEventListener("click", deleteBook);
 });
+
+// Event listener to process request to send a join request to a member
 sendInviteButton.addEventListener("click", addMember);
+
+// Event Listener to process inputs in the add member field.
 userSearchInput.addEventListener("input", showDropdown);
 
+// Event listener to process clicks outside the user search area to hide the search dropdown
 document.addEventListener("click", (event) => {
     if (
         !userDropdown.contains(event.target) &&
@@ -117,20 +130,21 @@ function showAddMember() {
     addMemberButton.hidden = true;
 }
 
+// Procedure to show a dropdown box with users matching the input string
 async function showDropdown() {
     const q = userSearchInput.value;
     users = await searchUser(q);
     if (users) {
         userDropdown.innerHTML = "";
         users.forEach((user) => {
-            const new_entry = document.createElement("div");
-            new_entry.classList.add("dropdown-item");
-            new_entry.textContent = user;
-            new_entry.addEventListener("click", () => {
+            const newEntry = document.createElement("div");
+            newEntry.classList.add("dropdown-item");
+            newEntry.textContent = user;
+            newEntry.addEventListener("click", () => {
                 userSearchInput.value = user;
                 userDropdown.innerHTML = "";
             });
-            userDropdown.appendChild(new_entry);
+            userDropdown.appendChild(newEntry);
         });
         userDropdown.hidden = users.length ? false : true;
     } else {
@@ -139,6 +153,7 @@ async function showDropdown() {
     }
 }
 
+// Procedure to send a join invite to the selected user
 async function addMember() {
     if (
         userSearchInput.value.length > 0 &&
@@ -146,15 +161,15 @@ async function addMember() {
     ) {
         const inputParts = userSearchInput.value.split("-");
         const username = inputParts[inputParts.length - 1].trim();
-        const invite = await sendInvite(club_id, username);
+        const invite = await sendInvite(clubId, username);
         if (invite) {
             userSearchInput.innerHTML = "";
-            new_member_row = document.createElement("div");
-            new_member_row.classList.add("row");
+            newMemberRow = document.createElement("div");
+            newMemberRow.classList.add("row");
 
-            new_member = document.createElement("div");
-            new_member.classList.add("col");
-            new_member.innerHTML = `${invite.added_member.first_name} ${invite.added_member.last_name}
+            newMember = document.createElement("div");
+            newMember.classList.add("col");
+            newMember.innerHTML = `${invite.added_member.first_name} ${invite.added_member.last_name}
              <span class='badge text-bg-warning'><i class='fa-solid fa-hourglass-start'></i></span>`;
 
             excludeIcon = document.createElement("span");
@@ -162,10 +177,10 @@ async function addMember() {
             excludeIcon.innerHTML = `<i class="fa-solid fa-burst" title="Exclude" data-delete-member-btn data-username="${username}"></i>`;
             excludeIcon.addEventListener("click", deleteMember);
 
-            new_member.appendChild(excludeIcon);
-            new_member_row.appendChild(new_member);
+            newMember.appendChild(excludeIcon);
+            newMemberRow.appendChild(newMember);
 
-            membersListDiv.appendChild(new_member_row);
+            membersListDiv.appendChild(newMemberRow);
             userSearchInput.value = "";
         } else {
             userSearchInput.value = "ERROR - Try Again";
@@ -176,7 +191,7 @@ async function addMember() {
 //procedure to delete user from book club
 async function deleteMember(event) {
     const deleted = await sendDeleteMember(
-        club_id,
+        clubId,
         event.target.dataset.username
     );
     if (deleted) {
@@ -187,7 +202,7 @@ async function deleteMember(event) {
 
 //procedure to delete book from book club reading list
 async function deleteBook(event) {
-    const deleted = await sendDeleteBook(event.target.dataset.book, club_id);
+    const deleted = await sendDeleteBook(event.target.dataset.book, clubId);
     if (deleted) {
         bookDiv = event.target.closest("div").parentElement;
         bookDiv.remove();

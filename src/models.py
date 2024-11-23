@@ -38,14 +38,14 @@ class User(db.Model):
     readlog = db.relationship("UserBook", backref="user")
     comments = db.relationship("Comment", backref="user")
     membership = db.relationship("ClubMembers", backref="user")
-    clubs = db.relationship("Club", secondary="clubs_users", backref="members")
     messages = db.relationship("Message", backref="user")
 
     def validate_user(self, password):
-        """Function to validate entered password, comparing to stored hashed password"""
+        """Method to validate entered password, comparing to stored hashed password"""
         return self if bcrypt.check_password_hash(self.password, password) else False
 
     def update_info(self, data):
+        """Method to update user data"""
         self.first_name = data.get("first_name", self.first_name)
         self.last_name = data.get("last_name", self.last_name)
         self.email = data.get("email", self.email)
@@ -60,6 +60,7 @@ class User(db.Model):
             return False
 
     def update_password(self, new_password):
+        """Method to update password"""
         try:
             hashed_password = bcrypt.generate_password_hash(new_password).decode("utf8")
             self.password = hashed_password
@@ -67,6 +68,15 @@ class User(db.Model):
             return self
         except:
             db.session.rollback()
+            return False
+
+    def add_to_reading_list(self, book):
+        """Method to add a book to the user reading list"""
+        try:
+            self.books.append(book)
+            db.session.commit()
+            return self.books
+        except:
             return False
 
     @classmethod
@@ -108,13 +118,12 @@ class Book(db.Model):
     page_count = db.Column(db.Integer)
 
     userlog = db.relationship("UserBook", backref="book")
-    comments = db.relationship("Comment", backref="book")
     clubs = db.relationship("Club", secondary="clubs_books", backref="books")
 
     # users -> users through users_books
 
     @classmethod
-    def saveBook(cls, data):
+    def save_book(cls, data):
         """Class method to save a new book to the database"""
         try:
             new_book = Book(**data)
@@ -147,7 +156,21 @@ class UserBook(db.Model):
     # user -> User connected to a readlog
     # book -> Book connected to the readlog
 
+    def update_info(self, data):
+        """Method to update user reading statistics"""
+        self.start_date = data.get("start_date", self.start_date)
+        self.finish_date = data.get("finish_date", self.finish_date)
+        self.current_page = data.get("current_page", self.current_page)
+        self.status = data.get("status", self.status)
+        try:
+            db.session.commit()
+            return self
+        except:
+            db.session.rollback()
+            return False
+
     def delete(self):
+        """Method to remove book from user reading list"""
         try:
             db.session.delete(self)
             db.session.commit()
@@ -178,7 +201,21 @@ class Comment(db.Model):
     # user -> User owner of the comment
     # book -> Book connected to the comment
 
+    def update(self, data):
+        """Method to update a book comment"""
+        self.comment = data.get("comment", self.comment)
+        self.rating = data.get("rating", self.rating)
+        self.domain = data.get("domain", self.domain)
+        self.date = date.today()
+        try:
+            db.session.commit()
+            return self
+        except:
+            db.session.rollback()
+            return False
+
     def serialize(self):
+        """Method to convert the comment data into a dictionary"""
         return {
             "user_id": self.user_id,
             "book_id": self.book_id,
@@ -187,6 +224,25 @@ class Comment(db.Model):
             "rating": self.rating,
             "username": self.user.first_name,
         }
+
+    @classmethod
+    def create_comment(cls, data):
+        """Class function to create a new book comment"""
+        new_comment = Comment(
+            user_id=data["user_id"],
+            book_id=data["book_id"],
+            date=data["date"],
+            comment=data["comment"],
+            rating=data["rating"],
+            domain=data["domain"],
+        )
+        try:
+            db.session.add(new_comment)
+            db.session.commit()
+            return new_comment
+        except:
+            db.session.rollback()
+            return False
 
 
 class Club(db.Model):
@@ -205,7 +261,8 @@ class Club(db.Model):
     # members = User added to the club by clubs_users
     # books = book added to the club reading list through clubs_books
 
-    def updateClub(self, name, description):
+    def update(self, name, description):
+        """Method to udpate the reading club information"""
         try:
             self.name = name
             self.description = description
@@ -216,6 +273,7 @@ class Club(db.Model):
             return False
 
     def delete(self):
+        """Method to delete the reading club"""
         try:
             db.session.delete(self)
             db.session.commit()
@@ -224,7 +282,8 @@ class Club(db.Model):
             db.session.rollback()
             return False
 
-    def addBookToList(self, book):
+    def add_book_to_list(self, book):
+        """Method to add a book to the reading club list"""
         try:
             if book not in self.books:
                 self.books.append(book)
@@ -235,13 +294,13 @@ class Club(db.Model):
             return False
 
     @classmethod
-    def createClub(cls, name, description, owner_id):
+    def create_club(cls, name, description, owner_id):
         """Class method to create new reading club in the database"""
         try:
             new_club = Club(name=name, description=description)
             db.session.add(new_club)
             db.session.flush()
-            owner = ClubMembers.enrolUser(
+            owner = ClubMembers.enrol_user(
                 club_id=new_club.id, member_id=owner_id, status=1
             )
             if owner:
@@ -267,6 +326,7 @@ class ClubBook(db.Model):
     )
 
     def delete(self):
+        """Method to remove a book from the reading club"""
         try:
             db.session.delete(self)
             db.session.commit()
@@ -293,7 +353,8 @@ class ClubMembers(db.Model):
     # user -> User connected to membership
     # club -> Club connected to membership
 
-    def acceptInvite(self):
+    def accept_invite(self):
+        """Method to accept an invitation to join a book club"""
         try:
             if self.status != 1:
                 self.status = 2
@@ -305,7 +366,8 @@ class ClubMembers(db.Model):
         except:
             return False
 
-    def rejectInvite(self):
+    def reject_invite(self):
+        """Method to reject an invitation to join a book club"""
         try:
             if self.status != 1:
                 self.status = 4
@@ -318,6 +380,7 @@ class ClubMembers(db.Model):
             return False
 
     def delete(self):
+        """Method to delete a member of the club (also valid for pending and rejected invites"""
         try:
             db.session.delete(self)
             db.session.commit()
@@ -327,8 +390,8 @@ class ClubMembers(db.Model):
             return False
 
     @classmethod
-    def enrolUser(cls, club_id, member_id, status):
-        """Class method to register a nem member to a club"""
+    def enrol_user(cls, club_id, member_id, status):
+        """Class method to invite a nem member to a club"""
         try:
             new_membership = ClubMembers(
                 club_id=club_id, member_id=member_id, status=status
@@ -355,6 +418,7 @@ class Message(db.Model):
     # user -> User who posted the message
 
     def serialize(self):
+        """Method to convert a forum message to a dictionary"""
         return {
             "id": self.id,
             "message": self.message,
@@ -365,6 +429,7 @@ class Message(db.Model):
         }
 
     def delete(self):
+        """Method to delete a forum message"""
         try:
             db.session.delete(self)
             db.session.commit()
@@ -372,17 +437,18 @@ class Message(db.Model):
         except:
             return False
 
-    def updateMessage(self, message):
+    def update_message(self, message):
+        """Method to update a forum message"""
         try:
             self.message = message
-            # self.timestamp = datetime.now(timezone.utc) #Not sure if the timestamp should be updated when edited.
             db.session.commit()
             return self
         except:
             return False
 
     @classmethod
-    def addMessage(cls, club_id, user_id, message):
+    def add_message(cls, club_id, user_id, message):
+        """Class function to add a new message to the club forum"""
         new_message = Message(
             club_id=club_id,
             user_id=user_id,

@@ -20,13 +20,13 @@ const errorElements = document.querySelector("[data-error]");
 //----------------------------------------------------------------
 //Event Listeners
 
+// Event listener to process the click on button to show form to add members to the club
 addClubButton.addEventListener("click", showAddClub);
 
 //----------------------------------------------------------------
 // DOM manipulation procedures
 
 // Procedure to show for to add members to the reading club
-
 function showAddClub() {
     addClubForm.hidden = false;
     addClubButton.hidden = true;

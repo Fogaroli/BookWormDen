@@ -32,14 +32,18 @@ const errorPasswordElements = document.querySelector("[data-error-password]");
 //----------------------------------------------------------------
 //Event Listeners
 
+// Event listener to monitor input entries in the password field and update visual cues to meet password requirements.
 if (signupForm) {
     $("#password").on("input", updateValidators);
 }
 
+// Event listener to monitor button to edit user information
 editUserButton.addEventListener("click", showEditForm);
 
+// Event listener to monitor button to change password
 updatePasswordButton.addEventListener("click", showUpdatePasswordForm);
 
+// Event listener to monitor input entries in the password change field and update visual cues to meet password requirements.
 if (passwordChangeDiv) {
     $("#new_password").on("input", updateValidators);
 }
@@ -59,7 +63,7 @@ function showUpdatePasswordForm() {
     passwordChangeDiv.hidden = false;
 }
 
-// Procedure to toggle the password validators
+// Procedure to toggle the password validators indicators
 function updateValidators() {
     const input = $(this).val();
     if (/[A-Z]/.test(input)) {
