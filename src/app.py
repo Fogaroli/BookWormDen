@@ -225,6 +225,11 @@ def profile_view():
                         "danger",
                     )
                 return redirect(url_for("profile_view"))
+            else:
+                flash(
+                    "Error changing password, please use old password and try again",
+                    "danger",
+                )
     return render_template("profile_page.html", user=g.user, form=edit_form)
 
 
@@ -506,7 +511,7 @@ def book_comments_route(volume_id):
         .all()
     )
     if not comments:
-        return jsonify({"error": "Book not found in the database"}), 400
+        return jsonify({"error": "No comments found in the database"}), 400
 
     return jsonify(comments=[book_comment.serialize() for book_comment in comments])
 
