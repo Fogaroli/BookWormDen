@@ -38,10 +38,14 @@ if (signupForm) {
 }
 
 // Event listener to monitor button to edit user information
-editUserButton.addEventListener("click", showEditForm);
+if (editDiv) {
+    editUserButton.addEventListener("click", showEditForm);
+}
 
 // Event listener to monitor button to change password
-updatePasswordButton.addEventListener("click", showUpdatePasswordForm);
+if (passwordChangeDiv) {
+    updatePasswordButton.addEventListener("click", showUpdatePasswordForm);
+}
 
 // Event listener to monitor input entries in the password change field and update visual cues to meet password requirements.
 if (passwordChangeDiv) {
