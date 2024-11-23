@@ -1,5 +1,5 @@
 /*
-Title: The BookWormDen
+Title: The BookwormDen
 Author: Fabricio Ribeiro
 Date: October 6th, 2024
 Description: This file handles the message forum in the reading club.

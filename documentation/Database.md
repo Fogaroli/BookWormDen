@@ -1,12 +1,12 @@
 ``` Mermaid
 classDiagram
-    User "1" -- "*" UserBook : has
+    User "1" -- "*" UserBook : logs
     User "1" -- "*" Comment : makes
-    User "1" -- "*" ClubMembers : has
+    User "1" -- "*" ClubMembers : belongs to
     User "1" -- "*" Message : posts
-    Book "1" -- "*" UserBook : has
+    Book "1" -- "*" UserBook : logs
     Book "1" -- "*" Comment : has
-    Book "1" -- "*" ClubBook : has
+    Book "1" -- "*" ClubBook : listed in
     Club "1" -- "*" ClubMembers : has
     Club "1" -- "*" ClubBook : has
     Club "1" -- "*" Message : contains
@@ -23,10 +23,13 @@ classDiagram
         image_url | Text
         bio | Text
         location | String(30)
+
         Methods | Return
+        ---|---
         validate_user(password) | User/False
         update_info(data) | User/False
         update_password(new_password) | User/False
+        add_to_reading_list(book) | List/False
         $signup(data) | User/False
     }
 
@@ -41,19 +44,20 @@ classDiagram
         description | Text
         page_count | Integer
         Methods | Return
-        $saveBook(data) | Book/False
+        $save_book(data) | Book/False
     }
 
     class UserBook {
         Field | Type
         ---|---
         user_id | Integer FK
-        book_id | String FK
+        book_id | String(30) FK
         start_date | Date
         finish_date | Date
         current_page | Integer
         status | Integer
         Methods | Return
+        update_info(data) | UserBook/False
         delete() | Boolean
     }
 
@@ -61,13 +65,15 @@ classDiagram
         Field | Type
         ---|---
         user_id | Integer FK
-        book_id | String FK
+        book_id | String(30) FK
         date | Date
         comment | Text
         rating | Numeric
         domain | Integer
         Methods | Return
+        update(data) | Comment/False
         serialize() | Dict
+        $create_comment(data) | Comment/False
     }
 
     class Club {
@@ -87,7 +93,7 @@ classDiagram
         Field | Type
         ---|---
         club_id | Integer FK
-        book_id | String FK
+        book_id | String(30) FK
         Methods | Return
         delete() | Boolean
     }

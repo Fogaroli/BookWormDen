@@ -10,7 +10,7 @@ const {
     showBookDetails,
 } = require("../static/app.js");
 
-describe("BookWormDen Frontend Functions", () => {
+describe("BookwormDen Frontend Functions", () => {
     beforeEach(() => {
         const htmlTemplate = fs.readFileSync(
             path.resolve(__dirname, "../templates/base.html"),
