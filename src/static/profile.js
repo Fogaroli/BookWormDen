@@ -100,7 +100,7 @@ function updateValidators() {
     }
 }
 
-// Show user information edit form in case or form validation error
+// Show user information edit form in case of form validation error
 if (errorFormElements) {
     showEditForm();
 }
@@ -108,4 +108,15 @@ if (errorFormElements) {
 // show password change form in case of form validation error
 if (errorPasswordElements) {
     showUpdatePasswordForm();
+}
+
+//================================================================
+//Setup for unit testing
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = {
+        showEditForm,
+        showUpdatePasswordForm,
+        updateValidators,
+    };
 }

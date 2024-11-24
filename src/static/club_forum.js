@@ -174,11 +174,13 @@ async function updateMessage(event) {
 
 if (typeof module !== "undefined" && module.exports) {
     module.exports = {
-        addMarkup,
-        starRating,
-        addBookDetailsMarkup,
-        convertSearchString,
-        updateBookSearch,
-        showBookDetails,
+        getMessageMarkup,
+        getMessageEditMarkup,
+        processMessageIcon,
+        loadInitialMessages,
+        sendNewMessage,
+        removeMessage,
+        showEditMessage,
+        updateMessage,
     };
 }
