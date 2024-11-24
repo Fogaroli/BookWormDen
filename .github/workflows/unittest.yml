@@ -31,12 +31,12 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
-        python-version: "3.13"
+        python-version: "3.12"
 
     - name: Set up Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: "22"
 
@@ -78,13 +78,13 @@ jobs:
 
 
     - name: Upload pytest results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: pytest-results
         path: src/pytest-results.xml
 
     - name: Upload Jest results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: jest-results
         path: src/jest-results.json
@@ -94,13 +94,13 @@ jobs:
       run: |
         python -m pip install junitparser
         python -c "
-          import sys
-          from junitparser import JUnitXml
-          xml = JUnitXml.fromfile('src/backend_unit_test/pytest-results.xml')
-          for suite in xml:
-              for case in suite:
-                  if case.result and case.result[0].type == 'failure':
-                      print(f'::error file={case.file},line={case.line}::{case.result[0].message}')
+import sys
+from junitparser import JUnitXml
+xml = JUnitXml.fromfile('src/backend_unit_test/pytest-results.xml')
+for suite in xml:
+    for case in suite:
+        if case.result and case.result[0].type == 'failure':
+            print(f'::error file={case.file},line={case.line}::{case.result[0].message}')
           "
 
     - name: Annotate Jest results
