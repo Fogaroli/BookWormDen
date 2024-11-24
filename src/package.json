@@ -7,6 +7,7 @@
     "jquery": "^3.7.1"
   },
   "scripts": {
-    "test": "jest --config frontend_unit_test/jest.config.js frontend_unit_test/app.test.js"
+    "test": "jest --config frontend_unit_test/jest.config.js **/*.test.js",
+    "autotest": "jest --json --outputFile=jest-results.json --config frontend_unit_test/jest.config.js **/*.test.js"
 }
 }

@@ -308,6 +308,7 @@ class Club(db.Model):
                 return new_club
             else:
                 raise Exception()
+            return False
         except Exception:
             db.session.rollback()
             return False

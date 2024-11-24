@@ -35,3 +35,12 @@ function showAddClub() {
 if (errorElements) {
     showAddClub();
 }
+
+//================================================================
+//Setup for unit testing
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = {
+        showAddClub,
+    };
+}

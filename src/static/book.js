@@ -202,3 +202,20 @@ async function addReadingClub(event) {
         }
     }
 }
+
+//================================================================
+//Setup for unit testing
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = {
+        getCommentMarkup,
+        getClubLi,
+        addClub,
+        showDescription,
+        showStatistics,
+        showComments,
+        showAddComment,
+        showBookClubs,
+        addReadingClub,
+    };
+}

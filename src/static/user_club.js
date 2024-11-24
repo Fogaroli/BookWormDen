@@ -208,3 +208,20 @@ async function deleteBook(event) {
         bookDiv.remove();
     }
 }
+
+//================================================================
+//Setup for unit testing
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = {
+        searchUser,
+        sendInvite,
+        sendDeleteMember,
+        sendDeleteBook,
+        showAddMember,
+        showDropdown,
+        addMember,
+        deleteMember,
+        deleteBook,
+    };
+}
