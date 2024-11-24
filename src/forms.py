@@ -59,7 +59,7 @@ class UserEditForm(FlaskForm):
     last_name = StringField("Last name", validators=[DataRequired(), Length(max=50)])
     email = StringField("E-mail", validators=[DataRequired(), Email()])
     image_url = StringField("Portrait (Avatar) URL", validators=[Optional(), URL()])
-    bio = TextAreaField("A bit about yorself", validators=[Optional()])
+    bio = TextAreaField("A bit about yourself", validators=[Optional()])
     location = StringField("City, Country", validators=[Optional()])
     password = PasswordField("Old Password", validators=[Optional()])
     new_password = PasswordField(
@@ -94,7 +94,7 @@ class ReadStatisticsForm(FlaskForm):
         "Date I started reading the book", format="%Y-%m-%d", validators=[Optional()]
     )
     finish_date = DateField(
-        "Date I finished dreading the book", format="%Y-%m-%d", validators=[Optional()]
+        "Date I finished reading the book", format="%Y-%m-%d", validators=[Optional()]
     )
     current_page = IntegerField("Page I last read", validators=[Optional()])
     status = SelectField(

@@ -32,9 +32,10 @@ This document describes the project structure and steps to be followed in order 
 1. ~~Create message board frontend~~
 1. ~~Book view could have multiple tabs, one for public comments / reviews if available in the API, one for "Den" reviews, other the user to record information about the reading status, and one for the users review. (the data for each tab is build within other tasks below)~~
 
-Features to be added.
+## Features to be added
 
 - Improve appearance in the entire site
+- Add average rating of a book, given by den members
 - Add password reset option using the registered E-mail for a temporary password.
 - ~~Migrate Unittest to use Pytest~~
 - Add Google user Signin option (Might not be a good idea anymore)
@@ -43,3 +44,8 @@ Features to be added.
 - Add an option to mark a feedback abusive, ir multiple reports are received, feedback is marked as private and notification sent to the owner.
 - Improve rating on book search to use half start grading
 - Order names on the club members list.
+
+
+## Known Issues
+
+- If a book is added to a reading club that a user is member, from the reading club the user have access a link to the book, but the user can't open the page because the book is not found in its reading list.

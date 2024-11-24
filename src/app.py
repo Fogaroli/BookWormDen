@@ -281,7 +281,7 @@ def add_book_to_user():
     else:
         book_added = g.user.add_to_reading_list(book_entry)
         if book_added:
-            flash("Book added to you reading list", "success")
+            flash("Book added to your reading list", "success")
         else:
             flash("Error adding book to your reading list", "danger")
 
