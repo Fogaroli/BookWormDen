@@ -1,0 +1,115 @@
+name: Unit Test
+
+on:
+  pull_request:
+    branches:
+      - dev
+      - main
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpassword
+          POSTGRES_DB: bookwormden_test
+        options: >-
+          --health-cmd="pg_isready -U testuser"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+        ports:
+          - 5432:5432
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.13"
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: "22"
+
+    - name: Install backend dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r src/requirements.txt
+
+    - name: Install frontend dependencies
+      run: |
+        cd src
+        npm install
+
+    - name: Set up environment variables
+      run: |
+        echo "TEST_DB_URI=postgresql://testuser:testpassword@localhost:5432/bookwormden_test" >> $GITHUB_ENV
+        echo "FLASK_ENV=testing" >> $GITHUB_ENV
+
+    - name: Set up secrets as environment variables
+      run: |
+        echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> $GITHUB_ENV
+        echo "GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}" >> $GITHUB_ENV
+
+    - name: Wait for Postgres to be ready
+      run: |
+        until pg_isready -h localhost -p 5432 -U testuser; do
+          sleep 1
+        done
+
+    - name: Run backend tests with pytest
+      run: |
+        cd src
+        pytest --junitxml=pytest-results.xml
+
+    - name: Run frontend tests with Jest
+      run: |
+        cd src
+        npm run autotest
+
+
+    - name: Upload pytest results
+      uses: actions/upload-artifact@v3
+      with:
+        name: pytest-results
+        path: src/pytest-results.xml
+
+    - name: Upload Jest results
+      uses: actions/upload-artifact@v3
+      with:
+        name: jest-results
+        path: src/jest-results.json
+
+    - name: Annotate pytest results
+      if: failure()
+      run: |
+        python -m pip install junitparser
+        python -c "
+          import sys
+          from junitparser import JUnitXml
+          xml = JUnitXml.fromfile('src/backend_unit_test/pytest-results.xml')
+          for suite in xml:
+              for case in suite:
+                  if case.result and case.result[0].type == 'failure':
+                      print(f'::error file={case.file},line={case.line}::{case.result[0].message}')
+          "
+
+    - name: Annotate Jest results
+      if: failure()
+      run: |
+        jq -c '.testResults[] | select(.status == "failed") | .assertionResults[] | select(.status == "failed") | {file: .ancestorTitles[0], title: .title, message: .failureMessages[0]}' src/jest-results.json |
+        while read -r result; do
+          file=$(echo $result | jq -r '.file')
+          title=$(echo $result | jq -r '.title')
+          message=$(echo $result | jq -r '.message')
+          echo "::error file=$file::$title: $message"
+        done        
