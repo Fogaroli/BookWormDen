@@ -49,3 +49,4 @@ This document describes the project structure and steps to be followed in order 
 ## Known Issues
 
 - If a book is added to a reading club that a user is member, from the reading club the user have access a link to the book, but the user can't open the page because the book is not found in its reading list.
+- Rendering error when the description data (or any data) loaded from google books api comer in HTML format. The text is being transferred without at change to jinja template. Need to add it as text value instead of value on the form to add to the reading list, or replace the html special characters ("<>").

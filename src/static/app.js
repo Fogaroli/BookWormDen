@@ -262,5 +262,6 @@ if (typeof module !== "undefined" && module.exports) {
         convertSearchString,
         updateBookSearch,
         showBookDetails,
+        setBookListeners,
     };
 }

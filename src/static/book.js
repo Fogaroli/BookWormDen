@@ -44,7 +44,7 @@ function getCommentMarkup(comment) {
       `;
 }
 
-// Function to create li element with rading club name
+// Function to create li element with reading club name
 function getClubLi(clubName) {
     newLi = document.createElement("li");
     newLi.classList.add("list-group-item");
