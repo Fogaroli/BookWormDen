@@ -7,7 +7,6 @@ global.$ = $;
 global.jQuery = $;
 global.axios = axios;
 global.mockAxios = new MockAdapter(axios);
-jest.mock(`axios`);
 
 const { Book, Comment, Club, Message } = require("../static/classes.js");
 global.Book = Book;
