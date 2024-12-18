@@ -2,12 +2,12 @@
 block body %}
 
 <h1>My Book Clubs</h1>
-<div class="row">
-    <div class="col-1">Owner</div>
-    <div class="col-11">
+<div class="row container">
+    <div class="col-12">Owner</div>
+    <div class="col-12">
         <div class="row">
             {%for club in owned%}
-            <div class="card col-3">
+            <div class="card col-12 col-sm-6 col-lg-4">
                 <h5 class="card-header">{{club.name}}</h5>
                 <div class="card-body">
                     <p class="card-text">{{club.description}}</p>
@@ -21,12 +21,12 @@ block body %}
     </div>
 </div>
 <hr />
-<div class="row">
-    <div class="col-1">Member</div>
-    <div class="col-11">
+<div class="row container">
+    <div class="col-12">Member</div>
+    <div class="col-12">
         <div class="row">
             {%for club in member%}
-            <div class="card col-3">
+            <div class="card col-12 col-sm-6 col-lg-4">
                 <h5 class="card-header">{{club.name}}</h5>
                 <div class="card-body">
                     <p class="card-text">{{club.description}}</p>
@@ -40,12 +40,12 @@ block body %}
     </div>
 </div>
 <hr />
-<div class="row">
-    <div class="col-1">Pending Invites</div>
-    <div class="col-11">
+<div class="row container">
+    <div class="col-12">Pending Invites</div>
+    <div class="col-12">
         <div class="row">
             {%for club in invited%}
-            <div class="card col-3">
+            <div class="card col-12 col-sm-6 col-lg-4">
                 <h5 class="card-header">{{club.name}}</h5>
                 <div class="card-body">
                     <p class="card-text">{{club.description}}</p>

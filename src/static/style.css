@@ -7,9 +7,10 @@ h1 {
 #book-search-section {
     position: fixed;
     top:10%;
-    left: 10%;
-    right: 10%;
+    left: 5%;
+    right: 5%;
     max-height: 80vh;
+    max-width: 95%;
     background-color: lightgray;
     z-index: 10;
     display: flex;
@@ -17,7 +18,7 @@ h1 {
     align-items: center;
     overflow-y: auto;
     display: none;
-    padding: 20px;
+    padding: 12px;
 }
 
 #book-list-loading-msg {
@@ -27,9 +28,10 @@ h1 {
 #book-details-section {
     position: fixed;
     top:10%;
-    left: 10%;
-    right: 10%;
+    left: 5%;
+    right: 5%;
     max-height: 80vh;
+    max-width: 95%;
     background-color: lightgray;
     z-index: 10;
     display: flex;
@@ -37,7 +39,7 @@ h1 {
     align-items: center;
     overflow-y: auto;
     display: none;
-    padding: 20px;
+    padding: 12px;
 }
 
 #book-details-loading-msg {

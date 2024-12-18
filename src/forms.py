@@ -91,12 +91,12 @@ class ReadStatisticsForm(FlaskForm):
     """Form to record the reading statistics for a specified book"""
 
     start_date = DateField(
-        "Date I started reading the book", format="%Y-%m-%d", validators=[Optional()]
+        "Started Reading", format="%Y-%m-%d", validators=[Optional()]
     )
     finish_date = DateField(
-        "Date I finished reading the book", format="%Y-%m-%d", validators=[Optional()]
+        "Finished reading", format="%Y-%m-%d", validators=[Optional()]
     )
-    current_page = IntegerField("Page I last read", validators=[Optional()])
+    current_page = IntegerField("Current page", validators=[Optional()])
     status = SelectField(
         "Current Status",
         choices=[

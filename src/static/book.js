@@ -35,9 +35,9 @@ function getCommentMarkup(comment) {
             </p>
           </div>
           <div class="row">
-            <small class="col">by ${comment["username"]}</small>
-            <small class="col">Rating: ${comment["rating"]}</small>
-            <small class="col">posted on ${comment["date"]}</small>
+            <small class="col-12 col-lg-4">by ${comment["username"]}</small>
+            <small class="col-12 col-lg-4">Rating: ${comment["rating"]}</small>
+            <small class="col-12 col-lg-4">posted on ${comment["date"]}</small>
           </div>
         </div>
         </li>
