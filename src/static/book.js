@@ -35,16 +35,16 @@ function getCommentMarkup(comment) {
             </p>
           </div>
           <div class="row">
-            <small class="col">by ${comment["username"]}</small>
-            <small class="col">Rating: ${comment["rating"]}</small>
-            <small class="col">posted on ${comment["date"]}</small>
+            <small class="col-12 col-lg-4">by ${comment["username"]}</small>
+            <small class="col-12 col-lg-4">Rating: ${comment["rating"]}</small>
+            <small class="col-12 col-lg-4">posted on ${comment["date"]}</small>
           </div>
         </div>
         </li>
       `;
 }
 
-// Function to create li element with rading club name
+// Function to create li element with reading club name
 function getClubLi(clubName) {
     newLi = document.createElement("li");
     newLi.classList.add("list-group-item");

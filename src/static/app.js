@@ -26,21 +26,20 @@ function addMarkup(book) {
     /**Add html markup to the book entry before adding to the results page */
     const bookEntry = `
                 <div class="row">
-                    <div class="col-2 img-fluid">
+                    <div class="col-12 col-lg-2 img-fluid">
                         <img class="book-cover-image" id="${book.id}"
                             src="${book.thumbnail}"
                         />
                     </div>
-                    <div class="col-10">
+                    <div class="col-12 col-lg-10">
                         <div class="row">
                             <div class="col-12 h4">
                                 <strong class="book-link" id="${book.id}">${book.title}</strong>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-4">${book.authors}</div>
-                            <div class="col-5"></div>
-                            <div class="col-3 text-align-right">${book.publishedDate}</div>
+                            <div class="col-6">${book.authors}</div>
+                            <div class="col-6 text-align-right">${book.publishedDate}</div>
                         </div>
 
                         <div class="row">
@@ -79,7 +78,7 @@ function addBookDetailsMarkup(book) {
     /**Add html markup to the book entry before adding to the results page */
     const bookEntry = `
                 <div class="row">
-                    <div class="col-2 img-fluid">
+                    <div class="col-12 col-lg-2 img-fluid">
                         <div class="row">    
                             <img src="${book.thumbnail}"/>
                         </div>
@@ -100,23 +99,23 @@ function addBookDetailsMarkup(book) {
                             }
                         </div>
                     </div>
-                    <div class="col-10">
+                    <div class="col-12 col-lg-10">
                         <div class="row">
                             <div class="col-12 h4">
                                 <strong>${book.title}</strong>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-4">${book.authors}</div>
-                            <div class="col-2"></div>
-                            <div class="col-6 text-align-right">Published by ${
+                            <div class="col-4 col-lg-6">${book.authors}</div>
+                            <div class="col-8 col-lg-6 text-align-right">Published by ${
                                 book.publisher
                             } in ${book.publishedDate}</div>
                         </div>
                         <div class="row">
-                            <div class="col-4">${book.page_count} pages</div>
-                            <div class="col-2"></div>
-                            <div class="col-6 text-align-right">Rating ${starRating(
+                            <div class="col-4 col-lg-6">${
+                                book.page_count
+                            } pages</div>
+                            <div class="col-8 col-lg-6 text-align-right">Rating ${starRating(
                                 book.average_rating
                             )}</div>
                         </div>
@@ -262,5 +261,6 @@ if (typeof module !== "undefined" && module.exports) {
         convertSearchString,
         updateBookSearch,
         showBookDetails,
+        setBookListeners,
     };
 }
