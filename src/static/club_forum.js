@@ -23,7 +23,7 @@ const $messageForm = $("#new-message-form");
 function getMessageMarkup(message) {
     const messageEntry = `
         <div class="row" data-messageid=${message.id}>
-            <div class="col-1 d-flex justify-content-center align-items-center">
+            <div class="col-2 d-flex justify-content-center align-items-center">
             ${
                 userUsername === message["user_username"]
                     ? `<i class="fa-solid fa-burst m-1 action" id="remove-message" title="Remove message"></i>
@@ -32,18 +32,26 @@ function getMessageMarkup(message) {
             }
             </div>
 
-            <div class="col-3 text-center">
-                <p class="fw-bold">${message["user_first_name"]} ${
+            <div class="col-10">
+                <div class="row">
+                    <div class="col-12 text-center">
+                        <div class="fw-bold" id="message-text" data-messagecontent=${
+                            message.id
+                        }>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-sm-6 text-center">
+                            ${message["user_first_name"]} ${
         message["user_last_name"]
-    }</p>
-                <small>${message["timestamp"]}</small>
-            </div>
-
-            <div class="col-8">
-                <div class="row" data-messagecontent=${message.id}>
-                    <div class="col fw-bold" id="message-text"></div>
-                </div>
-            </div>
+    }
+                        </div>
+                        <div class="col-12 col-sm-6 text-center">    
+                            ${message["timestamp"]}
+                        </div>
+                    </div>
+                </div>    
+            </div
         </div>
     `;
     return $("<li>", { class: "list-group-item" }).html(messageEntry);

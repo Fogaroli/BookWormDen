@@ -2,7 +2,7 @@
 block body %}
 <div class="container mt-5">
     <div class="row">
-        <div class="col-8">
+        <div class="col-12">
             <div class="p-3 mb-3 bg-body-tertiary rounded-3">
                 <div class="container-fluid">
                     <div class="col-12 h2 text-center">
@@ -13,7 +13,12 @@ block body %}
                     <div class="col-8 h4 m-3">{{club.description}}</div>
                 </div>
             </div>
-            <hr />
+        </div>
+
+        <hr />
+    </div>
+    <div class="row">
+        <div class="container">
             <div>
                 <p class="h5 text-center">Forum</p>
             </div>
@@ -30,14 +35,18 @@ block body %}
                     >Send</span
                 >
             </div>
-            <ul class="list-group" id="club-forum"></ul>
+            <ul class="list-group mb-3" id="club-forum"></ul>
             <div id="forum-loading-msg" class="text-center" hidden>
                 <div><i class="fa-solid fa-sync fa-spin"></i></div>
             </div>
         </div>
-        <div class="col-4">
+
+        <hr />
+
+        <div class="col-12 col-sm-4">
             <div class="row">
-                <div class="col-4 text-end">Members:</div>
+                <div class="col-12 text-start">Members:</div>
+                <div class="col-2 text-end"></div>
                 <div class="col-8" id="members-list">
                     {%for membership in memberships%}
                     <div class="row">
@@ -133,38 +142,46 @@ block body %}
             </div>
             {%endif%}
             <hr />
+        </div>
+        <div class="col-12 col-sm-6">
             <div class="row">
-                <div class="col">Reading List:</div>
-            </div>
-            {%for book in club.books%}
-            <div class="row">
-                <div
-                    class="col-2 d-flex justify-content-center align-items-center"
-                >
-                    {%if owner.id == g.user.id %}
-                    <i
-                        class="fa-solid fa-burst btn"
-                        title="Exclude"
-                        data-delete-book-btn
-                        data-book="{{book.api_id}}"
-                    ></i>
-                    {%endif%}
-                </div>
-                <div class="col-10" id="reading-list">
+                <div class="col-12">Reading List:</div>
+                <div class="col-1"></div>
+                <div class="col-11">
+                    {%for book in club.books%}
                     <div class="row">
-                        <div class="col-2 m-1">
-                            <img class="img-fluid" src="{{book.cover}}" />
+                        <div
+                            class="col-1 d-flex justify-content-center align-items-center"
+                        >
+                            {%if owner.id == g.user.id %}
+                            <i
+                                class="fa-solid fa-burst btn"
+                                title="Exclude"
+                                data-delete-book-btn
+                                data-book="{{book.api_id}}"
+                            ></i>
+                            {%endif%}
                         </div>
-                        <div class="col-8">
-                            <a
-                                href="{{url_for('book_view', volume_id = book.api_id)}}"
-                                >{{book.title}}</a
-                            >
+                        <div class="col-10" id="reading-list">
+                            <div class="row">
+                                <div class="col-2 m-1 align-self-center">
+                                    <img
+                                        class="img-fluid"
+                                        src="{{book.cover}}"
+                                    />
+                                </div>
+                                <div class="col-8">
+                                    <a
+                                        href="{{url_for('book_view', volume_id = book.api_id)}}"
+                                        >{{book.title}}</a
+                                    >
+                                </div>
+                            </div>
                         </div>
                     </div>
+                    {%endfor%}
                 </div>
             </div>
-            {%endfor%}
         </div>
     </div>
 </div>

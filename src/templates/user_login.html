@@ -8,7 +8,7 @@ block body %}
     <form method="post" id="login_form">
         {{form.hidden_tag()}} {% for field in form if field.widget.input_type !=
         'hidden'%}
-        <div class="mb-3 row text-end">
+        <div class="mb-3 row text-center">
             {{field.label(class_="col-sm-4 col-form-label")}}
             <div class="col-sm-6">
                 {{field(class_="form-control")}} {%for err in field.errors%}
