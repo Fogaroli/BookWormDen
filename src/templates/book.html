@@ -102,7 +102,7 @@ body %}
                 </form>
                 <form
                     method="post"
-                    action="{{url_for('remove_book_from_user', volume_id = book.api_id)}}"
+                    action="{{url_for('den_route.remove_book_from_user', volume_id = book.api_id)}}"
                 >
                     <button type="submit" class="btn btn-danger w-100 mt-3">
                         Remove book from my Den

@@ -106,7 +106,7 @@ class Message {
     static async getClubMessages(clubId, offset, quantity) {
         /**Class method to get club messages from the server*/
         const response = await axios
-            .get(`/clubs/${clubId}/messages`, {
+            .get(`/forum/${clubId}/messages`, {
                 params: { start: offset, quantity: quantity },
             })
             .catch((error) => {
@@ -122,7 +122,7 @@ class Message {
     static async sendNewMessage(clubId, message) {
         /**Class method to send a new forum message to the server */
         const response = await axios({
-            url: `/clubs/${clubId}/messages`,
+            url: `/forum/${clubId}/messages`,
             method: "POST",
             data: { message: message },
         }).catch((error) => {
@@ -137,7 +137,7 @@ class Message {
     static async sendDelete(clubId, messageId) {
         /**Class method to delete a message from the server */
         const response = await axios({
-            url: `/clubs/${clubId}/messages/${messageId}`,
+            url: `/forum/${clubId}/messages/${messageId}`,
             method: "DELETE",
             data: { message: messageId },
         }).catch((error) => {
@@ -152,7 +152,7 @@ class Message {
     static async sendUpdate(clubId, messageId, message) {
         /**Class method to update a message content from the club forum */
         const response = await axios({
-            url: `/clubs/${clubId}/messages/${messageId}`,
+            url: `/forum/${clubId}/messages/${messageId}`,
             method: "PATCH",
             data: { message: message },
         }).catch((error) => {
