@@ -240,14 +240,14 @@ def test_club_messages(client, test_user, models):
 
     # Test posting message
     response = client.post(
-        f"/clubs/{club.id}/messages",
+        f"/forum/{club.id}/messages",
         json={"message": "Test message"},
         content_type="application/json",
     )
     assert response.status_code == 200
 
     # Test getting messages
-    response = client.get(f"/clubs/{club.id}/messages")
+    response = client.get(f"/forum/{club.id}/messages")
     assert response.status_code == 200
     messages = response.json.get("messages")
     assert len(messages) == 1
@@ -256,7 +256,7 @@ def test_club_messages(client, test_user, models):
     # Test updating message
     message_id = messages[0]["id"]
     response = client.patch(
-        f"/clubs/{club.id}/messages/{message_id}",
+        f"/forum/{club.id}/messages/{message_id}",
         json={"message": "Updated message"},
         content_type="application/json",
     )
@@ -265,7 +265,7 @@ def test_club_messages(client, test_user, models):
 
     # Test deleting message
     response = client.delete(
-        f"/clubs/{club.id}/messages/{message_id}",
+        f"/forum/{club.id}/messages/{message_id}",
         json={},
         content_type="application/json",
     )

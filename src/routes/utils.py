@@ -12,7 +12,7 @@ def login_required(f):
     def decorated_function(*args, **kwargs):
         if "CURRENT_USER" not in session:
             flash("Please login first", "danger")
-            return redirect(url_for("user_route.login_view", next=request.url))
+            return redirect(url_for("auth_route.login_view", next=request.url))
         return f(*args, **kwargs)
 
     return decorated_function
