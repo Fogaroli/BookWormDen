@@ -31,13 +31,12 @@ This document describes the project structure and steps to be followed in order 
 1. ~~Create RESTful api to handle a message board within the club.~~
 1. ~~Create message board frontend~~
 1. ~~Book view could have multiple tabs, one for public comments / reviews if available in the API, one for "Den" reviews, other the user to record information about the reading status, and one for the users review. (the data for each tab is build within other tasks below)~~
+1. ~~Migrate Unittest to use Pytest~~
 
 ## Features to be added
 
-- Improve appearance in the entire site
-- Add average rating of a book, given by den members
+- Add average rating of a book, given by Den members
 - Add password reset option using the registered E-mail for a temporary password.
-- ~~Migrate Unittest to use Pytest~~
 - Add Google user Signin option (Might not be a good idea anymore)
 - Add dropdown for books already in the database during book search
 - Add option for advanced search, MVP only book title search.
@@ -48,5 +47,5 @@ This document describes the project structure and steps to be followed in order 
 
 ## Known Issues
 
-- If a book is added to a reading club that a user is member, from the reading club the user have access a link to the book, but the user can't open the page because the book is not found in its reading list.
+- If a book is added to a reading club that a user is member but the book is not ont he users'reading list, from the reading club the user have access to a link to the book, but the user can't open the page because the book is not found in its reading list.
 - Rendering error when the description data (or any data) loaded from google books api comer in HTML format. The text is being transferred without at change to jinja template. Need to add it as text value instead of value on the form to add to the reading list, or replace the html special characters ("<>").

@@ -165,6 +165,97 @@
 
             {% endif %} {% endwith %} {% block body %}{% endblock %}
         </div>
+
+        <template id="book-search-result-template">
+            <li class="list-group-item">
+                <div class="row">
+                    <div class="col-12 col-lg-2 img-fluid">
+                        <img class="book-cover-image" src="" />
+                    </div>
+                    <div class="col-12 col-lg-10">
+                        <div class="row">
+                            <div class="col-12 h4">
+                                <strong class="book-link"></strong>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 book-authors"></div>
+                            <div
+                                class="col-6 text-align-right book-published-date"
+                            ></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <small class="book-description"></small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </template>
+
+        <template id="book-details-template">
+            <li class="list-group-item">
+                <div class="row">
+                    <div class="col-12 col-lg-2 img-fluid">
+                        <div class="row">
+                            <img class="book-thumbnail" src="" />
+                        </div>
+                        <div class="row">
+                            <form
+                                action="/den/add-book"
+                                method="POST"
+                                class="add-book-form"
+                            >
+                                <input name="api_id" hidden />
+                                <input name="title" hidden />
+                                <input name="cover" hidden />
+                                <input name="authors" hidden />
+                                <input name="categories" hidden />
+                                <input name="description" hidden />
+                                <input name="page_count" hidden />
+                                <button type="submit" class="btn btn-light m-2">
+                                    Add to my reading list
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-10">
+                        <div class="row">
+                            <div class="col-12 h4">
+                                <strong class="book-title"></strong>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4 col-lg-6 book-authors"></div>
+                            <div
+                                class="col-8 col-lg-6 text-align-right book-publisher"
+                            ></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4 col-lg-6 book-page-count"></div>
+                            <div
+                                class="col-8 col-lg-6 text-align-right book-rating"
+                            ></div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <small class="book-description"></small>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <small>
+                                    <strong> Categories : </strong>
+                                    <span class="book-categories"></span>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </template>
+
         <script src="/static/classes.js"></script>
         <script src="/static/app.js"></script>
     </body>

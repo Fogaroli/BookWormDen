@@ -23,37 +23,20 @@ const userIsLogged = $("#user-page-link").length ? true : false;
 
 //function to create book search result markup
 function addMarkup(book) {
-    /**Add html markup to the book entry before adding to the results page */
-    const bookEntry = `
-                <div class="row">
-                    <div class="col-12 col-lg-2 img-fluid">
-                        <img class="book-cover-image" id="${book.id}"
-                            src="${book.thumbnail}"
-                        />
-                    </div>
-                    <div class="col-12 col-lg-10">
-                        <div class="row">
-                            <div class="col-12 h4">
-                                <strong class="book-link" id="${book.id}">${book.title}</strong>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-6">${book.authors}</div>
-                            <div class="col-6 text-align-right">${book.publishedDate}</div>
-                        </div>
+    const template = document
+        .getElementById("book-search-result-template")
+        .content.cloneNode(true);
 
-                        <div class="row">
-                            <div class="col-12">
-                                <small>
-                                ${book.description}
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    template.querySelector(".book-cover-image").src = book.thumbnail;
+    template.querySelector(".book-cover-image").id = book.id;
+    template.querySelector(".book-link").textContent = book.title;
+    template.querySelector(".book-link").id = book.id;
+    template.querySelector(".book-authors").textContent = book.authors;
+    template.querySelector(".book-published-date").textContent =
+        book.publishedDate;
+    template.querySelector(".book-description").textContent = book.description;
 
-    `;
-    return $("<li>", { class: "list-group-item" }).html(bookEntry);
+    return template;
 }
 
 //function to create book rating with star icons
@@ -75,71 +58,39 @@ function starRating(rating) {
 
 //function to create book details markup
 function addBookDetailsMarkup(book) {
-    /**Add html markup to the book entry before adding to the results page */
-    const bookEntry = `
-                <div class="row">
-                    <div class="col-12 col-lg-2 img-fluid">
-                        <div class="row">    
-                            <img src="${book.thumbnail}"/>
-                        </div>
-                        <div class="row">
-                            ${
-                                userIsLogged
-                                    ? `<form action="/den/add-book" method="POST">
-                                <input name="api_id" value="${book.id}" hidden />
-                                <input name="title" value="${book.title}" hidden />
-                                <input name="cover" value="${book.thumbnail}" hidden />
-                                <input name="authors" value="${book.authors}" hidden />
-                                <input name="categories" value="${book.categories}" hidden />
-                                <input name="description" value="${book.description}" hidden />
-                                <input name="page_count" value="${book.page_count}" hidden />
-                                <button type="submit" class="btn btn-light m-2" >Add to my reading list</button>
-                                </form>`
-                                    : ""
-                            }
-                        </div>
-                    </div>
-                    <div class="col-12 col-lg-10">
-                        <div class="row">
-                            <div class="col-12 h4">
-                                <strong>${book.title}</strong>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-4 col-lg-6">${book.authors}</div>
-                            <div class="col-8 col-lg-6 text-align-right">Published by ${
-                                book.publisher
-                            } in ${book.publishedDate}</div>
-                        </div>
-                        <div class="row">
-                            <div class="col-4 col-lg-6">${
-                                book.page_count
-                            } pages</div>
-                            <div class="col-8 col-lg-6 text-align-right">Rating ${starRating(
-                                book.average_rating
-                            )}</div>
-                        </div>
-                        <div class="row mt-3">
-                            <div class="col-12">
-                                <small>
-                                ${book.description}
-                                </small>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12">
-                                <small>
-                                <strong> Categories : </strong> ${
-                                    book.categories
-                                }
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    const template = document
+        .getElementById("book-details-template")
+        .content.cloneNode(true);
 
-    `;
-    return $("<li>", { class: "list-group-item" }).html(bookEntry);
+    template.querySelector(".book-thumbnail").src = book.thumbnail;
+    template.querySelector(".book-title").textContent = book.title;
+    template.querySelector(".book-authors").textContent = book.authors;
+    template.querySelector(
+        ".book-publisher"
+    ).textContent = `Published by ${book.publisher} in ${book.publishedDate}`;
+    template.querySelector(
+        ".book-page-count"
+    ).textContent = `${book.page_count} pages`;
+    template.querySelector(".book-rating").innerHTML = starRating(
+        book.average_rating
+    );
+    template.querySelector(".book-description").textContent = book.description;
+    template.querySelector(".book-categories").textContent = book.categories;
+
+    const form = template.querySelector(".add-book-form");
+    form.querySelector('input[name="api_id"]').value = book.id;
+    form.querySelector('input[name="title"]').value = book.title;
+    form.querySelector('input[name="cover"]').value = book.thumbnail;
+    form.querySelector('input[name="authors"]').value = book.authors;
+    form.querySelector('input[name="categories"]').value = book.categories;
+    form.querySelector('input[name="description"]').value = book.description;
+    form.querySelector('input[name="page_count"]').value = book.page_count;
+
+    if (!userIsLogged) {
+        form.remove();
+    }
+
+    return template;
 }
 
 //function to convert search string to searchable format.

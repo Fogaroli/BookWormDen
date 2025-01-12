@@ -69,7 +69,7 @@ body %}
         </div>
     </div>
 </div>
-<form action="{{url_for('profile_view')}}" method="post">
+<form action="{{url_for('user_route.profile_view')}}" method="post">
     {{ form.hidden_tag() }}
     <div id="edit-form" hidden>
         {% for field in form if field.widget.input_type != 'hidden' and
@@ -143,5 +143,5 @@ body %}
     </div>
 </form>
 
-<script src="static/profile.js"></script>
+<script src="/static/profile.js"></script>
 {% endblock %}

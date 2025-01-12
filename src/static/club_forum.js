@@ -21,40 +21,32 @@ const $messageForm = $("#new-message-form");
 
 // Function to create a li element with a message text based on the message map provided
 function getMessageMarkup(message) {
-    const messageEntry = `
-        <div class="row" data-messageid=${message.id}>
-            <div class="col-2 d-flex justify-content-center align-items-center">
-            ${
-                userUsername === message["user_username"]
-                    ? `<i class="fa-solid fa-burst m-1 action" id="remove-message" title="Remove message"></i>
-                    <i class="m-1 fa-regular fa-pen-to-square action" id="edit-message" title="Edit Message"></i>`
-                    : ""
-            }
-            </div>
+    const template = document
+        .getElementById("message-template")
+        .content.cloneNode(true);
 
-            <div class="col-10">
-                <div class="row">
-                    <div class="col-12 text-center">
-                        <div class="fw-bold" id="message-text" data-messagecontent=${
-                            message.id
-                        }>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12 col-sm-6 text-center">
-                            ${message["user_first_name"]} ${
-        message["user_last_name"]
+    const messageRow = template.querySelector(".row");
+    messageRow.setAttribute("data-messageid", message.id);
+
+    if (userUsername === message["user_username"]) {
+        template.querySelector("#remove-message").style.display = "inline";
+        template.querySelector("#edit-message").style.display = "inline";
+    } else {
+        template.querySelector("#remove-message").style.display = "none";
+        template.querySelector("#edit-message").style.display = "none";
     }
-                        </div>
-                        <div class="col-12 col-sm-6 text-center">    
-                            ${message["timestamp"]}
-                        </div>
-                    </div>
-                </div>    
-            </div
-        </div>
-    `;
-    return $("<li>", { class: "list-group-item" }).html(messageEntry);
+
+    template.querySelector("#message-text").textContent = message.content;
+    template
+        .querySelector("#message-text")
+        .setAttribute("data-messagecontent", message.id);
+    template.querySelector(
+        "#message-user"
+    ).textContent = `${message["user_first_name"]} ${message["user_last_name"]}`;
+    template.querySelector("#message-timestamp").textContent =
+        message.timestamp;
+
+    return template;
 }
 
 // Function to create the input text area for a message edit. Event listener to handle updates
@@ -112,10 +104,9 @@ async function loadInitialMessages() {
     if (messageList) {
         messageList.forEach((message) => {
             const messageContent = getMessageMarkup(message);
-            messageContent
-                .find("#message-text")
-                .text(message["message"])
-                .css("white-space", "pre-wrap");
+            const messageText = messageContent.querySelector("#message-text");
+            messageText.textContent = message["message"];
+            messageText.style.whiteSpace = "pre-wrap";
             $messagesUl.append(messageContent);
         });
         $forumMessageLoading.prop("hidden", true);
