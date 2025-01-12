@@ -1,5 +1,6 @@
 
 from .database import db
+from .club_member import ClubMembers
 
 class Club(db.Model):
     """Reading club database model
