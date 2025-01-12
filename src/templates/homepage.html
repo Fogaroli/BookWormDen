@@ -24,13 +24,19 @@ block body %}
 </div>
 
 <hr />
+{%if not g.user%}
 <div class="container text-center">
     Create your account today and start recording your adventure.
     <a
-        href="{{url_for('registration_view')}}"
-        class="btn btn-secondary w-100 mt-5"
+        href="{{url_for('auth_route.registration_view')}}"
+        class="btn btn-primary w-100 mt-5 mb-5"
         >Sign-up</a
     >
+    Returning user, please login to your account.
+    <a
+        href="{{url_for('auth_route.login_view')}}"
+        class="btn btn-secondary w-100 mt-2"
+        >Log-In</a
+    >
 </div>
-
-{% endblock %}
+{%endif%} {% endblock %}
