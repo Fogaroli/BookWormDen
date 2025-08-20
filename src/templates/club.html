@@ -35,7 +35,9 @@ block body %}
                     >Send</span
                 >
             </div>
-            <ul class="list-group mb-3" id="club-forum"></ul>
+            <ul class="list-group mb-3" id="club-forum">
+                <!-- Forum messages goes here, template at the bottom of this file -->
+            </ul>
             <div id="forum-loading-msg" class="text-center" hidden>
                 <div><i class="fa-solid fa-sync fa-spin"></i></div>
             </div>
@@ -132,7 +134,7 @@ block body %}
             <div class="row justify-content-center">
                 <div class="col-12">
                     <a
-                        href="{{url_for('edit_club_view', club_id = club.id)}}"
+                        href="{{url_for('club_route.edit_club_view', club_id = club.id)}}"
                         class="btn btn-outline-secondary m-2 w-100"
                         id="edit-club"
                     >
@@ -172,7 +174,7 @@ block body %}
                                 </div>
                                 <div class="col-8">
                                     <a
-                                        href="{{url_for('book_view', volume_id = book.api_id)}}"
+                                        href="{{url_for('den_route.book_view', volume_id = book.api_id)}}"
                                         >{{book.title}}</a
                                     >
                                 </div>
@@ -185,6 +187,47 @@ block body %}
         </div>
     </div>
 </div>
+
+<!-- Template for messages in the club forum -->
+<template id="message-template">
+    <li class="list-group-item">
+        <div class="row" data-messageid="">
+            <div class="col-2 d-flex justify-content-center align-items-center">
+                <i
+                    class="fa-solid fa-burst m-1 action"
+                    id="remove-message"
+                    title="Remove message"
+                ></i>
+                <i
+                    class="m-1 fa-regular fa-pen-to-square action"
+                    id="edit-message"
+                    title="Edit Message"
+                ></i>
+            </div>
+            <div class="col-10">
+                <div class="row">
+                    <div class="col-12 text-center">
+                        <div
+                            class="fw-bold"
+                            id="message-text"
+                            data-messagecontent=""
+                        ></div>
+                    </div>
+                    <div class="row">
+                        <div
+                            class="col-12 col-sm-6 text-center"
+                            id="message-user"
+                        ></div>
+                        <div
+                            class="col-12 col-sm-6 text-center"
+                            id="message-timestamp"
+                        ></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </li>
+</template>
 
 <script>
     const clubId = {{club.id}}

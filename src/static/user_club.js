@@ -164,10 +164,10 @@ async function addMember() {
         const invite = await sendInvite(clubId, username);
         if (invite) {
             userSearchInput.innerHTML = "";
-            newMemberRow = document.createElement("div");
+            const newMemberRow = document.createElement("div");
             newMemberRow.classList.add("row");
 
-            newMember = document.createElement("div");
+            const newMember = document.createElement("div");
             newMember.classList.add("col");
             newMember.innerHTML = `${invite.added_member.first_name} ${invite.added_member.last_name}
              <span class='badge text-bg-warning'><i class='fa-solid fa-hourglass-start'></i></span>`;
@@ -182,8 +182,16 @@ async function addMember() {
 
             membersListDiv.appendChild(newMemberRow);
             userSearchInput.value = "";
+            if (document.querySelector("#error-message")) {
+                document.querySelector("#error-message").remove();
+            }
         } else {
-            userSearchInput.value = "ERROR - Try Again";
+            const errorMessage = document.createElement("small");
+            errorMessage.id = "error-message";
+            errorMessage.innerText =
+                "Could not find/add user, please confirm name and try again";
+            errorMessage.classList.add("text-danger");
+            userSearchInput.parentElement.appendChild(errorMessage);
         }
     }
 }

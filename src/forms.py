@@ -21,6 +21,11 @@ from wtforms.validators import (
     NumberRange,
 )
 
+def password_validator():
+    return Regexp(
+        regex=r"^(?=.{6,})(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s).*$",
+        message="Password must have 6 characters minimum, UPPERCASE, lowercase and numeric character",
+    )
 
 class UserAddForm(FlaskForm):
     """Form for user registration."""
@@ -33,10 +38,7 @@ class UserAddForm(FlaskForm):
         "Password",
         validators=[
             DataRequired(),
-            Regexp(
-                regex="^(?=.{6,})(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s).*$",
-                message="Password must have 6 characters minimum, UPPERCASE, lowercase and numeric character",
-            ),
+            password_validator()
         ],
     )
 
@@ -66,10 +68,7 @@ class UserEditForm(FlaskForm):
         "New Password",
         validators=[
             Optional(),
-            Regexp(
-                regex="^(?=.{6,})(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s).*$",
-                message="Password must have 6 characters minimum, UPPERCASE, lowercase and numeric character",
-            ),
+            password_validator()
         ],
     )
 

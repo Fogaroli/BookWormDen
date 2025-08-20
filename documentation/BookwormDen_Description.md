@@ -2,9 +2,9 @@
 
 The project completed the first cycle fo the course consolidating the knowledge acquired to that point.
 
-In the attempt to use most if not all the functionality learned, the project encapsulates multiple technologies use a mix of code format, in order to explore and practice the use of different tools, libraries and concepts.
+In the attempt to use most if not all the functionality learned, the project encapsulates multiple technologies using a mix of code format, in order to explore and practice the use of different tools, libraries and concepts.
 
-The full stack project is divided into a backend written in Python making use of the Flask framework, using Jinja html templates. The frontend is written in Vanilla javascript, using a mix of basic javascript and JQuery, along with Bootstrap css library for styling.
+The full stack project is divided into a backend written in Python making use of the Flask framework and using Jinja to render html templates. The frontend is written in Vanilla javascript, using a mix of basic javascript and JQuery, along with Bootstrap css library for styling.
 
 ## Backend
 
@@ -14,7 +14,7 @@ For the backend implementation the project focus on the usage of Flask to manage
 1. SQLAlchemy to manage the database
 1. BCrypt to manage password encryption
 1. Jinja to render html templates
-1. Pytest for unit testing
+1. PyTest for unit testing
 
 The backend files are split into a main [app.py](../src/app.py) that consolidates all http routes.
 The database model and management is all concentrated into the [models.py](../src/models.py).
@@ -26,13 +26,13 @@ To manage the data used in the project a relational database was created using P
 
 For the frontend implementation the project uses Vanilla Javascript with assistance of the libraries below:
 
-1. JQuery to DOM manipulation
-1. Boostrap for CSS styling
+1. JQuery for DOM manipulation
+1. Bootstrap for CSS styling
 1. Axios for API requests to the backend.
 1. Jest for unit testing.
-1. Fontawesome for icon images.
+1. FontAwesome for icon images.
 
-The Javascript code is split among multiple files, being rendered according to the html template loaded in the backend. It is possible to notice that some files make use of JQuery and others don't, this is a intentional difference to make sure that DOM manipulation is practices with and without the use of JQuery.
+The Javascript code is split among multiple files, being rendered according to the html template loaded by the backend. It is possible to notice that some files make use of JQuery and others don't, this is a intentional difference to make sure that DOM manipulation is practiced with and without the use of JQuery.
 
 The javascript file [classes.js](../src/static/classes.js) concentrates all classes written in javascript and it is accessed by multiple script files.
 The file [app.js](../src/static/app.js) concentrates the handling of the book search engine, present in the navigation bar.
