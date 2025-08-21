@@ -70,7 +70,7 @@ GOOGLE_API_KEY=<key generated on google API with access to goog books> # Used to
 
 On the terminal, after sourcing the python virtual environment run:
 
-`python seeserver.py`
+`python seedserver.py`
 
 ### Run
 
@@ -87,7 +87,7 @@ Run in debug mode by using
 Unit tests are written and added to the repository. 
 Backend tests can be executed entering the `src/backend_unit_test` folder and triggering the test execution:
 
-`python`
+`pytest`
 
 Frontend tests are developed in Node.js Jest, it is necessary to have node installed on the machine that will be used to run the tests.
 Navigate to the `src`folder and use:
