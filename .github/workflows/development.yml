@@ -9,7 +9,7 @@ on:
 
 jobs:
   test:
-    name: Run Frontned Tests
+    name: Run Tests
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -40,14 +40,14 @@ jobs:
         run: |
           cd src
           npm ci
-          PGPASSWORD=testpass psql -h localhost -U testuser -d testdb -f expenseer.sql
 
       - name: Run tests
         env:
-          DB_URI_TEST: ${{ env.DB_URI_TEST }}
+          TEST_DB_URI: ${{ env.DB_URI_TEST }}
           PORT: 4001
           SECRET_KEY: TestKey
         run: |
+          cd src
           npm test
 
   deploy:
