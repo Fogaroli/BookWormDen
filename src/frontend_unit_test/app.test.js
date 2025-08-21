@@ -36,7 +36,9 @@ describe("BookwormDen Frontend Functions", () => {
             publishedDate: "2022",
             description: "This is a mock description.",
         };
-        const result = addMarkup(book).prop("outerHTML");
+        const fragment = addMarkup(book);
+        const element = fragment.children[0];
+        const result = element.outerHTML;
         expect(result).toContain("Mock Book");
         expect(result).toContain("Mock Author");
         expect(result).toContain("https://example.com/cover.jpg");
@@ -65,11 +67,12 @@ describe("BookwormDen Frontend Functions", () => {
             categories: "Fiction",
         };
 
-        const markup = addBookDetailsMarkup(book);
-        expect(markup.find("img").attr("src")).toBe("test-url.jpg");
-        expect(markup.html()).toContain("Test Publisher");
-        expect(markup.html()).toContain("200 pages");
-        expect(markup.html()).toContain("Fiction");
+        const fragment = addBookDetailsMarkup(book);
+        const element = fragment.children[0];
+        expect(element.querySelector("img").src).toBe("test-url.jpg");
+        expect(element.innerHTML).toContain("Test Publisher");
+        expect(element.innerHTML).toContain("200 pages");
+        expect(element.innerHTML).toContain("Fiction");
     });
 
     test("convertSearchString handles quoted strings correctly", () => {
